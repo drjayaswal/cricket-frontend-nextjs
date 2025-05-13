@@ -1,9 +1,10 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { NAVLINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-
+import { usePathname } from "next/navigation";
 const Navbar = () => {
   return (
     <>
@@ -23,7 +24,7 @@ const Navbar = () => {
                 <Link
                   key={index}
                   href={link.href}
-                  className="text-gray-400 hover:text-white transition-colors duration-200"
+                  className={cn("text-gray-400 hover:text-white transition-colors duration-200",usePathname() == link.href && "text-purple-400")}
                 >
                   {link.title}
                 </Link>
