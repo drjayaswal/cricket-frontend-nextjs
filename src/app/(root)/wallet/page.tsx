@@ -59,10 +59,10 @@ export default function MoneyTransactionsPage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:text-white sm:size-default"
+              className="border-spacing-x-0.5 border-transparent hover:border-white text-white hover:bg-transparent p-4 sm:size-default"
             >
               <Download className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Export History</span>
+              <span className="hidden sm:inline">Export Transactions</span>
               <span className="sm:hidden">Export</span>
             </Button>
             {/* <Button className="bg-green-500 text-white hover:bg-green-600" size="sm">
@@ -81,19 +81,19 @@ export default function MoneyTransactionsPage() {
         <div className="grid gap-4 sm:gap-6 mb-6 sm:mb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="bg-gray-900 backdrop-blur-sm border-2 border-transparent hover:border-emerald-500">
             <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-              <CardTitle className="text-white">Available Balance</CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardTitle className="text-2xl text-white">Available Balance</CardTitle>
+              <CardDescription className="text-lg text-gray-400">
                 Current funds in your wallet
               </CardDescription>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center">
-                <Wallet className="h-8 w-8 mr-3 text-emerald-500" />
+                <Wallet className="h-10 w-10 mr-3 text-emerald-500" />
                 <div>
                   <div className="text-3xl font-bold text-white">
                     ₹24,568.75
                   </div>
-                  <p className="text-sm text-gray-400">
+                  <p className="mt-1 text-sm text-gray-400">
                     Last updated: 10 minutes ago
                   </p>
                 </div>
@@ -102,19 +102,19 @@ export default function MoneyTransactionsPage() {
           </Card>
           <Card className="bg-gray-900 backdrop-blur-sm border-2 border-transparent hover:border-blue-400">
             <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-              <CardTitle className="text-white">Total Deposited</CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardTitle className="text-2xl text-white">Total Deposited</CardTitle>
+              <CardDescription className="text-lg text-gray-400">
                 All-time deposits to platform
               </CardDescription>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center">
-                <ArrowDownLeft className="h-8 w-8 mr-3 text-blue-400" />
+                <ArrowDownLeft className="h-10 w-10 mr-3 text-blue-400" />
                 <div>
                   <div className="text-3xl font-bold text-white">
                     ₹45,750.00
                   </div>
-                  <p className="text-sm text-gray-400">
+                  <p className="mt-1 text-sm text-gray-400">
                     Across 12 transactions
                   </p>
                 </div>
@@ -123,19 +123,19 @@ export default function MoneyTransactionsPage() {
           </Card>
           <Card className="bg-gray-900 backdrop-blur-sm border-2 border-transparent hover:border-orange-400">
             <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-              <CardTitle className="text-white">Total Withdrawn</CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardTitle className="text-2xl text-white">Total Withdrawls</CardTitle>
+              <CardDescription className="text-lg text-gray-400">
                 All-time withdrawals from platform
               </CardDescription>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 md:p-6">
               <div className="flex items-center">
-                <ArrowUpRight className="h-8 w-8 mr-3 text-orange-400" />
+                <ArrowUpRight className="h-10 w-10 mr-3 text-orange-400" />
                 <div>
                   <div className="text-3xl font-bold text-white">
                     ₹21,181.25
                   </div>
-                  <p className="text-sm text-gray-400">Across 5 transactions</p>
+                  <p className="mt-1 text-sm text-gray-400">Across 5 transactions</p>
                 </div>
               </div>
             </CardContent>
@@ -147,9 +147,9 @@ export default function MoneyTransactionsPage() {
           <Card className="bg-gray-900 backdrop-blur-sm">
             <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
               <CardTitle className="text-4xl text-white">
-                Quick Add Money
+                Quick Add Funds
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-lg text-gray-400">
                 Add funds to your wallet
               </CardDescription>
             </CardHeader>
@@ -185,11 +185,11 @@ export default function MoneyTransactionsPage() {
 
           {/* Quick Withdraw Card */}
           <Card className="bg-gray-900 backdrop-blur-sm">
-            <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
+            <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3">
               <CardTitle className="text-4xl text-white">
-                Quick Withdraw
+                Quick Withdraw Funds
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-lg text-gray-400">
                 Withdraw funds from your wallet
               </CardDescription>
             </CardHeader>
@@ -224,38 +224,35 @@ export default function MoneyTransactionsPage() {
           </Card>
         </div>
         <Tabs defaultValue="all">
-          <TabsList className="mt-10 bg-gray-800 text-gray-400">
+          <TabsList className="mt-10 h-12 w-100 p-0 bg-gray-900 text-gray-400 rounded-full">
             <TabsTrigger
               value="all"
-              className="data-[state=active]:bg-gray-700 data-[state=active]:text-white"
+              className="data-[state=active]:bg-accent border data-[state=active]:border-accent data-[state=active]:text-white rounded-none rounded-tl-full rounded-bl-full"
             >
               All Transactions
             </TabsTrigger>
             <TabsTrigger
               value="deposits"
-              className="data-[state=active]:bg-gray-700 data-[state=active]:text-white"
+              className="data-[state=active]:bg-accent data-[state=active]:text-white rounded-none"
             >
               Deposits
             </TabsTrigger>
             <TabsTrigger
               value="withdrawals"
-              className="data-[state=active]:bg-gray-700 data-[state=active]:text-white"
+              className="data-[state=active]:bg-accent data-[state=active]:text-white rounded-none rounded-tr-full rounded-br-full"
             >
               Withdrawals
             </TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-4">
             <Card className="border-gray-900 bg-gray-900 backdrop-blur-sm">
-              <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-                <CardTitle className="text-white">
-                  All Wallet Transactions
+              <CardHeader className="px-3 pt-2 sm:px-4 sm:pt-3 md:px-6 md:pt-4">
+                <CardTitle className="text-4xl text-white">
+                  All Transactions
                 </CardTitle>
-                <CardDescription className="text-gray-400">
-                  View all your deposits and withdrawals
-                </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 md:p-6">
-                <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 lg:flex-row">
+              <CardContent className="p-6 pt-0">
+                <div className=" sm:mb-6 flex flex-col gap-3 sm:gap-4 lg:flex-row">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -342,22 +339,20 @@ export default function MoneyTransactionsPage() {
                               </div>
                             </td>
                             <td
-                              className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${
-                                transaction.type === "deposit"
-                                  ? "text-green-400"
-                                  : "text-orange-400"
-                              }`}
+                              className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${transaction.type === "deposit"
+                                ? "text-green-400"
+                                : "text-orange-400"
+                                }`}
                             >
                               {transaction.type === "deposit" ? "+" : "-"}₹
                               {transaction.amount}
                             </td>
                             <td className="whitespace-nowrap px-4 py-4 text-center text-sm">
                               <Badge
-                                className={`${
-                                  transaction.type === "deposit"
-                                    ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                                    : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                                }`}
+                                className={`${transaction.type === "deposit"
+                                  ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                                  : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
+                                  }`}
                               >
                                 <span className="flex items-center">
                                   {transaction.type === "deposit" ? (
@@ -413,30 +408,30 @@ export default function MoneyTransactionsPage() {
           </TabsContent>
           <TabsContent value="deposits" className="mt-4">
             <Card className="border-gray-700 bg-gray-800/50 backdrop-blur-sm">
-              <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-                <CardTitle className="text-white">Deposits</CardTitle>
-                <CardDescription className="text-gray-400">
-                  View all your deposits to the platform
-                </CardDescription>
+
+              <CardHeader className="px-3 pt-2 sm:px-4 sm:pt-3 md:px-6 md:pt-4">
+                <CardTitle className="text-4xl text-white">
+                  Deposits
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 md:p-6">
                 <p className="text-gray-400">
-                  Your deposit transactions will be displayed here.
+                  Your deposit transactions will be displayed here
                 </p>
               </CardContent>
             </Card>
           </TabsContent>
           <TabsContent value="withdrawals" className="mt-4">
             <Card className="border-gray-700 bg-gray-800/50 backdrop-blur-sm">
-              <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-                <CardTitle className="text-white">Withdrawals</CardTitle>
-                <CardDescription className="text-gray-400">
-                  View all your withdrawals from the platform
-                </CardDescription>
+
+              <CardHeader className="px-3 pt-2 sm:px-4 sm:pt-3 md:px-6 md:pt-4">
+                <CardTitle className="text-4xl text-white">
+                  Withdrawls
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 md:p-6">
-                <p className="text-gray-400">
-                  Your withdrawal transactions will be displayed here.
+                <p className="text-lg text-gray-400">
+                  Your withdrawal transactions will be displayed here
                 </p>
               </CardContent>
             </Card>

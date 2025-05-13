@@ -35,31 +35,31 @@ export function CricketStockChart() {
     const playerStocks: PlayerStock[] = [
       {
         name: "V. Kohli",
-        color: "rgba(147, 51, 234, 0.8)",
+        color: "red",
         data: generateStockData(10, 0.10),
         currentValue: 0,
         trend: "down",
       },
       {
         name: "R. Sharma",
-        color: "rgba(79, 70, 229, 0.8)",
+        color: "green",
         data: generateStockData(30, 0.04),
+        currentValue: 0,
+        trend: "stable",
+      },
+      {
+        name: "R. Jadeja",
+        color: "yellow",
+        data: generateStockData(25, 0.02),
         currentValue: 0,
         trend: "down",
       },
       {
-        name: "J. Bumrah",
-        color: "rgba(59, 130, 246, 0.8)",
-        data: generateStockData(50, 0.06),
+        name: "S. Gill",
+        color: "cyan",
+        data: generateStockData(15, 0.04),
         currentValue: 0,
-        trend: "up",
-      },
-      {
-        name: "R. Jadeja",
-        color: "rgba(16, 185, 129, 0.8)",
-        data: generateStockData(25, 0.02),
-        currentValue: 0,
-        trend: "up",
+        trend: "down",
       },
     ]
 
