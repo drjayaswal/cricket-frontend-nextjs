@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "crickstock",
+  title: "CricStock11",
   description: "Developed by Coadal with love",
 };
 

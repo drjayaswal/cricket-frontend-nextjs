@@ -34,7 +34,7 @@ export default function Portfolio() {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           <Card className="border-transparent">
-            <CardContent className="p-6 border-2 border-transparent hover:border-purple-500 rounded-2xl bg-background/80">
+            <CardContent className="p-6 bg-gray-900 border-2 border-transparent hover:border-purple-500 rounded-2xl">
               <div className="flex justify-around items-start">
                 <div>
                   <p className="text-gray-400 text-md">Total Value</p>
@@ -52,7 +52,7 @@ export default function Portfolio() {
           </Card>
 
           <Card className="border-transparent">
-            <CardContent className="p-6 border-2 border-transparent hover:border-cyan-500 rounded-2xl bg-background/80">
+            <CardContent className="p-6 bg-gray-900 border-2 border-transparent hover:border-cyan-500 rounded-2xl">
               <div className="flex justify-around items-start">
                 <div>
                   <p className="text-gray-400 text-md">Active Players</p>
@@ -69,7 +69,7 @@ export default function Portfolio() {
           </Card>
 
           <Card className="border-transparent">
-            <CardContent className="p-6 border-2 border-transparent hover:border-emerald-500 rounded-2xl bg-background/80">
+            <CardContent className="p-6 bg-gray-900 border-2 border-transparent hover:border-emerald-500 rounded-2xl">
               <div className="flex justify-around items-start">
                 <div>
                   <p className="text-gray-400 text-md">Total Profit</p>
@@ -90,16 +90,16 @@ export default function Portfolio() {
         {/* Portfolio Tabs */}
         <Tabs defaultValue="player" className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <TabsList className="bg-gray-800/50">
+            <TabsList className="">
               <TabsTrigger
                 value="player"
-                className="p-4 data-[state=active]:bg-purple-500 text-white transition all ease-in-out duration-300 rounded-bl-2xl rounded-tl-2xl rounded-br-none rounded-tr-none"
+                className="p-4 h-10 w-50 text-lg bg-gray-900 data-[state=active]:bg-purple-500 text-white transition all ease-in-out duration-300 rounded-bl-full rounded-tl-full rounded-br-none rounded-tr-none"
               >
                 Player Portfolio
               </TabsTrigger>
               <TabsTrigger
                 value="team"
-                className="p-4 data-[state=active]:bg-purple-500 text-white transition all ease-in-out duration-300 rounded-br-2xl rounded-tr-2xl rounded-bl-none rounded-tl-none"
+                className="p-4 h-10 w-50 text-lg bg-gray-900 data-[state=active]:bg-purple-500 text-white transition all ease-in-out duration-300 rounded-br-full rounded-tr-full rounded-bl-none rounded-tl-none"
               >
                 Team Portfolio
               </TabsTrigger>
@@ -163,7 +163,7 @@ export default function Portfolio() {
             </h2>
             <Button
               variant="outline"
-              className="text-white hover:bg-background hover:text-white border-transparent hover:border-purple-600 border-2"
+              className="text-white hover:bg-background hover:text-white border-2 border-transparent hover:border-purple-600"
             >
               View All
             </Button>
