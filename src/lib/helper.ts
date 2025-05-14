@@ -126,6 +126,113 @@ export const generateTermsPDF = (sections: Section[]) => {
 }
 
 
+const BASE62: string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const SECRET_KEY: bigint = BigInt(0xa3b1c2d3);
+
+function base62Encode(num: number | bigint): string {
+  let encoded: string = "";
+  const base: bigint = BigInt(62);
+  num = BigInt(num);
+  
+  if (num === BigInt(0)) {
+    return "0".padStart(8, "0");
+  }
+  
+  while (num > BigInt(0)) {
+    encoded = BASE62[Number(num % base)] + encoded;
+    num = num / base;
+  }
+  return encoded.padStart(8, "0");
+}
+
+function base62Decode(str: string): bigint {
+  let num: bigint = BigInt(0);
+  const base: bigint = BigInt(62);
+  
+  for (let char of str) {
+    const value: bigint = BigInt(BASE62.indexOf(char));
+    num = num * base + value;
+  }
+  return num;
+}
+
+function encrypt(phoneNumber: string): string {
+  if (!/^\d{12}$/.test(phoneNumber)) {
+    throw new Error("Phone number must be exactly 12 digits.");
+  }
+  const num: bigint = BigInt(phoneNumber);
+  const obfuscated: bigint = num ^ SECRET_KEY;
+  return base62Encode(obfuscated);
+}
+
+function decrypt(cipherText: string): string {
+  if (!/^[0-9A-Za-z]{8}$/.test(cipherText)) {
+    throw new Error("Cipher text must be exactly 8 base62 characters.");
+  }
+  const decoded: bigint = base62Decode(cipherText);
+  const original: bigint = decoded ^ SECRET_KEY;
+  return original.toString().padStart(12, "0");
+}
+
+function generateAlphaCode(): string {
+  const chars: string =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result: string = "";
+  for (let i = 0; i < 5; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+interface BackendResponse {
+  status: number;
+  message: string;
+}
+
+// Declaring BACKEND_URL and toast as they were used in the original code
+declare const BACKEND_URL: string;
+declare const toast: {
+  error: (message: string) => void;
+};
+
+const isUserAdmin = async (): Promise<boolean> => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.error("Please login again");
+    return false;
+  }
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/auth/admin-login`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    const data: BackendResponse = await response.json();
+    if (data.status === 200) {
+      return true;
+    } else {
+      toast.error(data.message);
+      return false;
+    }
+  } catch (error) {
+    toast.error("Failed to verify admin status");
+    return false;
+  }
+};
+
+export {
+  isUserAdmin,
+  generateAlphaCode,
+  encrypt,
+  decrypt,
+  base62Decode,
+  base62Encode
+};
+
+
 export const isAuthenticated = async (request: NextRequest) => {
   const token = request.cookies.get("token")?.value;
   return !!token;
