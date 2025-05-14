@@ -1,23 +1,33 @@
-"use client"
+"use client";
 
-import { ChevronDown, ChevronRight, Trophy, TrendingUp, BarChart2, Activity } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useEffect, useRef } from "react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Flame, Zap } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Trophy,
+  TrendingUp,
+  BarChart2,
+  Activity,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 export default function HomePage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
     // Set canvas dimensions
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
     // Stock chart data
     const stockData = {
@@ -34,10 +44,18 @@ export default function HomePage() {
           color: "#3B82F6",
         },
       ],
-    }
+    };
 
     // Particles for dynamic effect
-    const particles: { x: number; y: number; size: number; speedX: number; speedY: number; color: string; opacity: number }[] = []
+    const particles: {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      color: string;
+      opacity: number;
+    }[] = [];
     for (let i = 0; i < 50; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -47,11 +65,19 @@ export default function HomePage() {
         speedY: (Math.random() - 0.5) * 2,
         color: i % 5 === 0 ? "#10B981" : i % 3 === 0 ? "#3B82F6" : "#FFFFFF",
         opacity: Math.random() * 0.5 + 0.2,
-      })
+      });
     }
 
     // Cricket balls
-    const balls: { x: number; y: number; size: number; speedX: number; speedY: number; rotation: number; rotationSpeed: number }[] = []
+    const balls: {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      rotation: number;
+      rotationSpeed: number;
+    }[] = [];
     for (let i = 0; i < 5; i++) {
       balls.push({
         x: Math.random() * canvas.width,
@@ -61,146 +87,164 @@ export default function HomePage() {
         speedY: (Math.random() - 0.5) * 3,
         rotation: 0,
         rotationSpeed: (Math.random() - 0.5) * 0.1,
-      })
+      });
     }
 
     // Animation variables
-    let animationFrameId: number
-    let time = 0
+    let animationFrameId: number;
+    let time = 0;
 
     // Draw stock chart
     const drawStockChart = () => {
-      const chartHeight = canvas.height * 0.6
-      const chartTop = canvas.height * 0.2
-      const chartWidth = canvas.width * 0.8
-      const chartLeft = canvas.width * 0.1
+      const chartHeight = canvas.height * 0.6;
+      const chartTop = canvas.height * 0.2;
+      const chartWidth = canvas.width * 0.8;
+      const chartLeft = canvas.width * 0.1;
 
       // Draw grid
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"
-      ctx.lineWidth = 1
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1;
 
       // Horizontal grid lines
       for (let i = 0; i <= 5; i++) {
-        const y = chartTop + (chartHeight / 5) * i
-        ctx.beginPath()
-        ctx.moveTo(chartLeft, y)
-        ctx.lineTo(chartLeft + chartWidth, y)
-        ctx.stroke()
+        const y = chartTop + (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(chartLeft, y);
+        ctx.lineTo(chartLeft + chartWidth, y);
+        ctx.stroke();
       }
 
       // Vertical grid lines
       for (let i = 0; i <= 10; i++) {
-        const x = chartLeft + (chartWidth / 10) * i
-        ctx.beginPath()
-        ctx.moveTo(x, chartTop)
-        ctx.lineTo(x, chartTop + chartHeight)
-        ctx.stroke()
+        const x = chartLeft + (chartWidth / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, chartTop);
+        ctx.lineTo(x, chartTop + chartHeight);
+        ctx.stroke();
       }
 
       // Update data with some movement
       stockData.datasets.forEach((dataset) => {
         dataset.data = dataset.data.map((value) => {
-          return value + (Math.random() - 0.5) * 5
-        })
-      })
+          return value + (Math.random() - 0.5) * 5;
+        });
+      });
 
       // Draw datasets
       stockData.datasets.forEach((dataset, datasetIndex) => {
-        ctx.strokeStyle = dataset.color
-        ctx.lineWidth = 3
-        ctx.beginPath()
+        ctx.strokeStyle = dataset.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
 
         // Create gradient
-        const gradient = ctx.createLinearGradient(0, chartTop, 0, chartTop + chartHeight)
-        gradient.addColorStop(0, dataset.color)
-        gradient.addColorStop(1, "rgba(0, 0, 0, 0)")
+        const gradient = ctx.createLinearGradient(
+          0,
+          chartTop,
+          0,
+          chartTop + chartHeight
+        );
+        gradient.addColorStop(0, dataset.color);
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
         // Draw line
         dataset.data.forEach((value, index) => {
-          const x = chartLeft + (chartWidth / (dataset.data.length - 1)) * index
+          const x =
+            chartLeft + (chartWidth / (dataset.data.length - 1)) * index;
           const normalizedValue =
-            (value - Math.min(...dataset.data)) / (Math.max(...dataset.data) - Math.min(...dataset.data))
-          const y = chartTop + chartHeight - normalizedValue * chartHeight
+            (value - Math.min(...dataset.data)) /
+            (Math.max(...dataset.data) - Math.min(...dataset.data));
+          const y = chartTop + chartHeight - normalizedValue * chartHeight;
 
           if (index === 0) {
-            ctx.moveTo(x, y)
+            ctx.moveTo(x, y);
           } else {
-            ctx.lineTo(x, y)
+            ctx.lineTo(x, y);
           }
-        })
+        });
 
         // Add shadow for glow effect
-        ctx.shadowColor = dataset.color
-        ctx.shadowBlur = 10
-        ctx.stroke()
-        ctx.shadowBlur = 0
+        ctx.shadowColor = dataset.color;
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
 
         // Draw area under the line
-        ctx.lineTo(chartLeft + chartWidth, chartTop + chartHeight)
-        ctx.lineTo(chartLeft, chartTop + chartHeight)
-        ctx.closePath()
-        ctx.fillStyle = gradient
-        ctx.globalAlpha = 0.2
-        ctx.fill()
-        ctx.globalAlpha = 1
+        ctx.lineTo(chartLeft + chartWidth, chartTop + chartHeight);
+        ctx.lineTo(chartLeft, chartTop + chartHeight);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.globalAlpha = 0.2;
+        ctx.fill();
+        ctx.globalAlpha = 1;
 
         // Draw data points
         dataset.data.forEach((value, index) => {
-          const x = chartLeft + (chartWidth / (dataset.data.length - 1)) * index
+          const x =
+            chartLeft + (chartWidth / (dataset.data.length - 1)) * index;
           const normalizedValue =
-            (value - Math.min(...dataset.data)) / (Math.max(...dataset.data) - Math.min(...dataset.data))
-          const y = chartTop + chartHeight - normalizedValue * chartHeight
+            (value - Math.min(...dataset.data)) /
+            (Math.max(...dataset.data) - Math.min(...dataset.data));
+          const y = chartTop + chartHeight - normalizedValue * chartHeight;
 
           // Pulse effect on points
-          const pulseSize = 4 + Math.sin(time * 0.1 + index * 0.5) * 2
+          const pulseSize = 4 + Math.sin(time * 0.1 + index * 0.5) * 2;
 
-          ctx.beginPath()
-          ctx.arc(x, y, pulseSize, 0, Math.PI * 2)
-          ctx.fillStyle = dataset.color
-          ctx.shadowColor = dataset.color
-          ctx.shadowBlur = 15
-          ctx.fill()
-          ctx.shadowBlur = 0
-        })
+          ctx.beginPath();
+          ctx.arc(x, y, pulseSize, 0, Math.PI * 2);
+          ctx.fillStyle = dataset.color;
+          ctx.shadowColor = dataset.color;
+          ctx.shadowBlur = 15;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
 
         // Draw label
-        ctx.font = "12px Arial"
-        ctx.fillStyle = dataset.color
-        ctx.fillText(dataset.label, chartLeft + 10, chartTop + 20 + datasetIndex * 20)
-      })
+        ctx.font = "12px Arial";
+        ctx.fillStyle = dataset.color;
+        ctx.fillText(
+          dataset.label,
+          chartLeft + 10,
+          chartTop + 20 + datasetIndex * 20
+        );
+      });
 
       // Draw price indicators
       stockData.datasets.forEach((dataset, idx) => {
-        const latestValue = dataset.data[dataset.data.length - 1]
-        const prevValue = dataset.data[dataset.data.length - 2]
-        const change = latestValue - prevValue
-        const changePercent = (change / prevValue) * 100
+        const latestValue = dataset.data[dataset.data.length - 1];
+        const prevValue = dataset.data[dataset.data.length - 2];
+        const change = latestValue - prevValue;
+        const changePercent = (change / prevValue) * 100;
 
-        const x = chartLeft + chartWidth + 10
+        const x = chartLeft + chartWidth + 10;
         const normalizedValue =
-          (latestValue - Math.min(...dataset.data)) / (Math.max(...dataset.data) - Math.min(...dataset.data))
-        const y = chartTop + chartHeight - normalizedValue * chartHeight
+          (latestValue - Math.min(...dataset.data)) /
+          (Math.max(...dataset.data) - Math.min(...dataset.data));
+        const y = chartTop + chartHeight - normalizedValue * chartHeight;
 
-        ctx.font = "bold 14px Arial"
-        ctx.fillStyle = dataset.color
-        ctx.fillText(`${latestValue.toFixed(2)}`, x, y)
+        ctx.font = "bold 14px Arial";
+        ctx.fillStyle = dataset.color;
+        ctx.fillText(`${latestValue.toFixed(2)}`, x, y);
 
-        ctx.font = "12px Arial"
-        ctx.fillStyle = change >= 0 ? "#10B981" : "#EF4444"
-        ctx.fillText(`${change >= 0 ? "+" : ""}${changePercent.toFixed(2)}%`, x, y + 15)
-      })
-    }
+        ctx.font = "12px Arial";
+        ctx.fillStyle = change >= 0 ? "#10B981" : "#EF4444";
+        ctx.fillText(
+          `${change >= 0 ? "+" : ""}${changePercent.toFixed(2)}%`,
+          x,
+          y + 15
+        );
+      });
+    };
 
     // Animation loop
     const render = () => {
       // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Update time
-      time += 0.05
+      time += 0.05;
 
       // Draw stock chart
-      drawStockChart()
+      drawStockChart();
 
       // Draw particles
       // particles.forEach((particle) => {
@@ -280,107 +324,111 @@ export default function HomePage() {
       // })
 
       // Draw animated wave at bottom
-      const waveHeight = 20
-      const waveLength = canvas.width / 2
-      const waveY = canvas.height - 30
+      const waveHeight = 20;
+      const waveLength = canvas.width / 2;
+      const waveY = canvas.height - 30;
 
-      ctx.beginPath()
-      ctx.moveTo(0, waveY + waveHeight)
+      ctx.beginPath();
+      ctx.moveTo(0, waveY + waveHeight);
 
       for (let x = 0; x < canvas.width; x++) {
-        const y = waveY + Math.sin((x / waveLength) * Math.PI * 2 + time) * waveHeight
-        ctx.lineTo(x, y)
+        const y =
+          waveY + Math.sin((x / waveLength) * Math.PI * 2 + time) * waveHeight;
+        ctx.lineTo(x, y);
       }
 
-      ctx.lineTo(canvas.width, canvas.height)
-      ctx.lineTo(0, canvas.height)
-      ctx.closePath()
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
 
-      const waveGradient = ctx.createLinearGradient(0, waveY - waveHeight, 0, canvas.height)
-      waveGradient.addColorStop(0, "rgba(16, 185, 129, 0.2)")
-      waveGradient.addColorStop(1, "rgba(16, 185, 129, 0)")
+      const waveGradient = ctx.createLinearGradient(
+        0,
+        waveY - waveHeight,
+        0,
+        canvas.height
+      );
+      waveGradient.addColorStop(0, "rgba(16, 185, 129, 0.2)");
+      waveGradient.addColorStop(1, "rgba(16, 185, 129, 0)");
 
-      ctx.fillStyle = waveGradient
-      ctx.fill()
+      ctx.fillStyle = waveGradient;
+      ctx.fill();
 
       // Continue animation
-      animationFrameId = requestAnimationFrame(render)
-    }
+      animationFrameId = requestAnimationFrame(render);
+    };
 
-    render()
+    render();
 
     // Cleanup
     return () => {
       if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId)
+        cancelAnimationFrame(animationFrameId);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* Hero Section with Stock Chart Animation */}
-      <section className="relative h-[300px] overflow-hidden">
-        <div className="absolute inset-0 bg-gray-950">
+      {/* Hero Section with Stock Chart and Gradient Overlay */}
+      <section className="relative h-[500px] overflow-hidden bg-gray-950">
+        {/* Canvas background */}
+        <div className="absolute inset-0 z-0">
           <canvas ref={canvasRef} className="w-full h-full opacity-100" />
         </div>
+
+        {/* Blended background image */}
         <Image
           src="/placeholder.svg?key=kc7u0"
-          alt="Cricket Stock"
+          alt="Cricket Stock Image"
           width={1200}
           height={600}
-          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30"
+          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-20"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/80 to-gray-900/60"></div>
-        <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2 text-green-400 mb-2">
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/70 to-gray-950/10 z-10" />
+
+        {/* Main Content */}
+        <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center">
+          <div className="max-w-3xl">
+            {/* Subheading with icon */}
+            <div className="flex items-center gap-2 text-green-400 mb-3 animate-fade-in">
               <TrendingUp className="h-5 w-5 animate-pulse" />
-              <span className="text-sm font-medium uppercase tracking-wider">Cricket Leagues & Market Trends</span>
+              <span className="text-sm font-semibold uppercase tracking-widest">
+                Cricket Leagues & Market Trends
+              </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Don't Miss The Action</h1>
-            <p className="text-gray-300 mb-6 flex items-center gap-2">
+
+            {/* Main Heading */}
+            <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
+              Don’t Miss The Action
+            </h1>
+
+            {/* Subtext */}
+            <p className="text-gray-300 mb-6 flex items-center gap-2 text-base">
               <BarChart2 className="h-4 w-4 text-green-400" />
               Track live matches and performance stats in real-time
             </p>
+            <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
+              {["Live Commentary", "Real-time Updates", "Expert Analysis"].map(
+                (item) => (
+                  <div key={item} className="flex items-center">
+                    <Zap className="h-4 w-4 mr-2 text-blue-400" />
+                    <span>{item}</span>
+                  </div>
+                )
+              )}
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Live Matches Section */}
-      <section className="py-6 container mx-auto px-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>
-            Live Matches
-          </h2>
-          <Link href="/live" className="text-green-400 text-sm hover:underline flex items-center">
-            View All <ChevronRight className="h-4 w-4 ml-1" />
+          <Link href="/live-matches" className="mt-10">
+            <Button
+              size="lg"
+              className="bg-green-500 text-white hover:bg-green-600 font-bold shadow-lg transition-all duration-300 hover:scale-105 border-2 border-green-500 hover:border-green-400"
+            >
+              Watch Live Matches
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <LiveMatchCard
-            team1="India"
-            team2="Australia"
-            score1="245/6"
-            score2="180/4"
-            overs="32.4"
-            league="ICC T20 World Cup"
-            status="India needs 65 runs in 17.2 overs"
-            trend="up"
-          />
-
-          <LiveMatchCard
-            team1="England"
-            team2="South Africa"
-            score1="302/8"
-            score2="210/7"
-            overs="42.1"
-            league="ODI Series"
-            status="South Africa needs 93 runs in 7.5 overs"
-            trend="down"
-          />
         </div>
       </section>
 
@@ -395,18 +443,54 @@ export default function HomePage() {
           <LeagueAccordion
             title="ICC Womens T20 World Cup Asia Qualifier 2025"
             matches={[
-              { team1: "India", team2: "Pakistan", date: "May 15, 2025", time: "14:30 GMT", trend: "stable" },
-              { team1: "Sri Lanka", team2: "Bangladesh", date: "May 16, 2025", time: "10:00 GMT", trend: "up" },
-              { team1: "Nepal", team2: "UAE", date: "May 17, 2025", time: "12:30 GMT", trend: "down" },
+              {
+                team1: "India",
+                team2: "Pakistan",
+                date: "May 15, 2025",
+                time: "14:30 GMT",
+                trend: "stable",
+              },
+              {
+                team1: "Sri Lanka",
+                team2: "Bangladesh",
+                date: "May 16, 2025",
+                time: "10:00 GMT",
+                trend: "up",
+              },
+              {
+                team1: "Nepal",
+                team2: "UAE",
+                date: "May 17, 2025",
+                time: "12:30 GMT",
+                trend: "down",
+              },
             ]}
           />
 
           <LeagueAccordion
             title="Cook Islands tour of Japan, 2025"
             matches={[
-              { team1: "Japan", team2: "Cook Islands", date: "June 3, 2025", time: "09:00 GMT", trend: "up" },
-              { team1: "Japan", team2: "Cook Islands", date: "June 5, 2025", time: "09:00 GMT", trend: "stable" },
-              { team1: "Japan", team2: "Cook Islands", date: "June 8, 2025", time: "08:30 GMT", trend: "up" },
+              {
+                team1: "Japan",
+                team2: "Cook Islands",
+                date: "June 3, 2025",
+                time: "09:00 GMT",
+                trend: "up",
+              },
+              {
+                team1: "Japan",
+                team2: "Cook Islands",
+                date: "June 5, 2025",
+                time: "09:00 GMT",
+                trend: "stable",
+              },
+              {
+                team1: "Japan",
+                team2: "Cook Islands",
+                date: "June 8, 2025",
+                time: "08:30 GMT",
+                trend: "up",
+              },
             ]}
           />
 
@@ -467,7 +551,7 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 // Component for Live Match Card
@@ -482,12 +566,22 @@ interface LiveMatchCardProps {
   trend: "up" | "down" | "stable";
 }
 
-function LiveMatchCard({ team1, team2, score1, score2, overs, league, status, trend }: LiveMatchCardProps) {
+function LiveMatchCard({
+  team1,
+  team2,
+  score1,
+  score2,
+  overs,
+  league,
+  status,
+  trend,
+}: LiveMatchCardProps) {
   return (
     <div className="bg-gradient-to-r from-gray-800 to-gray-800/70 border border-gray-700 rounded-lg p-4 hover:shadow-lg transition">
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-medium text-red-400 flex items-center gap-1">
-          <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span> LIVE
+          <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>{" "}
+          LIVE
         </span>
         <span className="text-xs text-gray-400">{league}</span>
       </div>
@@ -520,26 +614,42 @@ function LiveMatchCard({ team1, team2, score1, score2, overs, league, status, tr
         Watch Live
       </Link>
     </div>
-  )
+  );
 }
 
 // Component for League Accordion
 interface LeagueAccordionProps {
   title: string;
-  matches: { team1: string; team2: string; date: string; time: string; trend: "up" | "down" | "stable" }[];
+  matches: {
+    team1: string;
+    team2: string;
+    date: string;
+    time: string;
+    trend: "up" | "down" | "stable";
+  }[];
   isPopular?: boolean;
 }
 
-function LeagueAccordion({ title, matches, isPopular = false }: LeagueAccordionProps) {
+function LeagueAccordion({
+  title,
+  matches,
+  isPopular = false,
+}: LeagueAccordionProps) {
   return (
     <div className="border border-gray-700 rounded-lg overflow-hidden">
       <div
-        className={`flex items-center justify-between p-4 ${isPopular ? "bg-gradient-to-r from-gray-800 to-gray-700" : "bg-gray-800"}`}
+        className={`flex items-center justify-between p-4 ${
+          isPopular
+            ? "bg-gradient-to-r from-gray-800 to-gray-700"
+            : "bg-gray-800"
+        }`}
       >
         <div className="flex items-center gap-2">
           <h3 className="font-medium text-white">{title}</h3>
           {isPopular && (
-            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">Popular</span>
+            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">
+              Popular
+            </span>
           )}
         </div>
         <button className="text-gray-400 hover:text-white transition">
@@ -554,9 +664,15 @@ function LeagueAccordion({ title, matches, isPopular = false }: LeagueAccordionP
               <div>
                 <div className="text-white font-medium flex items-center gap-1">
                   {match.team1} vs {match.team2}
-                  {match.trend === "up" && <TrendingUp className="h-3 w-3 text-green-400" />}
-                  {match.trend === "down" && <ChevronDown className="h-3 w-3 text-red-400" />}
-                  {match.trend === "stable" && <Activity className="h-3 w-3 text-yellow-400" />}
+                  {match.trend === "up" && (
+                    <TrendingUp className="h-3 w-3 text-green-400" />
+                  )}
+                  {match.trend === "down" && (
+                    <ChevronDown className="h-3 w-3 text-red-400" />
+                  )}
+                  {match.trend === "stable" && (
+                    <Activity className="h-3 w-3 text-yellow-400" />
+                  )}
                 </div>
                 <div className="text-sm text-gray-400 mt-1">
                   {match.date} • {match.time}
@@ -573,5 +689,5 @@ function LeagueAccordion({ title, matches, isPopular = false }: LeagueAccordionP
         ))}
       </div>
     </div>
-  )
+  );
 }

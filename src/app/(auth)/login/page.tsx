@@ -1,21 +1,40 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { ChangeEvent, useEffect, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { TradingBackground, PriceTicker } from "@/components/auth/trading-background"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, InfoIcon, LoaderCircle } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { formatPhoneNumber, validatePassword, validatePhone } from "@/lib/helper"
+import type React from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  TradingBackground,
+  PriceTicker,
+} from "@/components/auth/trading-background";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, EyeOff, InfoIcon, LoaderCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  formatPhoneNumber,
+  validatePassword,
+  validatePhone,
+} from "@/lib/helper";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import { handleGoogleSuccess, login } from "@/lib/actions"
-import { toast } from "sonner"
+import { handleGoogleSuccess, login } from "@/lib/actions";
+import { toast } from "sonner";
+import { TooltipArrow } from "@radix-ui/react-tooltip";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
@@ -33,8 +52,8 @@ interface FormState {
 }
 
 export default function AuthPage() {
-  const [hasReferral, setHasReferral] = useState(false)
-  const [countryCode, setCountryCode] = useState("+91")
+  const [hasReferral, setHasReferral] = useState(false);
+  const [countryCode, setCountryCode] = useState("+91");
   const [mode, setMode] = useState<Mode>("login");
   const [step, setStep] = useState<Step>("form");
   const [form, setForm] = useState<FormState>({
@@ -51,13 +70,30 @@ export default function AuthPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      router.push("/") // navigate to home if token exists
+      router.push("/"); // navigate to home if token exists
     }
-  }, [router])
+  }, [router]);
+
+  const validReferral = () => {
+    const referralRegex = /^CRST-[A-Za-z0-9]{8}-[A-Za-z0-9]{5}$/;
+
+    if (!form.referral_code) {
+      toast.error("Empty Referral Code");
+      return;
+    }
+
+    const code = form.referral_code;
+
+    if (referralRegex.test(code)) {
+      toast.success("Valid referral code.");
+    } else {
+      toast.warning("Invalid referral code.");
+    }
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
@@ -186,7 +222,9 @@ export default function AuthPage() {
         setStep("otp");
         setInfo(data.message);
       } else if (res.status === 409 && data.message === "User already exists") {
-        toast.success("User already exists. Please login with your registered phone number.");
+        toast.success(
+          "User already exists. Please login with your registered phone number."
+        );
         setMode("login");
         setStep("form");
         setForm({ ...form, phone: form.phone });
@@ -222,7 +260,12 @@ export default function AuthPage() {
         setInfo("Signup successful! Please login.");
         setMode("login");
         setStep("form");
-        setForm({ name: "", phone: form.phone, password: "", new_password: "" });
+        setForm({
+          name: "",
+          phone: form.phone,
+          password: "",
+          new_password: "",
+        });
         setOtp("");
       } else if (res.status === 400) {
         setError("Invalid OTP. Please try again.");
@@ -237,8 +280,8 @@ export default function AuthPage() {
     }
   };
 
-  const togglePassword = () => setShowPassword(prev => !prev);
-  const toggleNewPassword = () => setShowNewPassword(prev => !prev);
+  const togglePassword = () => setShowPassword((prev) => !prev);
+  const toggleNewPassword = () => setShowNewPassword((prev) => !prev);
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -251,19 +294,37 @@ export default function AuthPage() {
           <p className="text-gray-400">Your cricket stock trading platform</p>
         </div>
 
-        <div className="bg-gray-800 animate-scale-in-lg p-6 rounded-lg shadow-xl border border-gray-700" >
+        <div className="bg-gray-800 animate-scale-in-lg p-6 rounded-lg shadow-xl border border-gray-700">
           <div className="grid w-full grid-cols-2 mb-6 gap-5">
             <Button
               variant={mode === "login" ? "default" : "ghost"}
-              onClick={() => { setMode("login"); setStep("form"); setError(""); setInfo(""); }}
-              className={`w-full ${mode === "login" ? "bg-purple-600 hover:bg-purple-700" : "bg-gray-700 hover:bg-gray-600"} text-white`}
+              onClick={() => {
+                setMode("login");
+                setStep("form");
+                setError("");
+                setInfo("");
+              }}
+              className={`w-full ${
+                mode === "login"
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-gray-700 hover:bg-gray-600"
+              } text-white`}
             >
               Login
             </Button>
             <Button
               variant={mode === "signup" ? "default" : "ghost"}
-              onClick={() => { setMode("signup"); setStep("form"); setError(""); setInfo(""); }}
-              className={`w-full ${mode === "signup" ? "bg-purple-600 hover:bg-purple-700" : "bg-gray-700 hover:bg-gray-600"} text-white`}
+              onClick={() => {
+                setMode("signup");
+                setStep("form");
+                setError("");
+                setInfo("");
+              }}
+              className={`w-full ${
+                mode === "signup"
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-gray-700 hover:bg-gray-600"
+              } text-white`}
             >
               Sign Up
             </Button>
@@ -271,21 +332,22 @@ export default function AuthPage() {
 
           {mode === "login" && (
             <div className="animate-slide-right-sm">
-              {
-                error &&
+              {error && (
                 <div className="text-red-500 mb-5 px-5 py-1 bg-red-500/10 rounded-full animate-slide-right-sm">
                   {error}
                 </div>
-              }
+              )}
 
-              {
-                info &&
+              {info && (
                 <div className="text-green-400 mb-5 px-5 py-1 bg-green-400/10 rounded-full animate-slide-right-sm">
                   {info}
                 </div>
-              }
+              )}
 
-              <form onSubmit={handleLogin} className="space-y-4 animate-slide-right-sm">
+              <form
+                onSubmit={handleLogin}
+                className="space-y-4 animate-slide-right-sm"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-gray-300">
                     Phone Number
@@ -342,30 +404,37 @@ export default function AuthPage() {
                     className="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
                     disabled={loading}
                   >
-                    {
-                      loading
-                        ? <LoaderCircle className="animate-spin" />
-                        : <span>Login</span>
-                    }
+                    {loading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <span>Login</span>
+                    )}
                   </Button>
                 </div>
 
                 <div className="text-center">
                   <Button
                     type="button"
-                    onClick={() => { setMode("forgot"); setStep("form"); setError(""); setInfo(""); }}
+                    onClick={() => {
+                      setMode("forgot");
+                      setStep("form");
+                      setError("");
+                      setInfo("");
+                    }}
                     className="text-sm text-purple-400 hover:text-purple-300 cursor-pointer"
                   >
                     Forgot Password?
                   </Button>
                 </div>
-
               </form>
             </div>
           )}
 
           {mode === "forgot" && step === "form" && (
-            <form onSubmit={handleForgotPassword} className="mt-8 space-y-6 animate-slide-right-sm">
+            <form
+              onSubmit={handleForgotPassword}
+              className="mt-8 space-y-6 animate-slide-right-sm"
+            >
               <div className="rounded-md space-y-4">
                 <div>
                   <Input
@@ -386,19 +455,23 @@ export default function AuthPage() {
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
                   disabled={loading}
                 >
-                  {
-                    loading ?
-                      <LoaderCircle className="animate-spin" />
-                      :
-                      <span>Request OTP</span>
-                  }
+                  {loading ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    <span>Request OTP</span>
+                  )}
                 </Button>
               </div>
 
               <div className="text-center">
                 <Button
                   type="button"
-                  onClick={() => { setMode("login"); setStep("form"); setError(""); setInfo(""); }}
+                  onClick={() => {
+                    setMode("login");
+                    setStep("form");
+                    setError("");
+                    setInfo("");
+                  }}
                   className="text-sm text-purple-400 hover:text-purple-300 cursor-pointer"
                 >
                   Back to Login
@@ -408,7 +481,10 @@ export default function AuthPage() {
           )}
 
           {mode === "forgot" && step === "otp" && (
-            <form onSubmit={handleResetPassVerifyOtp} className="mt-8 space-y-6 animate-slide-right">
+            <form
+              onSubmit={handleResetPassVerifyOtp}
+              className="mt-8 space-y-6 animate-slide-right"
+            >
               <div className="rounded-md space-y-4">
                 <div>
                   <Input
@@ -416,7 +492,11 @@ export default function AuthPage() {
                     name="otp"
                     placeholder="Enter OTP"
                     value={otp}
-                    onChange={(e) => { setOtp(e.target.value); setError(""); setInfo(""); }}
+                    onChange={(e) => {
+                      setOtp(e.target.value);
+                      setError("");
+                      setInfo("");
+                    }}
                     required
                     className="flex-1 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
                     maxLength={6}
@@ -458,7 +538,12 @@ export default function AuthPage() {
               <div className="text-center">
                 <Button
                   type="button"
-                  onClick={() => { setMode("login"); setStep("form"); setError(""); setInfo(""); }}
+                  onClick={() => {
+                    setMode("login");
+                    setStep("form");
+                    setError("");
+                    setInfo("");
+                  }}
                   className="text-sm text-purple-400 hover:text-purple-300 cursor-pointer"
                 >
                   Back to Login
@@ -469,19 +554,17 @@ export default function AuthPage() {
 
           {mode === "signup" && step === "form" && (
             <div className="animate-slide-left-sm">
-              {
-                error &&
+              {error && (
                 <div className="text-red-500 mb-5 pl-5 border-l-2 border-red-500 animate-slide-right-sm">
                   {error}
                 </div>
-              }
+              )}
 
-              {
-                info &&
+              {info && (
                 <div className="text-red-500 mb-5 pl-5 border-l-2 border-red-500 animate-slide-right-sm">
                   {info}
                 </div>
-              }
+              )}
               <form className="space-y-4" onSubmit={handleCreateAccount}>
                 <div className="space-y-2">
                   <Label htmlFor="first-name" className="text-gray-300">
@@ -560,7 +643,11 @@ export default function AuthPage() {
                       onClick={toggleNewPassword}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
                     >
-                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showNewPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -571,10 +658,15 @@ export default function AuthPage() {
                     <Checkbox
                       id="has-referral"
                       checked={hasReferral}
-                      onCheckedChange={(checked) => setHasReferral(checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        setHasReferral(checked as boolean)
+                      }
                       className="data-[state=checked]:bg-purple-600"
                     />
-                    <Label htmlFor="has-referral" className="text-gray-300 text-sm cursor-pointer">
+                    <Label
+                      htmlFor="has-referral"
+                      className="text-gray-300 text-sm cursor-pointer"
+                    >
                       I have a referral code
                     </Label>
                     <TooltipProvider>
@@ -582,36 +674,45 @@ export default function AuthPage() {
                         <TooltipTrigger asChild>
                           <InfoIcon className="h-4 w-4 text-gray-400" />
                         </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="w-56">Enter a referral code to get bonus credits and special offers</p>
+                        <TooltipContent className=" backdrop-blur-xs  rounded-full border-2 border-accent mb-3">
+                          <p
+                            className="p-2 font-bold text-accent"
+                          >
+                            Get ₹100 bonus credits when you sign up with a valid
+                            referral code!
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
 
                   {hasReferral && (
-                    <div className="overflow-hidden animate-slide-down-sm" >
+                    <div className="overflow-hidden animate-slide-down-sm">
                       <div className="space-y-2 pt-2">
-                        <Label htmlFor="referral-code" className="text-gray-300">
+                        <Label
+                          htmlFor="referral-code"
+                          className="text-gray-300"
+                        >
                           Referral Code
                         </Label>
                         <div className="relative">
                           <Input
                             id="referral-code"
-                            placeholder="Enter code (e.g. CRIC2025)"
-                            className="bg-gray-700 border-gray-600 text-white pr-16"
+                            name="referral_code"
+                            value={form.referral_code}
+                            placeholder="Enter code (e.g. CRST-XXXXXXXX-XXX)"
+                            className="flex-1 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
+                            onChange={handleChange}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             className="absolute right-0 top-0 h-full px-3 text-purple-400 hover:text-purple-300"
+                            onClick={validReferral}
                           >
                             Verify
                           </Button>
                         </div>
-                        <p className="text-xs text-purple-400">
-                          Get ₹100 bonus credits when you sign up with a valid referral code!
-                        </p>
                       </div>
                     </div>
                   )}
@@ -622,18 +723,21 @@ export default function AuthPage() {
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                   disabled={loading}
                 >
-                  {
-                    loading
-                      ? <LoaderCircle className="animate-spin" />
-                      : <span> Create Account </span>
-                  }
+                  {loading ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    <span> Create Account </span>
+                  )}
                 </Button>
               </form>
             </div>
           )}
 
           {mode === "signup" && step === "otp" && (
-            <form onSubmit={handleVerifyOtp} className="mt-8 space-y-6 animate-slide-right">
+            <form
+              onSubmit={handleVerifyOtp}
+              className="mt-8 space-y-6 animate-slide-right"
+            >
               <div className="rounded-md">
                 <div>
                   <Input
@@ -641,7 +745,11 @@ export default function AuthPage() {
                     name="otp"
                     placeholder="Enter OTP"
                     value={otp}
-                    onChange={(e) => { setOtp(e.target.value); setError(""); setInfo(""); }}
+                    onChange={(e) => {
+                      setOtp(e.target.value);
+                      setError("");
+                      setInfo("");
+                    }}
                     required
                     className="flex-1 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
                   />
@@ -653,11 +761,11 @@ export default function AuthPage() {
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                 disabled={loading}
               >
-                {
-                  loading
-                    ? <LoaderCircle className="animate-spin" />
-                    : <span> Verify & Signup  </span>
-                }
+                {loading ? (
+                  <LoaderCircle className="animate-spin" />
+                ) : (
+                  <span> Verify & Signup </span>
+                )}
               </Button>
             </form>
           )}
@@ -681,11 +789,17 @@ export default function AuthPage() {
 
         <div className="text-center mt-6 text-gray-400 text-sm animate-slide-up-sm">
           By continuing, you agree to our
-          <Link href="/terms-and-conditions" className="text-purple-500 hover:text-purple-400 mx-1">
+          <Link
+            href="/terms-and-conditions"
+            className="text-purple-500 hover:text-purple-400 mx-1"
+          >
             Terms of Service
           </Link>
           and
-          <Link href="/privacy-policy" className="text-purple-500 hover:text-purple-400 ml-1">
+          <Link
+            href="/privacy-policy"
+            className="text-purple-500 hover:text-purple-400 ml-1"
+          >
             Privacy Policy
           </Link>
         </div>
@@ -694,5 +808,5 @@ export default function AuthPage() {
       {/* Price ticker at bottom */}
       <PriceTicker />
     </div>
-  )
+  );
 }

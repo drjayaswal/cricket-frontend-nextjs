@@ -14,28 +14,64 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-
+import { encrypt, generateAlphaCode } from "../../../lib/helper";
+import "dotenv/config";
 export default function InviteFriendsComponent() {
   const [referralCode, setReferralCode] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [cooldownActive, setCooldownActive] = useState(false);
+  const [cooldownTime, setCooldownTime] = useState(0);
 
   // Generate a random referral code
-  const generateReferralCode = () => {
+  const generateReferralCode = async () => {
+    if (cooldownActive) return;
+    let newCode;
     setIsGenerating(true);
+    setCooldownActive(true);
+    setCooldownTime(10);
 
-    // Simulate API call to generate code
+    // Start the cooldown timer
+    const cooldownInterval = setInterval(() => {
+      setCooldownTime((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(cooldownInterval);
+          setCooldownActive(false);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
     setTimeout(() => {
-      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      let result = "";
-      for (let i = 0; i < 8; i++) {
-        result += characters.charAt(
-          Math.floor(Math.random() * characters.length)
-        );
-      }
-      setReferralCode(result);
+      newCode = `CRST-${encrypt(
+        "+916377257649".replace("+", "")
+      )}-${generateAlphaCode()}`;
+      setReferralCode(newCode);
       setIsGenerating(false);
-    }, 800);
+    }, 3000);
+
+    // const token = localStorage.getItem("token");
+
+    //   if (!token) {
+    //     console.log("No token found, user not logged in");
+    //     return;
+    //   }
+
+    //   const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/add-referral-code`, {
+    //     method: "POST",
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       referralCode: newCode,
+    //     }),
+    //   });
+    //   const status = data.status;
+    //   if (status !== 200) {
+    //     console.error("LOL");
+    //   }
   };
 
   // Generate code on initial load
@@ -80,15 +116,13 @@ export default function InviteFriendsComponent() {
           <Card className="">
             <CardHeader>
               <CardTitle className="text-2xl text-purple-400"></CardTitle>
-              <CardDescription className="text-gray-400 text-center">
-                Share your unique referral code with your friends and enjoy
-                mutual benifits
-              </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <p className="text-sm text-gray-400">Your Referral Code</p>
+                <p className="text-md text-center text-gray-400">
+                  Your Referral Code
+                </p>
                 <div className="flex items-center">
                   <div className="bg-gray-800 rounded-l-md p-2 flex-1 font-mono text-xl text-center text-purple-300 border-2 border-gray-900">
                     {isGenerating ? (
@@ -118,10 +152,18 @@ export default function InviteFriendsComponent() {
                 <Button
                   onClick={generateReferralCode}
                   variant="outline"
-                  className="w-full bg-gray-800 border-gray-900 hover:bg-accent text-lg p-5"
-                  disabled={isGenerating}
+                  className={`w-full border-gray-950 hover:bg-accent text-lg p-5 ${
+                    cooldownActive
+                      ? "bg-gray-950 cursor-progress"
+                      : "bg-gray-800 cursor-pointer"
+                  }`}
+                  disabled={isGenerating || cooldownActive}
                 >
-                  Generate
+                  {cooldownActive
+                    ? `Cool Down in (${cooldownTime}s)`
+                    : isGenerating
+                    ? "Generating..."
+                    : "Generate"}
                 </Button>
               </div>
 
