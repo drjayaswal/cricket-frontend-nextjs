@@ -1,3 +1,4 @@
+"use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -11,15 +12,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, BarChart3, Users, Trophy, Clock, Landmark, Bitcoin, DollarSign } from "lucide-react";
 import type { Metadata } from "next";
+import { useUserStore } from "@/store/user";
 
-export const metadata: Metadata = {
-  title: "Portfolio | CricStock11",
-  description:
-    "View your CricStock11 portfolio including player and team stocks, current performance, and investment value.",
-};
+// export const metadata: Metadata = {
+//   title: "Portfolio | CricStock11",
+//   description:
+//     "View your CricStock11 portfolio including player and team stocks, current performance, and investment value.",
+// };
 export default function Portfolio() {
+  const user = useUserStore.getState().user?.name;
+  console.log("Current user in store:", user);
+
   return (
     <div className="p-5 min-h-screen bg-gray-950">
+      {/* {<div>{user}</div>} */}
       <main className="container mx-auto px-4 py-8">
         {/* Portfolio Header */}
         <div className="mb-8">

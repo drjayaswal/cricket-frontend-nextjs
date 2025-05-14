@@ -53,12 +53,12 @@ export default function AuthPage() {
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const router = useRouter()
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      router.push("/") // navigate to home if token exists
-    }
-  }, [router])
-
+  // useEffect(() => {
+  //   if (localStorage.getItem("token")) {
+  //     router.push("/") // navigate to home if token exists
+  //   }
+  // }, [router])
+  //
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
       ...prev,
