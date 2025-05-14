@@ -1,6 +1,5 @@
 import Footer from "@/components/footer/footer";
 import Header from "@/components/header/header";
-import { Toaster } from "@/components/ui/sonner";
 
 export default function HomeLayout({
   children,
@@ -9,7 +8,6 @@ export default function HomeLayout({
 }) {
   return (
     <>
-      <Toaster/>
       <Header className="h-20" />
       <div className="h-20 " /> {/* Used as a space between FIXED header and rest of layout */}
       <main className="">
