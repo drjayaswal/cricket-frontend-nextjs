@@ -1,13 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { NAVLINKS } from "@/lib/constants";
+import { NAVLINKS, UNPROTECTED_ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+
 const Navbar = () => {
+  const pathname = usePathname();
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check for token in cookies
+    const checkAuth = () => {
+      const cookies = document.cookie.split(';');
+      const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+      setIsUserAuthenticated(!!tokenCookie);
+    };
+
+    checkAuth();
+  }, []);
+
   return (
     <>
       <div
@@ -25,20 +41,22 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6">
-            {NAVLINKS.map((link, index) => (
-              <Link
-                key={index}
-                href={link.href}
-                className={cn(
-                  "text-gray-400 hover:text-white transition-colors duration-200",
-                  usePathname() == link.href && "text-purple-400"
-                )}
-              >
-                {link.title}
-              </Link>
-            ))}
-          </nav>
+          {isUserAuthenticated &&
+            <nav className="hidden md:flex items-center gap-6">
+              {NAVLINKS.map((link, index) => (
+                <Link
+                  key={index}
+                  href={link.href}
+                  className={cn(
+                    "text-gray-400 hover:text-white transition-colors duration-200",
+                    pathname == link.href && "text-purple-400"
+                  )}
+                >
+                  {link.title}
+                </Link>
+              ))}
+            </nav>
+          }
 
           <Link href="/user-profile">
             <div className="flex items-center gap-3 border-2 border-accent rounded-full overflow-hidden p-1 cursor-pointer">
