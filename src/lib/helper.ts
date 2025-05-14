@@ -1,5 +1,6 @@
 import jsPDF from "jspdf"
-import { useCallback, useEffect, useState } from "react"
+import { NextRequest } from "next/server";
+import { useUserStore } from "@/store/user"; // adjust path
 
 export const validatePassword = (password: string): string => {
   if (!password) return "Password is required";
@@ -229,4 +230,55 @@ export {
   decrypt,
   base62Decode,
   base62Encode
+};
+
+
+export const isAuthenticated = async (request: NextRequest) => {
+  const token = request.cookies.get("token")?.value;
+  return !!token;
+};
+
+
+export const setUserIntoGlobalStore = async (token: string) => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/user`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.user) {
+        // Map MongoDB user data to User type
+        const mappedUser = {
+          name: data.user.name,
+          mobile: data.user.mobile,
+          isVerified: data.user.isVerified,
+          password: "", // We don't store password in frontend
+          isAdmin: data.user.isAdmin,
+          role: data.user.role,
+          lastSeen: new Date(data.user.lastSeen),
+          amount: data.user.amount,
+          transactions: data.user.transactions || [],
+          portfolio: data.user.portfolio || [],
+          teamPortfolio: data.user.teamPortfolio || [],
+          // Optional fields
+          ...(data.user.googleId && { googleId: data.user.googleId }),
+          ...(data.user.email && { email: data.user.email }),
+          ...(data.user.profileImage && { profileImage: data.user.profileImage }),
+          ...(data.user.referralCode && { referralCode: data.user.referralCode }),
+          ...(data.user.referredBy && { referredBy: data.user.referredBy }),
+        };
+
+        useUserStore.getState().setUser(mappedUser);
+        console.log("✅ User set in store:", mappedUser);
+        console.log("User data set into global store:", useUserStore.getState());
+      }
+    }
+  } catch (e) {
+    console.error("Error setting user into global store", e);
+  }
 };

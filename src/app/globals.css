@@ -4,14 +4,14 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #030712;
+  --background: #0B1121;
   --foreground: white;
   --accent: #AD45FF;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-secondary: #09121E;
+  --color-secondary: #081f58;
   --color-accent: #AD45FF;
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
