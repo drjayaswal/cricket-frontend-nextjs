@@ -203,9 +203,11 @@ export default function LiveMatches() {
 
                 {/* Footer */}
                 <CardFooter className="border-t border-gray-700 flex justify-center opacity-90 group-hover:opacity-100 transition-opacity">
-                  <Button className="bg-[#1671CC]/60 hover:bg-[#1671CC] p-6 text-xl transition-all duration-300 w-full">
+                  <Button className="bg-[#1671CC]/60 hover:bg-[#1671CC] p-6 text-xl transition-all duration-300 w-full" asChild>
+                  <Link href={"/betting-interface"}>
                     <PlusIcon className="mr-2 h-4 w-4" />
                     Add to Portfolio
+                  </Link>
                   </Button>
                 </CardFooter>
               </Card>
