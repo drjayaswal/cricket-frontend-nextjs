@@ -31,9 +31,12 @@ export default function UserProfile() {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLogoutOpen(false);
-    router.push("/login");
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    router.replace("/login");
   };
 
   return (

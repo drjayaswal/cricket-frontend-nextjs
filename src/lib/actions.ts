@@ -2,6 +2,8 @@ import { z } from "zod"
 import "dotenv/config";
 import { toast } from "sonner"
 import { CredentialResponse } from "@react-oauth/google";
+import { setUserIntoGlobalStore } from "./helper";
+import router from "next/router";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -23,8 +25,11 @@ const login = async (mobile: string, password: string): Promise<LoginResponse> =
     const data = await res.json();
 
     if (res.ok && data.token) {
-      localStorage.setItem("token", data.token);
+      // localStorage.setItem("token", data.token);
+      document.cookie = `token=${data.token}; path=/; secure;`;
       toast.success("Login successful! Welcome to Dashboard.");
+      setUserIntoGlobalStore(data.token)
+      console.log("User data set into global store");
       return { success: true, message: data.message };
     }
 

@@ -1,5 +1,5 @@
 export type TransactionStatus = "PENDING" | "SUCCESS" | "FAILED";
-export type Role = "marketing" | "financial" | "super_admin" | "";
+export type Role = "marketing" | "financial" | "super_admin" | "user";
 
 export interface Transaction {
   TID: string;

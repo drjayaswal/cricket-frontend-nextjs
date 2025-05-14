@@ -72,29 +72,14 @@ export default function AuthPage() {
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      router.push("/"); // navigate to home if token exists
-    }
-  }, [router]);
 
-  const validReferral = () => {
-    const referralRegex = /^CRST-[A-Za-z0-9]{8}-[A-Za-z0-9]{5}$/;
-
-    if (!form.referral_code) {
-      toast.error("Empty Referral Code");
-      return;
-    }
-
-    const code = form.referral_code;
-
-    if (referralRegex.test(code)) {
-      toast.success("Valid referral code.");
-    } else {
-      toast.warning("Invalid referral code.");
-    }
-  };
-
+  // useEffect(() => {
+  //   if (localStorage.getItem("token")) {
+  //     router.push("/") // navigate to home if token exists
+  //   }
+  // }, [router])
+  //
+  
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
       ...prev,
