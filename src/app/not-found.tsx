@@ -6,7 +6,7 @@ import { MoveLeft } from "lucide-react";
 export default function NotFoundPage() {
   return (
     <div className="fixed inset-0 z-50 grid h-screen place-items-center bg-background">
-      <div className="space-y-4 rounded-[2rem] border-dashed border-black bg-secondary p-4 sm:border md:p-8 md:py-12">
+      <div className="space-y-4 rounded-[2rem] border-dashed border-white bg-secondary p-4 sm:border md:p-8 md:py-12">
         <div className="flex justify-center">
           {/* <Image */}
           {/*   src="/Images/logo.png" */}
@@ -16,8 +16,6 @@ export default function NotFoundPage() {
           {/*   className="object-contain" */}
           {/* /> */}
         </div>
-
-        <hr className="text-white/20" />
 
         <h1 className="font-cabin text-white text-3xl font-semibold md:text-4xl">
           404 - Page Not Found
@@ -29,10 +27,10 @@ export default function NotFoundPage() {
 
         <Link
           href="/"
-          className="inline-flex text-blue-500 underline-offset-4 transition hover:text-blue-600 hover:underline"
+          className="inline-flex text-white underline-offset-4 transition hover:text-accent"
         >
           <MoveLeft className="mr-2" />
-          Go back to homepage
+          Go Home
         </Link>
       </div>
     </div>
