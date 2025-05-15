@@ -32,4 +32,6 @@ const useUserStore = create(
   )
 );
 
-export { useUserStore };
+const user = useUserStore.getState().user?.name;
+
+export { useUserStore, user };

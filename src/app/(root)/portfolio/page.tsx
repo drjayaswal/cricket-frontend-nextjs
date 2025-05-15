@@ -22,6 +22,7 @@ import { useUserStore } from "@/store/user";
 export default function Portfolio() {
   const user = useUserStore.getState().user?.name;
   console.log("Current user in store:", user);
+  
 
   return (
     <div className="p-5 min-h-screen bg-gray-950">

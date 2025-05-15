@@ -11,6 +11,8 @@ import { FeaturedBanner } from "./featured-banner"
 // Removed StockTicker import
 
 export default function LiveMatches() {
+  
+  
   const [isLoaded, setIsLoaded] = useState(false)
   const [isIndianMatchToday, setIsIndianMatchTiday] = useState(true)
   const matches = [

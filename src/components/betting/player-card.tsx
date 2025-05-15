@@ -44,7 +44,7 @@ export function PlayerCard({ player, onCreatePortfolio }: PlayerCardProps) {
   }
 
   return (
-    <Card className="border-gray-800 bg-gray-800/50 p-6 shadow-lg">
+    <Card className="border-gray-800 bg-gray-800/50 p-3 shadow-lg">
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 border-2 border-gray-700">

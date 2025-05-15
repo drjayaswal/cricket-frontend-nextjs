@@ -1,28 +1,59 @@
 "use client";
-
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Flame, Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import {
   ChevronDown,
   ChevronRight,
-  Trophy,
   TrendingUp,
   BarChart2,
   Activity,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import MatchesSection from "./matchSections";
 
-export default function HomePage() {
+interface Match {
+  matchDesc: string;
+  matchFormat: string;
+  team1: { teamName: string };
+  team2: { teamName: string };
+  startDate: string;
+  venueInfo: {
+    ground: string;
+    city: string;
+    country: string;
+  };
+}
+
+interface Series {
+  seriesCategory: string;
+  seriesName: string;
+  matchInfo: Match[];
+}
+
+interface MatchDay {
+  date: string;
+  matchScheduleList: Series[];
+}
+
+const CricketSchedulePage = () => {
+  const [matches, setMatches] = useState<MatchDay[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    let ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas dimensions
@@ -34,61 +65,17 @@ export default function HomePage() {
       labels: Array.from({ length: 20 }, (_, i) => i),
       datasets: [
         {
-          label: "IPL Stock",
+          label: "",
           data: Array.from({ length: 20 }, () => Math.random() * 100 + 150),
           color: "#10B981",
         },
         {
-          label: "T20 Index",
+          label: "",
           data: Array.from({ length: 20 }, () => Math.random() * 80 + 100),
           color: "#3B82F6",
         },
       ],
     };
-
-    // Particles for dynamic effect
-    const particles: {
-      x: number;
-      y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
-      color: string;
-      opacity: number;
-    }[] = [];
-    for (let i = 0; i < 50; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 3 + 1,
-        speedX: (Math.random() - 0.5) * 2,
-        speedY: (Math.random() - 0.5) * 2,
-        color: i % 5 === 0 ? "#10B981" : i % 3 === 0 ? "#3B82F6" : "#FFFFFF",
-        opacity: Math.random() * 0.5 + 0.2,
-      });
-    }
-
-    // Cricket balls
-    const balls: {
-      x: number;
-      y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
-      rotation: number;
-      rotationSpeed: number;
-    }[] = [];
-    for (let i = 0; i < 5; i++) {
-      balls.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 15 + 10,
-        speedX: (Math.random() - 0.5) * 3,
-        speedY: (Math.random() - 0.5) * 3,
-        rotation: 0,
-        rotationSpeed: (Math.random() - 0.5) * 0.1,
-      });
-    }
 
     // Animation variables
     let animationFrameId: number;
@@ -223,12 +210,12 @@ export default function HomePage() {
 
         ctx.font = "bold 14px Arial";
         ctx.fillStyle = dataset.color;
-        ctx.fillText(`${latestValue.toFixed(2)}`, x, y);
+        ctx.fillText(latestValue.toFixed(2), x, y);
 
         ctx.font = "12px Arial";
         ctx.fillStyle = change >= 0 ? "#10B981" : "#EF4444";
         ctx.fillText(
-          `${change >= 0 ? "+" : ""}${changePercent.toFixed(2)}%`,
+          (change >= 0 ? "+" : "") + changePercent.toFixed(2) + "%",
           x,
           y + 15
         );
@@ -245,83 +232,6 @@ export default function HomePage() {
 
       // Draw stock chart
       drawStockChart();
-
-      // Draw particles
-      // particles.forEach((particle) => {
-      //   ctx.beginPath()
-      //   ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-      //   ctx.fillStyle = particle.color
-      //   ctx.globalAlpha = particle.opacity
-      //   ctx.fill()
-      //   ctx.globalAlpha = 1
-
-      //   // Move particles
-      //   particle.x += particle.speedX
-      //   particle.y += particle.speedY
-
-      //   // Bounce off edges
-      //   if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1
-      //   if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1
-      // })
-
-      // Draw cricket balls (without using Image)
-      // balls.forEach((ball) => {
-      //   ctx.save()
-      //   ctx.translate(ball.x, ball.y)
-      //   ctx.rotate(ball.rotation)
-
-      //   // Draw a cricket ball (red circle)
-      //   ctx.beginPath()
-      //   ctx.arc(0, 0, ball.size / 2, 0, Math.PI * 2)
-      //   ctx.fillStyle = "#d33434"
-      //   ctx.fill()
-
-      //   // Add seam detail
-      //   ctx.beginPath()
-      //   ctx.arc(0, 0, ball.size / 3, 0, Math.PI * 2)
-      //   ctx.strokeStyle = "#ffffff"
-      //   ctx.lineWidth = 1
-      //   ctx.stroke()
-
-      //   ctx.restore()
-
-      //   // Move and rotate balls
-      //   ball.x += ball.speedX
-      //   ball.y += ball.speedY
-      //   ball.rotation += ball.rotationSpeed
-
-      //   // Bounce off edges
-      //   if (ball.x < ball.size / 2 || ball.x > canvas.width - ball.size / 2) {
-      //     ball.speedX *= -1
-      //     // Add trail effect on bounce
-      //     for (let i = 0; i < 5; i++) {
-      //       particles.push({
-      //         x: ball.x,
-      //         y: ball.y,
-      //         size: Math.random() * 2 + 1,
-      //         speedX: (Math.random() - 0.5) * 3,
-      //         speedY: (Math.random() - 0.5) * 3,
-      //         color: "#d33434",
-      //         opacity: Math.random() * 0.7 + 0.3,
-      //       })
-      //     }
-      //   }
-      //   if (ball.y < ball.size / 2 || ball.y > canvas.height - ball.size / 2) {
-      //     ball.speedY *= -1
-      //     // Add trail effect on bounce
-      //     for (let i = 0; i < 5; i++) {
-      //       particles.push({
-      //         x: ball.x,
-      //         y: ball.y,
-      //         size: Math.random() * 2 + 1,
-      //         speedX: (Math.random() - 0.5) * 3,
-      //         speedY: (Math.random() - 0.5) * 3,
-      //         color: "#d33434",
-      //         opacity: Math.random() * 0.7 + 0.3,
-      //       })
-      //     }
-      //   }
-      // })
 
       // Draw animated wave at bottom
       const waveHeight = 20;
@@ -367,26 +277,37 @@ export default function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/matches/all-stored-matches`
+        );
+        if (!res.ok) throw new Error("API Error");
+        const data = await res.json();
+        setMatches(data?.matches);
+      } catch (e) {
+        console.error("Fetch error:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+  
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="bg-background min-h-screen">
+      {/* Hero Section */}
       {/* Hero Section with Stock Chart and Gradient Overlay */}
-      <section className="relative h-[500px] overflow-hidden bg-gray-950">
+      <section className="relative h-[500px] overflow-hidden bg-gray-900">
         {/* Canvas background */}
         <div className="absolute inset-0 z-0">
           <canvas ref={canvasRef} className="w-full h-full opacity-100" />
         </div>
 
-        {/* Blended background image */}
-        <Image
-          src="/placeholder.svg?key=kc7u0"
-          alt="Cricket Stock Image"
-          width={1200}
-          height={600}
-          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-20"
-        />
-
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/70 to-gray-950/10 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/70 to-gray-950/70 z-10" />
 
         {/* Main Content */}
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center">
@@ -401,7 +322,7 @@ export default function HomePage() {
 
             {/* Main Heading */}
             <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
-              Don’t Miss The Action
+              Don't Miss The Action
             </h1>
 
             {/* Subtext */}
@@ -423,7 +344,7 @@ export default function HomePage() {
           <Link href="/live-matches" className="mt-10">
             <Button
               size="lg"
-              className="bg-green-500 text-white hover:bg-green-600 font-bold shadow-lg transition-all duration-300 hover:scale-105 border-2 border-green-500 hover:border-green-400"
+              className="border-2 border-green-600 text-green-500 bg-transparent hover:bg-green-600 font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:text-white"
             >
               Watch Live Matches
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -432,261 +353,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Upcoming Leagues Section */}
-      <section className="py-6 container mx-auto px-4">
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <Activity className="h-5 w-5 text-green-400" />
-          Upcoming Leagues & Tournaments
-        </h2>
-
-        <div className="space-y-4">
-          <LeagueAccordion
-            title="ICC Womens T20 World Cup Asia Qualifier 2025"
-            matches={[
-              {
-                team1: "India",
-                team2: "Pakistan",
-                date: "May 15, 2025",
-                time: "14:30 GMT",
-                trend: "stable",
-              },
-              {
-                team1: "Sri Lanka",
-                team2: "Bangladesh",
-                date: "May 16, 2025",
-                time: "10:00 GMT",
-                trend: "up",
-              },
-              {
-                team1: "Nepal",
-                team2: "UAE",
-                date: "May 17, 2025",
-                time: "12:30 GMT",
-                trend: "down",
-              },
-            ]}
-          />
-
-          <LeagueAccordion
-            title="Cook Islands tour of Japan, 2025"
-            matches={[
-              {
-                team1: "Japan",
-                team2: "Cook Islands",
-                date: "June 3, 2025",
-                time: "09:00 GMT",
-                trend: "up",
-              },
-              {
-                team1: "Japan",
-                team2: "Cook Islands",
-                date: "June 5, 2025",
-                time: "09:00 GMT",
-                trend: "stable",
-              },
-              {
-                team1: "Japan",
-                team2: "Cook Islands",
-                date: "June 8, 2025",
-                time: "08:30 GMT",
-                trend: "up",
-              },
-            ]}
-          />
-
-          <LeagueAccordion
-            title="Indian Premier League 2025"
-            matches={[
-              {
-                team1: "Mumbai Indians",
-                team2: "Chennai Super Kings",
-                date: "April 10, 2025",
-                time: "15:30 IST",
-                trend: "up",
-              },
-              {
-                team1: "Royal Challengers Bangalore",
-                team2: "Delhi Capitals",
-                date: "April 11, 2025",
-                time: "19:30 IST",
-                trend: "down",
-              },
-              {
-                team1: "Rajasthan Royals",
-                team2: "Kolkata Knight Riders",
-                date: "April 12, 2025",
-                time: "15:30 IST",
-                trend: "up",
-              },
-              {
-                team1: "Punjab Kings",
-                team2: "Sunrisers Hyderabad",
-                date: "April 13, 2025",
-                time: "19:30 IST",
-                trend: "stable",
-              },
-            ]}
-            isPopular={true}
-          />
-
-          <LeagueAccordion
-            title="Bulgaria Women tour of Estonia, 2025"
-            matches={[
-              {
-                team1: "Estonia Women",
-                team2: "Bulgaria Women",
-                date: "July 12, 2025",
-                time: "11:00 EEST",
-                trend: "down",
-              },
-              {
-                team1: "Estonia Women",
-                team2: "Bulgaria Women",
-                date: "July 14, 2025",
-                time: "11:00 EEST",
-                trend: "up",
-              },
-            ]}
-          />
-        </div>
-      </section>
+      {/* Matches Section */}
+      <MatchesSection matches={matches} isLoading={isLoading} />
     </div>
   );
+};
+
+export default CricketSchedulePage;
+function setIsLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
 }
 
-// Component for Live Match Card
-interface LiveMatchCardProps {
-  team1: string;
-  team2: string;
-  score1: string;
-  score2: string;
-  overs: string;
-  league: string;
-  status: string;
-  trend: "up" | "down" | "stable";
-}
-
-function LiveMatchCard({
-  team1,
-  team2,
-  score1,
-  score2,
-  overs,
-  league,
-  status,
-  trend,
-}: LiveMatchCardProps) {
-  return (
-    <div className="bg-gradient-to-r from-gray-800 to-gray-800/70 border border-gray-700 rounded-lg p-4 hover:shadow-lg transition">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium text-red-400 flex items-center gap-1">
-          <span className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></span>{" "}
-          LIVE
-        </span>
-        <span className="text-xs text-gray-400">{league}</span>
-      </div>
-
-      <div className="flex justify-between items-center mb-3">
-        <div className="text-white">
-          <p className="font-bold">{team1}</p>
-          <p className="text-lg font-bold text-white">{score1}</p>
-        </div>
-
-        <div className="text-gray-400 text-sm">vs</div>
-
-        <div className="text-white text-right">
-          <p className="font-bold">{team2}</p>
-          <p className="text-lg font-bold text-white">{score2}</p>
-        </div>
-      </div>
-
-      <div className="text-xs text-gray-400 mb-2">Overs: {overs}</div>
-      <div className="text-sm text-green-400 font-medium flex items-center gap-1">
-        {trend === "up" && <TrendingUp className="h-3 w-3" />}
-        {trend === "down" && <ChevronDown className="h-3 w-3 text-red-400" />}
-        {status}
-      </div>
-
-      <Link
-        href={`/match/${team1.toLowerCase()}-vs-${team2.toLowerCase()}`}
-        className="mt-3 text-center block w-full bg-gray-700 hover:bg-gray-600 text-white rounded py-1.5 text-sm transition"
-      >
-        Watch Live
-      </Link>
-    </div>
-  );
-}
-
-// Component for League Accordion
-interface LeagueAccordionProps {
-  title: string;
-  matches: {
-    team1: string;
-    team2: string;
-    date: string;
-    time: string;
-    trend: "up" | "down" | "stable";
-  }[];
-  isPopular?: boolean;
-}
-
-function LeagueAccordion({
-  title,
-  matches,
-  isPopular = false,
-}: LeagueAccordionProps) {
-  return (
-    <div className="border border-gray-700 rounded-lg overflow-hidden">
-      <div
-        className={`flex items-center justify-between p-4 ${isPopular
-          ? "bg-gradient-to-r from-gray-800 to-gray-700"
-          : "bg-gray-800"
-          }`}
-      >
-        <div className="flex items-center gap-2">
-          <h3 className="font-medium text-white">{title}</h3>
-          {isPopular && (
-            <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">
-              Popular
-            </span>
-          )}
-        </div>
-        <button className="text-gray-400 hover:text-white transition">
-          <ChevronDown className="h-5 w-5" />
-        </button>
-      </div>
-
-      <div className="bg-gray-900 divide-y divide-gray-800">
-        {matches.map((match, index) => (
-          <div key={index} className="p-4 hover:bg-gray-800/50 transition">
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="text-white font-medium flex items-center gap-1">
-                  {match.team1} vs {match.team2}
-                  {match.trend === "up" && (
-                    <TrendingUp className="h-3 w-3 text-green-400" />
-                  )}
-                  {match.trend === "down" && (
-                    <ChevronDown className="h-3 w-3 text-red-400" />
-                  )}
-                  {match.trend === "stable" && (
-                    <Activity className="h-3 w-3 text-yellow-400" />
-                  )}
-                </div>
-                <div className="text-sm text-gray-400 mt-1">
-                  {match.date} • {match.time}
-                </div>
-              </div>
-              <Link
-                href={`/match/${match.team1.toLowerCase()}-vs-${match.team2.toLowerCase()}`}
-                className="text-green-400 hover:text-green-300 text-sm flex items-center"
-              >
-                Details <ChevronRight className="h-4 w-4 ml-1" />
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+function setMatches(matches: any) {
+  throw new Error("Function not implemented.");
 }
