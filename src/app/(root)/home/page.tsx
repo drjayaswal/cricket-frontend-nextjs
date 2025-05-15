@@ -92,7 +92,7 @@ export default function HomePage() {
 
     // Animation variables
     let animationFrameId: number;
-    let time = 0;
+    let time = 5;
 
     // Draw stock chart
     const drawStockChart = () => {
@@ -639,8 +639,8 @@ function LeagueAccordion({
     <div className="border border-gray-700 rounded-lg overflow-hidden">
       <div
         className={`flex items-center justify-between p-4 ${isPopular
-            ? "bg-gradient-to-r from-gray-800 to-gray-700"
-            : "bg-gray-800"
+          ? "bg-gradient-to-r from-gray-800 to-gray-700"
+          : "bg-gray-800"
           }`}
       >
         <div className="flex items-center gap-2">

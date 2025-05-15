@@ -236,6 +236,7 @@ export default function AuthPage() {
         body: JSON.stringify({
           name: form.name,
           mobile: formattedPhone,
+          email: form.email,
           password: form.password,
           otp,
         }),
@@ -290,8 +291,8 @@ export default function AuthPage() {
                 setInfo("");
               }}
               className={`w-full ${mode === "login"
-                  ? "bg-purple-600 hover:bg-purple-700"
-                  : "bg-gray-700 hover:bg-gray-600"
+                ? "bg-purple-600 hover:bg-purple-700"
+                : "bg-gray-700 hover:bg-gray-600"
                 } text-white`}
             >
               Login
@@ -305,8 +306,8 @@ export default function AuthPage() {
                 setInfo("");
               }}
               className={`w-full ${mode === "signup"
-                  ? "bg-purple-600 hover:bg-purple-700"
-                  : "bg-gray-700 hover:bg-gray-600"
+                ? "bg-purple-600 hover:bg-purple-700"
+                : "bg-gray-700 hover:bg-gray-600"
                 } text-white`}
             >
               Sign Up
