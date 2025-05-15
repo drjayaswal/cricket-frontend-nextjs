@@ -16,7 +16,6 @@ export default function AboutPage() {
   const fetchMatches = useMatchesStore((s) => s.fetchMatches);
 
   const matchData = useMatchesStore((s) => s.matchData);;
-  const conectedUsers = useSocketStore((s) => s.scoreData);
   console.log("matchData :", matchData)
 
   useEffect(() => {

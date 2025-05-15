@@ -4,8 +4,12 @@ import { PlayerCard } from "@/components/betting/player-card";
 import { MatchHeader } from "@/components/betting/match-header";
 import { TeamStats } from "@/components/betting/team-stats";
 import { Clock } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 export default function MatchPage() {
+  const matchId = useSearchParams().get("id");
+  // map match id and avoid tresspassers
   const [activeTab, setActiveTab] = useState("bhutan");
 
   const matchData = {
