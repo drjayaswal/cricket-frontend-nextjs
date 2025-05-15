@@ -13,9 +13,9 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
   response.headers.set("x-middleware-cache", "no-cache");
 
-  // if (isPublicPath && isAuth) {
-  //   return NextResponse.redirect(new URL("/home", request.url));
-  // }
+  if (pathname === "/login" && isAuth) {
+    return NextResponse.redirect(new URL("/home", request.url));
+  }
 
   if (!isPublicPath && !isAuth) {
     return NextResponse.redirect(new URL("/login", request.url));
