@@ -29,7 +29,6 @@ const login = async (mobile: string, password: string): Promise<LoginResponse> =
       document.cookie = `token=${data.token}; path=/; secure;`;
       toast.success("Login successful! Welcome to Dashboard.");
       setUserIntoGlobalStore(data.token)
-      console.log("User data set into global store");
       return { success: true, message: data.message };
     }
 
@@ -76,9 +75,10 @@ const handleGoogleSuccess = async (
     const data: GoogleLoginResponse = await res.json();
 
     if (data.token) {
-      localStorage.setItem("token", data.token);
+      document.cookie = `token=${data.token}; path=/; secure;`;
       toast.success("Login successful! Welcome to Dashboard.");
-      window.location.href = "/";
+      setUserIntoGlobalStore(data.token)
+      window.location.href = "/home";
       return { success: true, message: data.message };
     }
 

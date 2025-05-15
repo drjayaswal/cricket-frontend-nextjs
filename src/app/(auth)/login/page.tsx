@@ -79,7 +79,7 @@ export default function AuthPage() {
   //   }
   // }, [router])
   //
-  
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
       ...prev,
@@ -104,7 +104,7 @@ export default function AuthPage() {
 
       if (res.success) {
         setInfo("Login successful!");
-        router.push("/");
+        router.push("/home");
       } else {
         setError(res.message || "Login failed. Please check your credentials.");
       }
@@ -289,11 +289,10 @@ export default function AuthPage() {
                 setError("");
                 setInfo("");
               }}
-              className={`w-full ${
-                mode === "login"
+              className={`w-full ${mode === "login"
                   ? "bg-purple-600 hover:bg-purple-700"
                   : "bg-gray-700 hover:bg-gray-600"
-              } text-white`}
+                } text-white`}
             >
               Login
             </Button>
@@ -305,11 +304,10 @@ export default function AuthPage() {
                 setError("");
                 setInfo("");
               }}
-              className={`w-full ${
-                mode === "signup"
+              className={`w-full ${mode === "signup"
                   ? "bg-purple-600 hover:bg-purple-700"
                   : "bg-gray-700 hover:bg-gray-600"
-              } text-white`}
+                } text-white`}
             >
               Sign Up
             </Button>

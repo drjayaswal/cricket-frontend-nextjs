@@ -26,7 +26,7 @@ export default function NotFoundPage() {
         </p>
 
         <Link
-          href="/"
+          href="/home"
           className="inline-flex text-white underline-offset-4 transition hover:text-accent"
         >
           <MoveLeft className="mr-2" />

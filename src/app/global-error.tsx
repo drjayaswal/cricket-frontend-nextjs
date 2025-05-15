@@ -37,7 +37,7 @@ export default function GlobalError({ error }: Props) {
 
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <Link
-            href="/"
+            href="/home"
             className="inline-flex text-blue-500 underline-offset-4 transition hover:text-blue-600 hover:underline"
           >
             <MoveLeft className="mr-2" />
