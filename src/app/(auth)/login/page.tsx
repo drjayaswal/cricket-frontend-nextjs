@@ -114,7 +114,17 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
-
+const validReferral = () => {
+  if(!form.referral_code){
+    toast.error("Enter Referral Code !")
+  }else{
+    if(!form.referral_code.startsWith("CRST-") || form.referral_code.length < 19){
+      toast.error("Unknown Referral Code !")
+    }else{
+      toast.success("Referral Code Added !")
+    }
+  }
+}
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 

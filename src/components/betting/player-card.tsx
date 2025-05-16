@@ -16,7 +16,6 @@ interface PlayerStats {
 interface Player {
   id: number
   name: string
-  image: string
   team: string
   status: string
   price: number
@@ -48,7 +47,6 @@ export function PlayerCard({ player, onCreatePortfolio }: PlayerCardProps) {
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 border-2 border-gray-700">
-            <AvatarImage src={player.image || "/placeholder.svg"} alt={player.name} />
             <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">

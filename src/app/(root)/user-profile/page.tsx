@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,10 +23,64 @@ import {
   HelpCircle,
   UserPlus,
   Plus,
+  LoaderCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useUserStore } from "@/store/user";
+import { toast } from "sonner";
 
 export default function UserProfile() {
+  const setUser = useUserStore((state) => state.setUser)
+  const user = useUserStore((state) => state.user)
+  const [loading,setLoading] = useState(false)
+  
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true)
+    const toastId = toast.loading("Uploading Image...");
+    console.log(toastId)
+    if (event.target.files && event.target.files[0]) {
+      const formData = new FormData();
+      formData.append("image", event.target.files[0]);
+      const getTokenFromCookies = () => {
+        const cookies = document.cookie.split("; ");
+        const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+        return tokenCookie ? tokenCookie.split("=")[1] : null;
+      };
+      const token = getTokenFromCookies();
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/upload-profile`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to upload image");
+        }
+        
+        const data = await response.json();
+        console.log(data.user)
+        setUser(data.user)
+        toast.success("Profile Image Uploaded!");
+        toast.dismiss(toastId)
+        setLoading(false)
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message || "Something went wrong");
+        } else {
+          toast.error("Something went wrong");
+        }
+      }
+    }
+  };
+  
+  const triggerFileInput = () => {
+    document.getElementById("imageUploadInput")?.click();
+  };
+  // console.log("Current user in store:", user);
   const [isLogoutOpen, setLogoutOpen] = useState(false);
   const router = useRouter();
 
@@ -47,24 +101,43 @@ export default function UserProfile() {
           <CardContent className="pt-0">
             <div className="flex items-start justify-between gap-4 w-full">
               <div className="flex gap-4">
-                <Avatar className="h-16 w-16 border-2 transition-all duration-250 hover:border-accent shadow-md">
-                  <AvatarFallback className="text-gray-300 text-xl">
-                    US
-                  </AvatarFallback>
-                  <AvatarImage src="/diverse-group.png" />
-                </Avatar>
+                <div>
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    id="imageUploadInput"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+
+                  {/* Avatar */}
+                  <Avatar
+                    className="h-16 w-16 border-2 mt-3 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center"
+                    onClick={triggerFileInput}
+                  >
+                    {user?.profileImage &&!loading ? (
+                      <AvatarImage src={user?.profileImage} alt="User Profile" className="object-cover" />
+                    ) : (
+                      <>
+                        <LoaderCircle className=" animate-spin text-gray-300 size-10"/>
+                        <AvatarImage />
+                      </>
+                    )}
+                  </Avatar>
+                </div>
                 <div className="pt-4">
                   <h2 className="text-xl font-medium text-gray-100">
-                    User Profile
+                    {user?.name || "John"}
                   </h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                     <Phone className="h-3 w-3" />
-                    <span>+919549098255</span>
+                    <span>+91-{user?.mobile.slice(3) || "XXXXXXXXXX"}</span>
                     <Badge
                       variant="outline"
-                      className="ml-1 text-xs bg-[#2a2a2a] text-gray-300 hover:bg-[#333333] border-[#444444] cursor-pointer"
+                      className="ml-1 text-xs text-amber-600 bg-gray-900 border-amber-600 cursor-no-drop"
                     >
-                      Verify
+                      Verified
                     </Badge>
                   </div>
                 </div>
@@ -89,7 +162,7 @@ export default function UserProfile() {
                 <p className="text-md font-normal text-gray-400">
                   Wallet Balance
                 </p>
-                <h3 className="text-5xl font-medium text-white mt-1">₹0</h3>
+                <h3 className="text-5xl font-medium text-white mt-1">₹{user?.amount || 0}</h3>
               </div>
               <Button
                 className="bg-[#f5f5f5] text-[#121212] hover:bg-white/70 shadow-md"
