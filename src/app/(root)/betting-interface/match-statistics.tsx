@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { BarChart3, MapPin, ThermometerSun, Users, Award, Droplets, TrendingUp, Zap, Target } from "lucide-react"
+import { useSocketStore } from "@/store/socket-store"
+import { useEffect } from "react"
 
 interface TeamStats {
   runs: number
@@ -365,7 +367,7 @@ export function MatchStatistics({ team1, team2, matchStats, className = "" }: Ma
                             {Math.round(
                               ((team1.stats.boundaries.fours + team1.stats.boundaries.sixes) /
                                 (team1.stats.overs * 6)) *
-                                100,
+                              100,
                             )}
                             %
                           </span>
@@ -436,7 +438,7 @@ export function MatchStatistics({ team1, team2, matchStats, className = "" }: Ma
                             {Math.round(
                               ((team2.stats.boundaries.fours + team2.stats.boundaries.sixes) /
                                 (team2.stats.overs * 6)) *
-                                100,
+                              100,
                             )}
                             %
                           </span>

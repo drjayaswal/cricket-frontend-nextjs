@@ -51,7 +51,6 @@ const dashboardApi = {
     if (!res.ok) throw new Error('Failed to fetch company loss');
     return res.json();
   },
-  // Add more API calls here...
 };
 
 // Custom Hook for Dashboard Data

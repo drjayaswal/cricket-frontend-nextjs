@@ -1,5 +1,5 @@
 "use client";
-import { useMatchesStore } from "@/store/match-score";
+import { useMatchStore } from "@/store/match-store";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket-store";
 import {
@@ -14,14 +14,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FeaturedBanner } from "./featured-banner";
+import { Match } from "@/store/match-store";
 // Removed StockTicker import
 
 export default function LiveMatches() {
-  const fetchMatchData = useMatchesStore((s) => s.fetchMatches);
-  const matchesData = useMatchesStore((s) => s.matchData);
+  const fetchMatchData = useMatchStore((s) => s.fetchMatches);
+  const matchesData = useMatchStore((s) => s.matchData);
+  const setSelectedMatch = useMatchStore.getState().setSelectedMatch
+
   useEffect(() => {
     fetchMatchData();
   }, []);
+
+  const handleAddToPortfolio = (selectedMatch: Match) => {
+    setSelectedMatch(selectedMatch)
+  }
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -178,6 +185,7 @@ export default function LiveMatches() {
                     <Button
                       className="hover:bg-accent/50 border-2 hover:text-white hover:border-transparent bg-accent/10 border-accent/20 p-6 text-xl w-full text-accent/60"
                       asChild
+                      onClick={() => handleAddToPortfolio(match)}
                     >
                       <Link href={`/betting-interface?id=${match.matchId}`}>
                         <PlusIcon className="mr-2 h-4 w-4" />

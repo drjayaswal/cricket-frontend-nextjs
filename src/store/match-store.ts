@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useSocketStore } from "./socket-store";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -15,29 +16,30 @@ export interface Match {
 }
 
 interface MatchState {
-  matchData: Match[];
-  seriesMatchData: Record<string, Match[]>;
   isLoading: boolean;
   error: string | null;
-  connectedUsers: number;
+  matchData: Match[];
+  seriesMatchData: Record<string, Match[]>;
   fetchMatches: () => Promise<void>;
+  selectedMatch: Match | null;
+  setSelectedMatch: (match: Match | null) => void;
+  clearSelectedMatch: () => void;
 }
 
 export const useMatchStore = create(
   persist<MatchState>(
-    (set) => ({
-      matchData: [],
-      seriesMatchData: {},
+    (set, get) => ({
       isLoading: false,
       error: null,
-      connectedUsers: 0,
+      matchData: [],
+      seriesMatchData: {},
 
       fetchMatches: async () => {
         try {
           set({ isLoading: true, error: null });
 
           const response = await fetch(`${BACKEND_URL}/matches/all-stored-matches`);
-          console.log("Response:", response);
+          // console.log("Response:", response);
 
           if (!response.ok) {
             throw new Error("Failed to fetch match data");
@@ -96,7 +98,26 @@ export const useMatchStore = create(
           set({ error: error.message || "Unknown error", isLoading: false });
         }
       },
-    }),
+
+      selectedMatch: null,
+
+      setSelectedMatch: (match) => {
+        set({ selectedMatch: match });
+      },
+
+      clearSelectedMatch: () => {
+        const { selectedMatch } = get();
+        const socket = useSocketStore.getState().socket;
+
+        // If already subscribed to a match, unsubscribe first
+        if (selectedMatch?.matchId && socket) {
+          socket.emit("unsubscribeMatch", selectedMatch.matchId);
+        }
+        set({ selectedMatch: null });
+      }
+    }
+    ),
+
     {
       name: "match-store", // key in localStorage
     }

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoaderCircle, Search } from "lucide-react";
-import { useUserStore } from "@/lib/store";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;

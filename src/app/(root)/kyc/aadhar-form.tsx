@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+
 export function AadharForm() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -11,7 +12,14 @@ export function AadharForm() {
     address: "",
   });
 
-  const [errors, setErrors] = useState({});
+  type FormErrors = {
+    fullName?: string;
+    aadharNumber?: string;
+    dateOfBirth?: string;
+    address?: string;
+  };
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [showAadhar, setShowAadhar] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

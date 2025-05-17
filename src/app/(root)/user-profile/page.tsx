@@ -24,16 +24,17 @@ import {
   UserPlus,
   Plus,
   LoaderCircle,
+  User,
 } from "lucide-react";
 import Link from "next/link";
-import { useUserStore } from "@/store/user";
+import { useUserStore } from "@/store/user-store";
 import { toast } from "sonner";
 
 export default function UserProfile() {
   const setUser = useUserStore((state) => state.setUser)
   const user = useUserStore((state) => state.user)
-  const [loading,setLoading] = useState(false)
-  
+  const [loading, setLoading] = useState(false)
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setLoading(true)
     const toastId = toast.loading("Uploading Image...");
@@ -55,12 +56,12 @@ export default function UserProfile() {
           },
           body: formData,
         });
-        
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Failed to upload image");
         }
-        
+
         const data = await response.json();
         console.log(data.user)
         setUser(data.user)
@@ -76,7 +77,7 @@ export default function UserProfile() {
       }
     }
   };
-  
+
   const triggerFileInput = () => {
     document.getElementById("imageUploadInput")?.click();
   };
@@ -116,14 +117,12 @@ export default function UserProfile() {
                     className="h-16 w-16 border-2 mt-3 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center"
                     onClick={triggerFileInput}
                   >
-                    {user?.profileImage &&!loading ? (
-                      <AvatarImage src={user?.profileImage} alt="User Profile" className="object-cover" />
-                    ) : (
-                      <>
-                        <LoaderCircle className=" animate-spin text-gray-300 size-10"/>
-                        <AvatarImage />
-                      </>
-                    )}
+                    {loading
+                      ? <LoaderCircle className=" animate-spin text-gray-300 size-10" />
+                      : user?.profileImage
+                        ? <AvatarImage src={user?.profileImage} alt="User Profile" className="object-cover" />
+                        : <User />
+                    }
                   </Avatar>
                 </div>
                 <div className="pt-4">

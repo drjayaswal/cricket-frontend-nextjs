@@ -1,24 +1,23 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
-import { useSelectedMatchStore } from "./selected-match-store";
+import { useMatchStore } from "./match-store";
+import { MatchScore } from "@/types/match-score";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface SocketState {
   socket: Socket | null;
-  scoreData: any;
-  connectedUsers: number;
   connectSocket: () => void;
   disconnectSocket: () => void;
+  scoreData: MatchScore | null;
   setScoreData: (data: any) => void;
-  setConnectedUsers: (count: number) => void;
+  handleGetScore: () => void;
 }
 
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   scoreData: null,
-  connectedUsers: 0,
 
   connectSocket: () => {
     const socket = io(BACKEND_URL as string, {
@@ -35,7 +34,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       console.log("Connected to WebSocket server");
 
       // Get the selected match from the store
-      const selectedMatch = useSelectedMatchStore.getState().selectedMatch;
+      const selectedMatch = useMatchStore.getState().selectedMatch;
       if (selectedMatch?.matchId) {
         console.log("Auto-resubscribing to match:", selectedMatch.matchId);
         socket.emit("subscribeMatch", selectedMatch);
@@ -65,6 +64,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("scoreUpdate", (data) => {
+      console.log("Score update received:", data);
       set({ scoreData: data });
     });
 
@@ -79,6 +79,31 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     }
   },
 
+  handleGetScore: () => {
+    // console.log("Fetching score for selected match...");
+    const selectedMatch = useMatchStore.getState().selectedMatch;
+    // console.log("selectedMatch :", selectedMatch)
+    const socket = useSocketStore.getState().socket;
+
+    // If already subscribed to a match, unsubscribe first
+    if (selectedMatch?.matchId && socket) {
+      socket.emit("unsubscribeMatch", selectedMatch.matchId);
+    }
+    const connectSocket = useSocketStore.getState().connectSocket;
+    connectSocket();
+
+    // Set new selected match
+    // set({ selectedMatch: selectedMatch });
+
+    // Subscribe to new match
+    if (socket) {
+      socket.emit("subscribeMatch", selectedMatch);
+      toast.success(`Selected Match: ${selectedMatch?.team1} vs ${selectedMatch?.team2}`);
+    }
+
+    // Navigate to betting interface
+    // window.location.href = "/betting-interface";
+  },
+
   setScoreData: (data) => set({ scoreData: data }),
-  setConnectedUsers: (count) => set({ connectedUsers: count }),
-})); 
+}));

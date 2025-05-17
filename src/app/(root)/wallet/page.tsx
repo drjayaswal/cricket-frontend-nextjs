@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "./date-range-picker";
-import { useUserStore } from "@/store/user";
+import { useUserStore } from "@/store/user-store";
 
 export default function MoneyTransactionsPage() {
   const [addtxnAmount, setAddtxnAmount] = useState("");
@@ -148,8 +148,8 @@ export default function MoneyTransactionsPage() {
                     }
                   </div>
                   <p className="mt-1 text-sm text-gray-400">Across {
-                  transactions
-                  .filter((transaction) => transaction.txnType === "deposit").length
+                    transactions
+                      .filter((transaction) => transaction.txnType === "deposit").length
                   } deposits</p>
                 </div>
               </div>
@@ -177,8 +177,8 @@ export default function MoneyTransactionsPage() {
                     }
                   </div>
                   <p className="mt-1 text-sm text-gray-400">Across {
-                  transactions
-                  .filter((transaction) => transaction.txnType === "withdrawal").length
+                    transactions
+                      .filter((transaction) => transaction.txnType === "withdrawal").length
                   } withdrawals</p>
                 </div>
               </div>

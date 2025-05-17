@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, BarChart3, Users, Trophy, Clock, Landmark, Bitcoin, DollarSign } from "lucide-react";
 import type { Metadata } from "next";
-import { useUserStore } from "@/store/user";
+import { useUserStore } from "@/store/user-store";
 
 // export const metadata: Metadata = {
 //   title: "Portfolio | CricStock11",
@@ -22,7 +22,7 @@ import { useUserStore } from "@/store/user";
 export default function Portfolio() {
   const user = useUserStore.getState().user?.name;
   console.log("Current user in store:", user);
-  
+
 
   return (
     <div className="p-5 min-h-screen bg-gray-950">

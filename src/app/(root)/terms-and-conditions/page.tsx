@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp, Download, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import {generateTermsPDF} from "@/lib/helper"
+import { generateTermsPDF } from "@/lib/pdf-helper"
 export default function TermsAndConditions() {
   const [expandedSection, setExpandedSection] = useState<string | null>("introduction")
 
@@ -95,9 +95,8 @@ export default function TermsAndConditions() {
                     <Button
                       key={section.id}
                       variant="ghost"
-                      className={`w-full justify-start text-left ${
-                        expandedSection === section.id ? "bg-gray-800" : ""
-                      }`}
+                      className={`w-full justify-start text-left ${expandedSection === section.id ? "bg-gray-800" : ""
+                        }`}
                       onClick={() => toggleSection(section.id)}
                     >
                       {section.title}
@@ -151,7 +150,7 @@ export default function TermsAndConditions() {
                 </div>
 
                 <div className="mt-8 flex justify-center">
-                  <Button className="flex items-center bg-accent text-white hover:bg-accent/80 cursor-pointer gap-2" onClick={()=>generateTermsPDF(sections)}>
+                  <Button className="flex items-center bg-accent text-white hover:bg-accent/80 cursor-pointer gap-2" onClick={() => generateTermsPDF(sections)}>
                     <span>Download PDF</span>
                     <Download className="h-4 w-4" />
                   </Button>

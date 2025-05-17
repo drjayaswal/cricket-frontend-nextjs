@@ -57,7 +57,7 @@ export function BuySellModal({ player, onClose }: BuySellModalProps) {
           <div className="flex items-center gap-3">
             <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-primary">
               <Image
-                src={player.image || "/placeholder.svg?height=48&width=48&query=cricket player"}
+                src={player.image || "/placeholder.svg"}
                 alt={player.name}
                 fill
                 className="object-cover"
@@ -68,13 +68,12 @@ export function BuySellModal({ player, onClose }: BuySellModalProps) {
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-gray-400">{player.team}</span>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-xs ${
-                    player.status === "Playing"
+                  className={`px-2 py-0.5 rounded-full text-xs ${player.status === "Playing"
                       ? "bg-green-500/20 text-green-400"
                       : player.status === "Out"
                         ? "bg-red-500/20 text-red-400"
                         : "bg-yellow-500/20 text-yellow-400"
-                  }`}
+                    }`}
                 >
                   {player.status}
                 </span>
@@ -202,9 +201,8 @@ export function BuySellModal({ player, onClose }: BuySellModalProps) {
               </div>
 
               <Button
-                className={`w-full py-6 text-lg font-bold ${
-                  activeTab === "buy" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
-                }`}
+                className={`w-full py-6 text-lg font-bold ${activeTab === "buy" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+                  }`}
               >
                 {activeTab === "buy" ? "Buy Now" : "Sell Now"}
               </Button>

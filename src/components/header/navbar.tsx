@@ -3,15 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { NAVLINKS, UNPROTECTED_ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { User } from "lucide-react";
+import { LoaderCircle, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { useUserStore } from "@/store/user-store";
 
 const Navbar = () => {
   const pathname = usePathname();
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     // Check for token in cookies
@@ -37,7 +41,13 @@ const Navbar = () => {
               href={"/"}
               className="text-xl font-bold bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text"
             >
-              CrickStock11
+              <Image
+                src={"/logo.png"}
+                alt="Logo"
+                width={160}
+                height={100}
+                className="rounded-full object-cover"
+              />
             </Link>
           </div>
 
@@ -59,21 +69,13 @@ const Navbar = () => {
           }
 
           <Link href="/user-profile">
-            <div className="flex items-center gap-3 border-2 border-accent rounded-full overflow-hidden p-1 cursor-pointer">
-              <Button className="h-8 w-8 flex justify-center items-center rounded-full cursor-pointer">
-                {true ? (
-                  <User className="scale-150 text-accent" />
-                ) : (
-                  <Image
-                    src={"globe.svg"}
-                    alt="User Profile"
-                    width={40}
-                    height={40}
-                    className="rounded-full object-cover"
-                  />
-                )}
-              </Button>
-            </div>
+            <Avatar className="size-11 border-2 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center" >
+              {
+                user?.profileImage
+                  ? <AvatarImage src={user?.profileImage} alt="User Profile" className="object-cover" />
+                  : <User />
+              }
+            </Avatar>
           </Link>
         </div>
       </div>

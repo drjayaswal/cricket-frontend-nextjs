@@ -1,6 +1,5 @@
-import jsPDF from "jspdf"
 import { NextRequest } from "next/server";
-import { useUserStore } from "@/store/user"; // adjust path
+import { useUserStore } from "@/store/user-store"; // adjust path
 
 export const validatePassword = (password: string): string => {
   if (!password) return "Password is required";
@@ -51,81 +50,6 @@ export const formatPhoneNumber = (phone: string): string => {
   return `+91${tenDigitNumber}`;
 };
 
-interface Section {
-  id: string
-  title: string
-  content: string
-}
-
-export const generateTermsPDF = (sections: Section[]) => {
-  // Create a new PDF document
-  const doc = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a4",
-  })
-
-  // Add title
-  doc.setFontSize(20)
-  doc.setTextColor(40, 40, 40)
-  doc.text("Terms and Conditions", 20, 20)
-
-  // Add date
-  doc.setFontSize(10)
-  doc.setTextColor(100, 100, 100)
-  doc.text(`Last updated: ${new Date().toLocaleDateString()}`, 20, 30)
-
-  let yPosition = 40
-
-  // Add each section
-  sections.forEach((section) => {
-    // Add section title
-    doc.setFontSize(14)
-    doc.setTextColor(40, 40, 40)
-    doc.text(section.title, 20, yPosition)
-    yPosition += 10
-
-    // Add section content
-    doc.setFontSize(10)
-    doc.setTextColor(80, 80, 80)
-
-    // Split content into lines to fit page width
-    const textLines = doc.splitTextToSize(section.content, 170)
-
-    // Check if we need a new page
-    if (yPosition + textLines.length * 5 > 280) {
-      doc.addPage()
-      yPosition = 20
-    }
-
-    doc.text(textLines, 20, yPosition)
-    yPosition += textLines.length * 5 + 15
-
-    // Add some space between sections
-    if (yPosition > 280) {
-      doc.addPage()
-      yPosition = 20
-    }
-  })
-
-  // Add footer
-  const pageCount = doc.getNumberOfPages()
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i)
-    doc.setFontSize(8)
-    doc.setTextColor(150, 150, 150)
-    doc.text(
-      `© ${new Date().getFullYear()} Your Company Name. All rights reserved. | Page ${i} of ${pageCount}`,
-      20,
-      285,
-    )
-  }
-
-  // Save the PDF
-  doc.save("terms-and-conditions.pdf")
-}
-
-
 const BASE62: string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 const SECRET_KEY: bigint = BigInt(0xa3b1c2d3);
 
@@ -133,11 +57,11 @@ function base62Encode(num: number | bigint): string {
   let encoded: string = "";
   const base: bigint = BigInt(62);
   num = BigInt(num);
-  
+
   if (num === BigInt(0)) {
     return "0".padStart(8, "0");
   }
-  
+
   while (num > BigInt(0)) {
     encoded = BASE62[Number(num % base)] + encoded;
     num = num / base;
@@ -148,7 +72,7 @@ function base62Encode(num: number | bigint): string {
 function base62Decode(str: string): bigint {
   let num: bigint = BigInt(0);
   const base: bigint = BigInt(62);
-  
+
   for (let char of str) {
     const value: bigint = BigInt(BASE62.indexOf(char));
     num = num * base + value;
@@ -201,7 +125,7 @@ const isUserAdmin = async (): Promise<boolean> => {
     toast.error("Please login again");
     return false;
   }
-  
+
   try {
     const response = await fetch(`${BACKEND_URL}/auth/admin-login`, {
       method: "GET",
@@ -209,7 +133,7 @@ const isUserAdmin = async (): Promise<boolean> => {
         Authorization: `Bearer ${token}`,
       },
     });
-    
+
     const data: BackendResponse = await response.json();
     if (data.status === 200) {
       return true;
@@ -232,12 +156,10 @@ export {
   base62Encode
 };
 
-
 export const isAuthenticated = async (request: NextRequest) => {
   const token = request.cookies.get("token")?.value;
   return !!token;
 };
-
 
 export const setUserIntoGlobalStore = async (token: string) => {
   try {
