@@ -132,7 +132,7 @@ export default function LiveMatches() {
                     <div className="flex flex-col items-center gap-3 w-1/3">
                       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white p-2 shadow-md">
                         <Image
-                          src="/teams/estonia.png"
+                          src="/teams/india.png"
                           alt={match.team1}
                           width={100}
                           height={100}
@@ -166,7 +166,7 @@ export default function LiveMatches() {
                     <div className="flex flex-col items-center gap-3 w-1/3">
                       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white p-2 shadow-md">
                         <Image
-                          src="/teams/bulgaria.png" // Replace with actual Bulgaria Women logo
+                          src="/teams/pakistan.png" // Replace with actual Bulgaria Women logo
                           alt={match.team2}
                           width={100}
                           height={100}

@@ -11,11 +11,13 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { useUserStore } from "@/store/user-store";
 
+
 const Navbar = () => {
+  const setUser = useUserStore((state) => state.setUser)
+  const user = useUserStore((state) => state.user)
   const pathname = usePathname();
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 
-  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     // Check for token in cookies

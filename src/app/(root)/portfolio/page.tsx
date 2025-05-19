@@ -20,18 +20,17 @@ import { useUserStore } from "@/store/user-store";
 //     "View your CricStock11 portfolio including player and team stocks, current performance, and investment value.",
 // };
 export default function Portfolio() {
-  const user = useUserStore.getState().user?.name;
+  const user = useUserStore.getState().user;
   console.log("Current user in store:", user);
 
 
   return (
     <div className="p-5 min-h-screen bg-gray-950">
-      {/* {<div>{user}</div>} */}
       <main className="container mx-auto px-4 py-8">
         {/* Portfolio Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-            Cricket Portfolio
+            {user?.name?.split(" ")[0]}'s Portfolio
           </h1>
           <p className="text-gray-400">
             Track your player investments and performance

@@ -286,6 +286,7 @@ const CricketSchedulePage = () => {
         );
         if (!res.ok) throw new Error("API Error");
         const data = await res.json();
+        console.log(data)
         setMatches(data?.matches);
       } catch (e) {
         console.error("Fetch error:", e);
