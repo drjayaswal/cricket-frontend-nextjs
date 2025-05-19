@@ -14,7 +14,7 @@ export default function ContactPage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid gap-12 lg:gap-20 md:grid-cols-2 items-start">
-            
+
             {/* Left Side - Contact Info */}
             <div>
               <p className="text-sm sm:text-base text-purple-400 mb-2">How can we help you?</p>
@@ -57,7 +57,7 @@ export default function ContactPage() {
 
             {/* Right Side - Form */}
             <div className="rounded-2xl shadow-lg p-2 sm:p-8">
-              <h2 className="text-5xl font-semibold text-purple-400">Send us a message</h2>
+              <h2 className="text-5xl font-semibold text-accent">Send us a message</h2>
               <ContactForm />
             </div>
           </div>
