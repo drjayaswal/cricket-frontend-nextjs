@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "./date-range-picker";
 import { useUserStore } from "@/store/user-store";
+import { TransactionModal } from "./transaction-modal";
 
 export default function MoneyTransactionsPage() {
   const [addtxnAmount, setAddtxnAmount] = useState("")
