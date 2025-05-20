@@ -9,6 +9,7 @@ import Image from "next/image"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import data from "./data.json"
+import { PlayerModal } from "./player-modal"
 
 // Type definitions for team stats props
 interface TeamStatsProps {
@@ -170,7 +171,7 @@ export default function MatchPage() {
   const [expandedPlayers, setExpandedPlayers] = useState<number[]>([]) // Track expanded player cards
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null) // Store selected player for modal
   const [isModalOpen, setIsModalOpen] = useState(false) // Control modal visibility
-
+  const [selectedBattingPosition, setSelectedBattingPosition] = useState<number>(0) // Store batting position
   /**
    * Toggle player card expansion state
    * @param playerId - ID of the player to toggle
@@ -280,20 +281,18 @@ export default function MatchPage() {
         <div className="mb-4">
           <div className="mb-6 flex border-b border-gray-800">
             <button
-              className={`px-4 py-2 font-medium ${
-                activeTab === "innings1"
+              className={`px-4 py-2 font-medium ${activeTab === "innings1"
                   ? "border-b-2 border-purple-500 text-purple-500"
                   : "text-gray-400 hover:text-white"
-              }`}
+                }`}
               onClick={() => setActiveTab("innings1")}
               aria-label={`View ${matchLiveScore.innings[0].batTeamName} innings`}
             >
               {matchLiveScore.innings[0].batTeamName}
             </button>
             <button
-              className={`px-4 py-2 font-medium ${
-                activeTab === "innings2" ? "border-b-2 border-cyan-500 text-cyan-500" : "text-gray-400 hover:text-white"
-              }`}
+              className={`px-4 py-2 font-medium ${activeTab === "innings2" ? "border-b-2 border-cyan-500 text-cyan-500" : "text-gray-400 hover:text-white"
+                }`}
               onClick={() => setActiveTab("innings2")}
               aria-label={`View ${matchLiveScore.innings[1].batTeamName} innings`}
             >
@@ -306,33 +305,30 @@ export default function MatchPage() {
         <div className="mb-6">
           <div className="mb-6 flex border-b border-gray-800">
             <button
-              className={`px-4 py-2 font-medium ${
-                activeSection === "batsmen"
+              className={`px-4 py-2 font-medium ${activeSection === "batsmen"
                   ? "border-b-2 border-blue-500 text-blue-500"
                   : "text-gray-400 hover:text-white"
-              }`}
+                }`}
               onClick={() => setActiveSection("batsmen")}
               aria-label="View batting statistics"
             >
               Batting
             </button>
             <button
-              className={`px-4 py-2 font-medium ${
-                activeSection === "bowlers"
+              className={`px-4 py-2 font-medium ${activeSection === "bowlers"
                   ? "border-b-2 border-blue-500 text-blue-500"
                   : "text-gray-400 hover:text-white"
-              }`}
+                }`}
               onClick={() => setActiveSection("bowlers")}
               aria-label="View bowling statistics"
             >
               Bowling
             </button>
             <button
-              className={`px-4 py-2 font-medium ${
-                activeSection === "wickets"
+              className={`px-4 py-2 font-medium ${activeSection === "wickets"
                   ? "border-b-2 border-blue-500 text-blue-500"
                   : "text-gray-400 hover:text-white"
-              }`}
+                }`}
               onClick={() => setActiveSection("wickets")}
               aria-label="View wickets information"
             >
@@ -373,11 +369,10 @@ export default function MatchPage() {
                       <tr
                         key={index}
                         onClick={() => openModal(batsman)}
-                        className={`${index % 2 === 0 ? "bg-gray-800/30 " : ""} rounded-4xl ${
-                          batsman.outDesc === "not out"
+                        className={`${index % 2 === 0 ? "bg-gray-800/30 " : ""} rounded-4xl ${batsman.outDesc === "not out"
                             ? "cursor-pointer hover:bg-white/10"
                             : "cursor-default opacity-70"
-                        }`}
+                          }`}
                       >
                         <td className="px-2 py-3 font-medium text-white sm:px-4">
                           {batsman.name} {batsman.isCaptain && "(C)"} {batsman.isKeeper && "(WK)"}
@@ -556,19 +551,17 @@ export default function MatchPage() {
               (player) => (
                 <div
                   key={player.id}
-                  className={`relative overflow-hidden rounded-xl shadow-lg transition-all hover:shadow-xl ${
-                    activeTab === "innings1"
+                  className={`relative overflow-hidden rounded-xl shadow-lg transition-all hover:shadow-xl ${activeTab === "innings1"
                       ? "border border-purple-800/30 bg-gradient-to-br from-purple-900/80 to-purple-950"
                       : "border border-cyan-800/30 bg-gradient-to-br from-cyan-900/80 to-cyan-950"
-                  }`}
+                    }`}
                 >
                   {/* Player header with avatar */}
                   <div className="relative p-4">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`relative h-12 w-12 rounded-full border-2 sm:h-14 sm:w-14 ${
-                          activeTab === "innings1" ? "border-purple-500" : "border-cyan-500"
-                        }`}
+                        className={`relative h-12 w-12 rounded-full border-2 sm:h-14 sm:w-14 ${activeTab === "innings1" ? "border-purple-500" : "border-cyan-500"
+                          }`}
                       >
                         <Image
                           src={`/teams/india.png`}
@@ -585,22 +578,20 @@ export default function MatchPage() {
                           <div className="flex flex-wrap gap-1">
                             {player.isKeeper && (
                               <span
-                                className={`rounded-full px-1.5 py-0.5 text-xs ${
-                                  activeTab === "innings1"
+                                className={`rounded-full px-1.5 py-0.5 text-xs ${activeTab === "innings1"
                                     ? "bg-purple-500/20 text-purple-300"
                                     : "bg-cyan-500/20 text-cyan-300"
-                                }`}
+                                  }`}
                               >
                                 Keeper
                               </span>
                             )}
                             {player.isCaptain && (
                               <span
-                                className={`rounded-full px-1.5 py-0.5 text-xs ${
-                                  activeTab === "innings1"
+                                className={`rounded-full px-1.5 py-0.5 text-xs ${activeTab === "innings1"
                                     ? "bg-purple-500/20 text-purple-300"
                                     : "bg-cyan-500/20 text-cyan-300"
-                                }`}
+                                  }`}
                               >
                                 Captain
                               </span>
@@ -616,32 +607,28 @@ export default function MatchPage() {
 
                   {/* Player stats */}
                   <div
-                    className={`p-4 ${activeTab === "innings1" ? "border-purple-800/30" : "border-cyan-800/30"} border-t ${
-                      activeTab === "innings1" ? "bg-purple-950/50" : "bg-cyan-950/50"
-                    }`}
+                    className={`p-4 ${activeTab === "innings1" ? "border-purple-800/30" : "border-cyan-800/30"} border-t ${activeTab === "innings1" ? "bg-purple-950/50" : "bg-cyan-950/50"
+                      }`}
                   >
                     {/* Primary stats - runs, balls, strike rate */}
                     <div className="grid grid-cols-3 gap-2 sm:gap-3">
                       <div
-                        className={`rounded-lg p-2 text-center ${
-                          activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
-                        }`}
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
                       >
                         <p className="text-xl font-bold text-white sm:text-2xl">{player.runs}</p>
                         <p className="text-xs text-gray-400">Runs</p>
                       </div>
                       <div
-                        className={`rounded-lg p-2 text-center ${
-                          activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
-                        }`}
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
                       >
                         <p className="text-xl font-bold text-white sm:text-2xl">{player.balls}</p>
                         <p className="text-xs text-gray-400">Balls</p>
                       </div>
                       <div
-                        className={`rounded-lg p-2 text-center ${
-                          activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
-                        }`}
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
                       >
                         <p className="text-xl font-bold text-white sm:text-2xl">{player.strikeRate}</p>
                         <p className="text-xs text-gray-400">SR</p>
@@ -651,9 +638,8 @@ export default function MatchPage() {
                     {/* Secondary stats - fours and sixes */}
                     <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
                       <div
-                        className={`rounded-lg p-2 text-center ${
-                          activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
-                        }`}
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
                       >
                         <div className="flex items-center justify-center gap-1">
                           <span className="text-base font-bold text-white sm:text-lg">{player.fours}</span>
@@ -661,9 +647,8 @@ export default function MatchPage() {
                         </div>
                       </div>
                       <div
-                        className={`rounded-lg p-2 text-center ${
-                          activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
-                        }`}
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
                       >
                         <div className="flex items-center justify-center gap-1">
                           <span className="text-base font-bold text-white sm:text-lg">{player.sixes}</span>
@@ -678,123 +663,13 @@ export default function MatchPage() {
           </div>
         </div>
 
-        {/* Player Modal - Detailed player information */}
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="max-w-4xl rounded-xl border-gray-700 bg-gray-900 p-4 text-white sm:p-6">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-semibold sm:text-3xl">{selectedPlayer?.name}</DialogTitle>
-            </DialogHeader>
-
-            {selectedPlayer && (
-              <div className="mt-4 sm:mt-6">
-                <div className="flex flex-col gap-4 sm:gap-6">
-                  {/* Row 1: Player Photo and Current Innings */}
-                  <div className="flex flex-col gap-4 sm:flex-row">
-                    {/* Player Image */}
-                    <div className="flex justify-center sm:justify-start">
-                      <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-gray-700 sm:h-30 sm:w-30">
-                        <Image
-                          src={`/teams/pakistan.png`}
-                          alt={selectedPlayer.name}
-                          height={150}
-                          width={150}
-                          className="object-cover"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Current Innings */}
-                    <div className="flex-1 rounded-lg bg-gray-800 px-4 py-3 shadow-md text-center sm:px-6 sm:py-4">
-                      <div className="mb-2 flex items-center justify-center gap-2 sm:justify-start">
-                        <TrendingUp className="h-5 w-5 text-green-400" />
-                        <span className="text-sm text-gray-400">Current Innings</span>
-                      </div>
-                      <div className="text-center sm:text-left">
-                        <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-3 md:grid-cols-5 md:gap-4">
-                          <div>
-                            <p className="text-lg font-bold text-white sm:text-xl">{selectedPlayer.runs}</p>
-                            <p className="text-sm text-gray-400 sm:text-md">Runs</p>
-                          </div>
-                          <div>
-                            <p className="text-lg font-bold text-white sm:text-xl">{selectedPlayer.balls}</p>
-                            <p className="text-sm text-gray-400 sm:text-md">Balls</p>
-                          </div>
-                          <div>
-                            <p className="text-lg font-bold text-white sm:text-xl">{selectedPlayer.fours}</p>
-                            <p className="text-sm text-gray-400 sm:text-md">Fours</p>
-                          </div>
-                          <div>
-                            <p className="text-lg font-bold text-white sm:text-xl">{selectedPlayer.sixes}</p>
-                            <p className="text-sm text-gray-400 sm:text-md">Sixes</p>
-                          </div>
-                          <div>
-                            <p className="text-lg font-bold text-white sm:text-xl">
-                              {Number(selectedPlayer.strikeRate).toFixed(1)}
-                            </p>
-                            <p className="text-sm text-gray-400 sm:text-md">SR</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Performance Metrics */}
-                  <div className="rounded-lg bg-gray-800 p-4 shadow-md sm:p-6">
-                    <h4 className="mb-3 text-base font-medium sm:mb-4 sm:text-lg">Performance Metrics</h4>
-                    <div className="space-y-3 sm:space-y-4">
-                      {/* Current Price */}
-                      <div>
-                        <div className="mb-1 flex justify-between">
-                          <span className="text-xs text-gray-400 sm:text-sm">Current Price</span>
-                          <span className="text-xs font-medium text-white sm:text-sm">
-                            ₹
-                            {selectedPlayer.outDesc === "not out"
-                              ? 35 + selectedPlayer.runs * 0.75 - selectedPlayer.dots * 0.5
-                              : ((35 + selectedPlayer.runs * 0.75 - selectedPlayer.dots * 0.5) * 0.7).toFixed(2)}{" "}
-                          </span>
-                        </div>
-                        <Progress
-                          value={
-                            selectedPlayer.outDesc === "not out"
-                              ? 35 + selectedPlayer.runs * 0.75 - selectedPlayer.dots * 0.5
-                              : (35 + selectedPlayer.runs * 0.75 - selectedPlayer.dots * 0.5) * 0.7
-                          }
-                          className="h-2 bg-gray-700"
-                        />
-                      </div>
-
-                      {/* Starting Price */}
-                      <div>
-                        <div className="mb-1 flex justify-between">
-                          <span className="text-xs text-gray-400 sm:text-sm">Starting Price</span>
-                          <span className="text-xs font-medium text-white sm:text-sm">₹{35}</span>
-                        </div>
-                        <Progress value={35} className="h-2 bg-gray-700" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                    <Button
-                      className="flex-1 rounded-lg bg-green-600 p-2 text-white hover:bg-green-700 sm:p-3"
-                      onClick={() => createPortfolio(selectedPlayer.id)}
-                    >
-                      Add to Portfolio
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1 rounded-lg border-gray-800 bg-gray-800 p-2 text-white sm:p-3"
-                      onClick={closeModal}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        {/* Player Modal - Using the new component */}
+        <PlayerModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          player={selectedPlayer}
+          battingPosition={selectedBattingPosition}
+        />
       </main>
     </div>
   )

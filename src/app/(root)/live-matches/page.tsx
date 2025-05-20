@@ -88,7 +88,7 @@ export default function LiveMatches() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen bg-background text-gray-100">
       {/* Featured Indian Matches */}
       {true && (
         <>
@@ -109,7 +109,7 @@ export default function LiveMatches() {
         <div {...{ className: "grid gap-6 md:grid-cols-2 lg:grid-cols-1" }}>
           {matchesData.map((match) => (
             <div key={match.matchId}>
-              <Card className="bg-gray-900 border-4 border-gray-800 hover:border- text-gray-100 overflow-hidden transition-all duration-300 group">
+              <Card className="bg-gray-900 border-4 border-accent-light/70 hover:border- text-gray-100 overflow-hidden transition-all duration-300 group">
                 {/* Header */}
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-base font-medium">
@@ -183,7 +183,7 @@ export default function LiveMatches() {
                 <CardFooter className="border-t border-gray-800 flex justify-center transition-opacity">
                   {Date.now() >= match.startDate! ? (
                     <Button
-                      className="hover:bg-accent/50 border-2 hover:text-white hover:border-transparent bg-accent/10 border-accent/20 p-6 text-xl w-full text-accent/60"
+                      className="hover:bg-accent-dark bg-dark border-2 hover:border-accent-dark border-accent-light text-accent-light p-6 text-xl w-full hover:text-white transition-colors"
                       asChild
                       onClick={() => handleAddToPortfolio(match)}
                     >

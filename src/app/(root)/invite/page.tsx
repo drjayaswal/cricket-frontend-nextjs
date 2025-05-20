@@ -124,7 +124,7 @@ export default function InviteFriendsComponent() {
                   Your Referral Code
                 </p>
                 <div className="flex items-center">
-                  <div className="bg-gray-800 rounded-l-md p-2 flex-1 font-mono text-xl text-center text-purple-300 border-2 border-gray-900">
+                  <div className="bg-gray-800 rounded-l-md p-2 flex-1 font-mono text-xl text-center text-accent-light border-2 border-gray-900">
                     {isGenerating ? (
                       <div className="flex justify-center items-center h-6">
                         <div className="animate-pulse">Generating...</div>
@@ -152,9 +152,9 @@ export default function InviteFriendsComponent() {
                 <Button
                   onClick={generateReferralCode}
                   variant="outline"
-                  className={`w-full border-gray-950 hover:bg-accent text-lg p-5 ${
+                  className={`w-full border-background hover:border-accent-light hover:bg-accent text-lg p-5 ${
                     cooldownActive
-                      ? "bg-gray-950 cursor-progress"
+                      ? "bg-background cursor-progress"
                       : "bg-gray-800 cursor-pointer"
                   }`}
                   disabled={isGenerating || cooldownActive}
@@ -171,7 +171,7 @@ export default function InviteFriendsComponent() {
                 <div className="flex space-x-3">
                   <Button
                     variant="outline"
-                    className="flex w-full bg-gray-900 border-gray-900 hover:bg-accent text-lg p-5"
+                    className="flex w-full border-4 border-accent-light bg-accent-light hover:border-accent-dark hover:bg-accent-dark text-lg p-5"
                     onClick={generateReferralLink}
                   >
                     <Share2 className="h-5 w-5" />
