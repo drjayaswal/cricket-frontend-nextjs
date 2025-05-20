@@ -3,7 +3,6 @@ import "dotenv/config";
 import { toast } from "sonner"
 import { CredentialResponse } from "@react-oauth/google";
 import { setUserIntoGlobalStore } from "./helper";
-import router from "next/router";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -155,10 +154,5 @@ async function verifyPan(formData: FormData) {
   // Return success response
   return { success: true }
 }
-
-
-
-
-
 
 export { login, handleGoogleSuccess, verifyAadhar, verifyPan }; 
