@@ -77,7 +77,7 @@ export default function ContactForm() {
                   <Input
                     placeholder="Your name"
                     {...field}
-                    className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-purple-500"
+                    className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-accent-dark"
                   />
                 </FormControl>
                 <FormMessage className="text-red-400" />
@@ -97,7 +97,7 @@ export default function ContactForm() {
                     placeholder="your.email@example.com"
                     type="email"
                     {...field}
-                    className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-purple-500"
+                    className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-accent-dark"
                   />
                 </FormControl>
                 <FormMessage className="text-red-400" />
@@ -116,7 +116,7 @@ export default function ContactForm() {
                   <Input
                     placeholder="What is this regarding?"
                     {...field}
-                    className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-purple-500"
+                    className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-accent-dark"
                   />
                 </FormControl>
                 <FormMessage className="text-red-400" />
@@ -134,7 +134,7 @@ export default function ContactForm() {
                 <FormControl>
                   <Textarea
                     placeholder="Please provide details about your inquiry..."
-                    className="min-h-[120px] border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-purple-500"
+                    className="min-h-[120px] border-gray-700 bg-gray-800 text-white placeholder:text-gray-500 focus-visible:ring-accent-dark"
                     {...field}
                   />
                 </FormControl>
@@ -146,7 +146,7 @@ export default function ContactForm() {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full bg-accent-dark hover:bg-purple-700 text-white font-medium transition-colors duration-300"
+            className="w-full bg-accent-light hover:bg-accent-dark text-white font-medium transition-colors duration-300"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

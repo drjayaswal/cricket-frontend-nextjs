@@ -198,7 +198,7 @@ export function FeaturedBanner() {
   const chartPath2 = createPath(chartPoints2, chartHeight)
 
   return (
-    <div className="relative overflow-hidden bg-gray-950 py-12 mb-8">
+    <div className="relative overflow-hidden bg-backgorund py-12 mb-8">
       {/* Canvas background animation - stock charts only */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }} />
 
