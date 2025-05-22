@@ -25,7 +25,7 @@ export default function AboutPage() {
   // }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Hero Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 relative overflow-hidden flex items-center justify-center text-center">
         <StockAnimationBackground />
@@ -126,7 +126,7 @@ export default function AboutPage() {
           </p>
           <div className="mt-5">
             <Button
-              className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-background hover:bg-accent py-5 font-semibold text-accent hover:text-white shadow-lg transition-all duration-300 hover:shadow-2xl"
+              className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-accent-light hover:bg-accent-dark py-5 font-semibold text-accent hover:text-white shadow-lg transition-all duration-300 hover:shadow-2xl"
               asChild
             >
               <Link href="/live-matches" className="flex items-center gap-2">

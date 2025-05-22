@@ -2,15 +2,17 @@ import { PlayerPortfolioData, SellPlayerData, SellTeamData, TeamPortfolioData } 
 import { create } from "zustand";
 
 interface PortfolioState {
+  selectedPlayerPortfolio: PlayerPortfolioData | null;
   playerPortfolio: PlayerPortfolioData[];
   teamPortfolio: TeamPortfolioData[];
   sellPlayerPortfolio: SellPlayerData[];
   sellTeamPortfolio: SellTeamData[];
 }
 
-export const useMatchStore = create<PortfolioState>(
+export const usePortfolioStore = create<PortfolioState>(
   (set, get) => (
     {
+      selectedPlayerPortfolio: null,
       playerPortfolio: [],
       teamPortfolio: [],
       sellPlayerPortfolio: [],
@@ -31,6 +33,7 @@ export const useMatchStore = create<PortfolioState>(
         const currentPortfolio = get().sellTeamPortfolio;
         set({ sellTeamPortfolio: [...currentPortfolio, data] });
       },
+      setSelectedPlayerPortfolio: (data: PlayerPortfolioData | null) => set({ selectedPlayerPortfolio: data }),
       setPlayerPortfolio: (data: PlayerPortfolioData[]) => set({ playerPortfolio: data }),
       setTeamPortfolio: (data: TeamPortfolioData[]) => set({ teamPortfolio: data }),
       setSellPlayerPortfolio: (data: SellPlayerData[]) => set({ sellPlayerPortfolio: data }),

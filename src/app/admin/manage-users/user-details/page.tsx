@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, ChevronDown, X, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { UpdateRole } from "@/components/admin/update-role";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -83,49 +84,11 @@ export default function UserDetails() {
     teamPortfolio: false
   });
 
-  const [showPromotePopup, setShowPromotePopup] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role>('marketing');
-
   const toggleSection = (section: keyof AccordionSections) => {
     setOpenSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
-  };
-
-  const handlePromote = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Please login again");
-        return;
-      }
-
-      const response = await fetch(`${BACKEND_URL}/admin/promote-user-to-admin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id: userDetails?._id,
-          role: selectedRole,
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success("User promoted to admin successfully");
-        setShowPromotePopup(false);
-        setSelectedRole('marketing');
-      } else {
-        toast.error(data.message || "Failed to promote user to admin");
-      }
-    } catch (error) {
-      console.error("Error promoting user:", error);
-      toast.error("An error occurred while promoting user");
-    }
   };
 
   useEffect(() => {
@@ -135,6 +98,7 @@ export default function UserDetails() {
         if (!res.ok) throw new Error("Failed to fetch user details");
         const data = await res.json();
         setUserDetails(data.user);
+        console.log("user ->", data.user);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -153,49 +117,6 @@ export default function UserDetails() {
   return (
     <div className="p-3 sm:p-6 max-w-7xl mx-auto">
       {/* Promote to Admin Popup */}
-      {showPromotePopup && (
-        <div className="fixed inset-0 w-screen h-screen justify-center flex items-center bg-black/30 backdrop-blur-xs z-50 p-4">
-          <div
-            onClick={() => setShowPromotePopup(false)}
-            className="fixed inset-0 w-screen h-screen z-40"
-          />
-          <div className="z-50 bg-[#181a20] border-2 rounded-2xl border-[#4c6590]/20 p-4 sm:p-5 flex flex-col gap-5 w-[95vw] max-w-md">
-            <div className="mb-5 flex justify-between items-center">
-              <h1 className="font-bold">Promote to Admin</h1>
-              <X
-                onClick={() => setShowPromotePopup(false)}
-                className="size-7 rounded-lg p-1 hover:bg-blue-900 cursor-pointer"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Select Role</label>
-              <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value as Role)}
-                className="p-2 rounded-lg border bg-gray-400/10 border-gray-300/20 focus:outline-none focus:ring-2 focus:ring-white"
-              >
-                <option value="marketing">Marketing Admin</option>
-                <option value="financial">Financial Admin</option>
-                <option value="super_admin">Super Admin</option>
-              </select>
-            </div>
-            <div className="flex gap-3 mt-5">
-              <Button
-                onClick={handlePromote}
-                className="bg-purple-800 hover:bg-purple-900 text-white w-fit h-fit py-2 px-4 rounded-lg cursor-pointer"
-              >
-                Confirm Promotion
-              </Button>
-              <Button
-                onClick={() => setShowPromotePopup(false)}
-                className="bg-gray-600 hover:bg-gray-700 text-white w-fit h-fit py-2 px-4 rounded-lg cursor-pointer"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-white">User Details</h1>
 
@@ -203,13 +124,7 @@ export default function UserDetails() {
       <div className="bg-white/5 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
         <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-0 sm:items-center mb-4">
           <h2 className="text-lg sm:text-xl font-semibold">Basic Information</h2>
-          <Button
-            onClick={() => setShowPromotePopup(true)}
-            className="flex justify-center items-center sm:ml-auto bg-purple-800 hover:bg-purple-900"
-          >
-            <ShieldCheck className="mr-2" />
-            promote to admin
-          </Button>
+          <UpdateRole user_id={userDetails._id}> Promote to Admin </UpdateRole>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -301,8 +216,9 @@ export default function UserDetails() {
             <ChevronDown className="w-5 h-5" />
           </span>
         </button>
-        <div className={`space-y-4 overflow-hidden transition-all duration-300 ${openSections.playerPortfolio ? 'max-h-[2000px] mt-4 p-4 sm:p-6' : 'max-h-0'
-          }`}>
+        <div className={`space-y-4 overflow-hidden transition-all duration-300 
+          ${openSections.playerPortfolio ? 'max-h-[2000px] mt-4 p-4 sm:p-6' : 'max-h-0'}`}
+        >
           {userDetails.portfolio.length === 0 ? (
             <div className="text-gray-400 text-center py-4">No player portfolio found</div>
           ) : (

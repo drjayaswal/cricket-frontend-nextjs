@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { LogOut, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import "dotenv/config"
+import { Role } from "@/types/user";
+import { getCookie } from "@/lib/helper";
+import { UpdateRole } from "@/components/admin/update-role";
 
 // Define environment variables type-safe
 declare global {
@@ -20,35 +23,37 @@ declare global {
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 
-// Types for API responses
-interface ApiResponse {
-  count?: number;
-  amount?: number;
-  value?: number;
-  profit?: number;
-  loss?: number;
-}
-
 // API Service Layer with TypeScript
 const dashboardApi = {
-  getTotalUsers: async (): Promise<ApiResponse> => {
+  getTotalUsers: async () => {
     const res = await fetch(`${BACKEND_URL}/admin/total-users`);
     if (!res.ok) throw new Error('Failed to fetch total users');
     return res.json();
   },
-  getActiveUsers: async (): Promise<ApiResponse> => {
+  getActiveUsers: async () => {
     const res = await fetch(`${BACKEND_URL}/match-scores/connected-users`);
     if (!res.ok) throw new Error('Failed to fetch active users');
     return res.json();
   },
-  getCompanyProfit: async (): Promise<ApiResponse> => {
+  getCompanyProfit: async () => {
     const res = await fetch(`${BACKEND_URL}/admin/company-profit`);
     if (!res.ok) throw new Error('Failed to fetch company profit');
     return res.json();
   },
-  getCompanyLoss: async (): Promise<ApiResponse> => {
+  getCompanyLoss: async () => {
     const res = await fetch(`${BACKEND_URL}/admin/company-loss`);
     if (!res.ok) throw new Error('Failed to fetch company loss');
+    return res.json();
+  },
+  getTeamMembers: async () => {
+    const res = await fetch(`${BACKEND_URL}/admin/fetch-all-admins`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getCookie("token")}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch team members');
     return res.json();
   },
 };
@@ -75,10 +80,14 @@ const useDashboardData = () => {
   const [isCompanyLossLoading, setIsCompanyLossLoading] = useState<boolean>(true);
   const [companyLossError, setCompanyLossError] = useState<string | null>(null);
 
+  const [teamMembers, setTeamMembers] = useState<{ _id: string, name: string, role: Role }[]>([]);
+  const [isTeamMembersLoading, setIsTeamMembersLoading] = useState<boolean>(true);
+  const [teamMembersError, setTeamMembersError] = useState<string | null>(null);
+
   // Function to fetch individual metric with proper TypeScript
   const fetchMetric = async (
-    apiCall: () => Promise<ApiResponse>,
-    setData: React.Dispatch<React.SetStateAction<number>>,
+    apiCall: () => Promise<any>,
+    setData: React.Dispatch<React.SetStateAction<any>>,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setError: React.Dispatch<React.SetStateAction<string | null>>,
     errorMessage: string
@@ -88,7 +97,7 @@ const useDashboardData = () => {
       setError(null);
 
       const data = await apiCall();
-      setData(data.count || data.amount || data.value || data.profit || data.loss || 0);
+      setData(data.count || data.amount || data.data || data.profit || data.loss || 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       toast.error(errorMessage);
@@ -130,6 +139,14 @@ const useDashboardData = () => {
       setCompanyLossError,
       'Failed to fetch company loss'
     );
+
+    fetchMetric(
+      dashboardApi.getTeamMembers,
+      setTeamMembers,
+      setIsTeamMembersLoading,
+      setTeamMembersError,
+      'Failed to fetch team members'
+    );
   }, []);
 
   return {
@@ -145,6 +162,9 @@ const useDashboardData = () => {
     companyLoss,
     isCompanyLossLoading,
     companyLossError,
+    teamMembers,
+    isTeamMembersLoading,
+    teamMembersError,
   };
 };
 
@@ -162,6 +182,9 @@ const Dashboard = (): JSX.Element => {
     companyLoss,
     isCompanyLossLoading,
     companyLossError,
+    teamMembers,
+    isTeamMembersLoading,
+    teamMembersError,
   } = useDashboardData();
 
   // Helper function to render metric value
@@ -357,7 +380,7 @@ const Dashboard = (): JSX.Element => {
         <div className="w-full h-[calc(100vh-50px)] overflow-y-scroll min-[1500px]:w-80 border-2 border-[#1e293b] rounded-2xl order-2 lg:order-1">
           <div className="text-xl bg-[#2f1d44] p-5 sticky top-0 font-bold ">Team members</div>
           <div className="space-y-4 p-4 sm:p-6 mb-6 lg:mb-0">
-            {Array.from({ length: 30 }).map((_, index) => (
+            {teamMembers.map((member, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center">
                   {/* <Avatar className="h-10 w-10 bg-gray-300"> */}
@@ -365,13 +388,11 @@ const Dashboard = (): JSX.Element => {
                   {/*   <AvatarFallback>TM</AvatarFallback> */}
                   {/* </Avatar> */}
                   <div className="ml-3">
-                    <div className="font-medium">Lorem Ipsum</div>
-                    <div className="text-sm text-gray-400">Profile</div>
+                    <div className="font-medium">{member.name}</div>
+                    <div className="text-sm text-gray-400">{member.role}</div>
                   </div>
                 </div>
-                <Button variant="outline" className="bg-[#181a20] flex items-center border-[#1e293b] text-white text-xs px-3">
-                  Access <ChevronDown className="ml-1 h-3 w-3" />
-                </Button>
+                <UpdateRole user_id={member._id}>Access</UpdateRole>
               </div>
             ))}
           </div>

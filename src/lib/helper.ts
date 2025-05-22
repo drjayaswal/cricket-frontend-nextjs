@@ -204,3 +204,8 @@ export const setUserIntoGlobalStore = async (token: string) => {
     console.error("Error setting user into global store", e);
   }
 };
+
+export const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+};

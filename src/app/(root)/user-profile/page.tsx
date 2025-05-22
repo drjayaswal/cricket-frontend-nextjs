@@ -99,7 +99,7 @@ export default function UserProfile() {
       <main className="max-w-4xl mx-auto px-4 space-y-6">
         {/* Profile Card */}
         <Card className="border-none rounded-xl shadow-md overflow-hidden">
-          <CardContent className="pt-0">
+          <CardContent className="pt-0 text-3xl">
             <div className="flex items-start justify-between gap-4 w-full">
               <div className="flex gap-4">
                 <div>
@@ -110,11 +110,11 @@ export default function UserProfile() {
                     accept="image/*"
                     className="hidden"
                     onChange={handleImageUpload}
-                  />
+                    />
 
                   {/* Avatar */}
                   <Avatar
-                    className="h-16 w-16 border-2 mt-3 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center"
+                    className="h-16 w-16 border-4 border-amber-600 mt-3 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center"
                     onClick={triggerFileInput}
                   >
                     {loading
@@ -127,7 +127,7 @@ export default function UserProfile() {
                 </div>
                 <div className="pt-4">
                   <h2 className="text-xl font-medium text-gray-100">
-                    {user?.name || "John"}
+                    {`${user?.name.split(" ")[0] || "John"}'s Profile`}
                   </h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                     <Phone className="h-3 w-3" />

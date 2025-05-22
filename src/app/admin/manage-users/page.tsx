@@ -123,7 +123,7 @@ export default function ManageUsers() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{user.amount}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                          {user.portfolio.length > 0 ? user.portfolio.length : 'Empty'}
+                          {/* {user.portfolio.length > 0 ? user.portfolio.length : 'Empty'} */}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           <button

@@ -1,1451 +1,29 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { PlayerCard } from "@/components/betting/player-card";
-import { MatchHeader } from "@/components/betting/match-header";
-import { TeamStats } from "@/components/betting/team-stats";
-import { Clock, LoaderCircle } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { useSocketStore } from "@/store/socket-store";
-import { Match, useMatchStore } from "@/store/match-store";
+import { useState } from "react"
+import { Progress } from "@/components/ui/progress"
+import { useSearchParams } from "next/navigation"
+import { TeamStats } from "@/components/betting/team-stats"
+import { LoaderCircle, TrendingUp } from "lucide-react"
+import Image from "next/image"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import data from "./data.json"
+import { PlayerModal } from "./player-modal"
+import { useMatchStore } from "@/store/match-store"
+import { usePortfolioStore } from "@/store/portfolio-store"
 
-const matchData = {
-  "_id": "682af7dede48c764e642997e",
-  "matchId": 117782,
-  "__v": 0,
-  "createdAt": "2025-05-19T09:20:30.197Z",
-  "innings": [
-    {
-      "inningsId": 1,
-      "batTeamName": "United Arab Emirates Women",
-      "batTeamSName": "UAEW",
-      "bowlTeamName": "Nepal Women",
-      "bowlTeamSName": "NEPW",
-      "score": 114,
-      "wickets": [
-        {
-          "batsmanId": 24713,
-          "batsmanName": "Theertha Satish",
-          "wicketNumber": 1,
-          "overNumber": "9.6",
-          "runs": 45,
-          "ballNumber": 96
-        },
-        {
-          "batsmanId": 13816,
-          "batsmanName": "Esha Rohit Oza",
-          "wicketNumber": 2,
-          "overNumber": "12.4",
-          "runs": 69,
-          "ballNumber": 124
-        },
-        {
-          "batsmanId": 25058,
-          "batsmanName": "Lavanya Keny",
-          "wicketNumber": 3,
-          "overNumber": "14.1",
-          "runs": 76,
-          "ballNumber": 141
-        },
-        {
-          "batsmanId": 1452584,
-          "batsmanName": "Michelle Botha",
-          "wicketNumber": 4,
-          "overNumber": "16.6",
-          "runs": 90,
-          "ballNumber": 166
-        },
-        {
-          "batsmanId": 13817,
-          "batsmanName": "Heena Hotchandani",
-          "wicketNumber": 5,
-          "overNumber": "18.3",
-          "runs": 103,
-          "ballNumber": 183
-        },
-        {
-          "batsmanId": 1430636,
-          "batsmanName": "Keziah Miriam Sabin",
-          "wicketNumber": 6,
-          "overNumber": "19.4",
-          "runs": 112,
-          "ballNumber": 194
-        },
-        {
-          "batsmanId": 25072,
-          "batsmanName": "Vaishnave Mahesh",
-          "wicketNumber": 7,
-          "overNumber": "19.6",
-          "runs": 114,
-          "ballNumber": 196
-        }
-      ],
-      "overs": "20",
-      "runRate": "5.7",
-      "ballNbr": 120,
-      "rpb": 0.57,
-      "isDeclared": false,
-      "isFollowOn": false,
-      "revisedOvers": 0,
-      "batsmen": [
-        {
-          "id": 13816,
-          "name": "Esha Rohit Oza",
-          "nickName": "",
-          "balls": 39,
-          "runs": 39,
-          "fours": 2,
-          "sixes": 1,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 2,
-          "minutes": 0,
-          "strikeRate": "100",
-          "outDesc": "c Riya Sharma b Manisha Upadhayay",
-          "bowlerId": 26771,
-          "fielderId1": 1450294,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "CAUGHT",
-          "isCaptain": true,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 24713,
-          "name": "Theertha Satish",
-          "nickName": "",
-          "balls": 32,
-          "runs": 21,
-          "fours": 2,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 2,
-          "minutes": 0,
-          "strikeRate": "65.62",
-          "outDesc": "c Rubina Chhetry b Rajmati Airee",
-          "bowlerId": 1428404,
-          "fielderId1": 11944,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "CAUGHT",
-          "isCaptain": false,
-          "isKeeper": true,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 25058,
-          "name": "Lavanya Keny",
-          "nickName": "",
-          "balls": 11,
-          "runs": 12,
-          "fours": 2,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 2,
-          "minutes": 0,
-          "strikeRate": "109.09",
-          "outDesc": "c Indu Barma b Manisha Upadhayay",
-          "bowlerId": 26771,
-          "fielderId1": 11961,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "CAUGHT",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 13817,
-          "name": "Heena Hotchandani",
-          "nickName": "",
-          "balls": 16,
-          "runs": 20,
-          "fours": 3,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 3,
-          "minutes": 0,
-          "strikeRate": "125",
-          "outDesc": "b Manisha Upadhayay",
-          "bowlerId": 26771,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "BOWLED",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1452584,
-          "name": "Michelle Botha",
-          "nickName": "",
-          "balls": 9,
-          "runs": 3,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "33.33",
-          "outDesc": "lbw b Manisha Upadhayay",
-          "bowlerId": 26771,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "LBW",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 13827,
-          "name": "Udeni Dona",
-          "nickName": "",
-          "balls": 6,
-          "runs": 6,
-          "fours": 1,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 1,
-          "minutes": 0,
-          "strikeRate": "100",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1430636,
-          "name": "Keziah Miriam Sabin",
-          "nickName": "",
-          "balls": 5,
-          "runs": 5,
-          "fours": 1,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 1,
-          "minutes": 0,
-          "strikeRate": "100",
-          "outDesc": "c Riya Sharma b Kabita Kunwar",
-          "bowlerId": 24715,
-          "fielderId1": 1450294,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "CAUGHT",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 25072,
-          "name": "Vaishnave Mahesh",
-          "nickName": "",
-          "balls": 2,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "lbw b Kabita Kunwar",
-          "bowlerId": 24715,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "LBW",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1452587,
-          "name": "Athige Silva",
-          "nickName": "",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 13043,
-          "name": "Katie Thompson",
-          "nickName": "",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 25065,
-          "name": "Suraksha Kotte",
-          "nickName": "",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        }
-      ],
-      "bowlers": [
-        {
-          "id": 1450294,
-          "name": "Riya Sharma",
-          "nickName": "",
-          "overs": "1",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 7,
-          "economy": "7",
-          "balls": 10,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.7,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 26771,
-          "name": "Manisha Upadhayay",
-          "nickName": "",
-          "overs": "4",
-          "maidens": 0,
-          "wickets": 4,
-          "runs": 20,
-          "economy": "5",
-          "balls": 40,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.5,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": "IN"
-        },
-        {
-          "id": 11952,
-          "name": "Sabnam Rai",
-          "nickName": "",
-          "overs": "3",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 21,
-          "economy": "7",
-          "balls": 30,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.7,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": "IN"
-        },
-        {
-          "id": 11961,
-          "name": "Indu Barma",
-          "nickName": "",
-          "overs": "2",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 15,
-          "economy": "7.5",
-          "balls": 20,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.75,
-          "isCaptain": true,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1428404,
-          "name": "Rajmati Airee",
-          "nickName": "",
-          "overs": "4",
-          "maidens": 0,
-          "wickets": 1,
-          "runs": 22,
-          "economy": "5.5",
-          "balls": 40,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 1,
-          "runsPerBall": 0.55,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 48787,
-          "name": "Puja Mahato",
-          "nickName": "",
-          "overs": "2",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 7,
-          "economy": "3.5",
-          "balls": 20,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.35,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 24715,
-          "name": "Kabita Kunwar",
-          "nickName": "",
-          "overs": "4",
-          "maidens": 1,
-          "wickets": 2,
-          "runs": 18,
-          "economy": "4.5",
-          "balls": 40,
-          "dots": 1,
-          "noBalls": 0,
-          "wides": 3,
-          "runsPerBall": 0.45,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        }
-      ],
-      "extras": {
-        "legByes": 1,
-        "byes": 3,
-        "wides": 4,
-        "noBalls": 0,
-        "penalty": 0,
-        "total": 8
-      },
-      "partnerships": [
-        {
-          "bat1Id": 13816,
-          "bat1Name": "Esha Oza",
-          "bat1Runs": 22,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 1,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 24713,
-          "bat2Name": "Theertha Satish",
-          "bat2Runs": 21,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 2,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 45,
-          "totalBalls": 60
-        },
-        {
-          "bat1Id": 13816,
-          "bat1Name": "Esha Oza",
-          "bat1Runs": 17,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 1,
-          "bat1Fives": 0,
-          "bat1Sixes": 1,
-          "bat1Boundaries": 0,
-          "bat2Id": 25058,
-          "bat2Name": "Lavanya Keny",
-          "bat2Runs": 7,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 1,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 24,
-          "totalBalls": 16
-        },
-        {
-          "bat1Id": 13817,
-          "bat1Name": "Heena Hotchandani",
-          "bat1Runs": 2,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 0,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 25058,
-          "bat2Name": "Lavanya Keny",
-          "bat2Runs": 5,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 1,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 7,
-          "totalBalls": 9
-        },
-        {
-          "bat1Id": 13817,
-          "bat1Name": "Heena Hotchandani",
-          "bat1Runs": 11,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 2,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 1452584,
-          "bat2Name": "Michelle Botha",
-          "bat2Runs": 3,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 0,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 14,
-          "totalBalls": 17
-        },
-        {
-          "bat1Id": 13817,
-          "bat1Name": "Heena Hotchandani",
-          "bat1Runs": 7,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 1,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 13827,
-          "bat2Name": "Udeni Dona",
-          "bat2Runs": 2,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 0,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 13,
-          "totalBalls": 9
-        },
-        {
-          "bat1Id": 1430636,
-          "bat1Name": "Keziah Miriam Sabin",
-          "bat1Runs": 5,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 1,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 13827,
-          "bat2Name": "Udeni Dona",
-          "bat2Runs": 4,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 1,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 9,
-          "totalBalls": 7
-        },
-        {
-          "bat1Id": 25072,
-          "bat1Name": "Vaishnave Mahesh",
-          "bat1Runs": 0,
-          "bat1Balls": 0,
-          "bat1Dots": 0,
-          "bat1Ones": 0,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 0,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 13827,
-          "bat2Name": "Udeni Dona",
-          "bat2Runs": 0,
-          "bat2Balls": 0,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 0,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 2,
-          "totalBalls": 2
-        }
-      ]
-    },
-    {
-      "inningsId": 2,
-      "batTeamName": "Nepal Women",
-      "batTeamSName": "NEPW",
-      "bowlTeamName": "United Arab Emirates Women",
-      "bowlTeamSName": "UAEW",
-      "score": 115,
-      "wickets": [
-        {
-          "batsmanId": 1428404,
-          "batsmanName": "Rajmati Airee",
-          "wicketNumber": 1,
-          "overNumber": "5.3",
-          "runs": 28,
-          "ballNumber": 53
-        },
-        {
-          "batsmanId": 44154,
-          "batsmanName": "Samjhana Khadka",
-          "wicketNumber": 2,
-          "overNumber": "7.4",
-          "runs": 34,
-          "ballNumber": 74
-        },
-        {
-          "batsmanId": 24715,
-          "batsmanName": "Kabita Kunwar",
-          "wicketNumber": 3,
-          "overNumber": "8.1",
-          "runs": 38,
-          "ballNumber": 81
-        },
-        {
-          "batsmanId": 48787,
-          "batsmanName": "Puja Mahato",
-          "wicketNumber": 4,
-          "overNumber": "12.3",
-          "runs": 62,
-          "ballNumber": 123
-        },
-        {
-          "batsmanId": 11944,
-          "batsmanName": "Rubina Chhetry",
-          "wicketNumber": 5,
-          "overNumber": "17.5",
-          "runs": 99,
-          "ballNumber": 175
-        }
-      ],
-      "overs": "19.3",
-      "runRate": "5.9",
-      "ballNbr": 117,
-      "rpb": 0.6,
-      "isDeclared": false,
-      "isFollowOn": false,
-      "revisedOvers": 0,
-      "batsmen": [
-        {
-          "id": 44154,
-          "name": "Samjhana Khadka",
-          "nickName": "Samjhana Khadka",
-          "balls": 27,
-          "runs": 21,
-          "fours": 3,
-          "sixes": 0,
-          "dots": 16,
-          "ones": 7,
-          "twos": 1,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 3,
-          "minutes": 23,
-          "strikeRate": "77.78",
-          "outDesc": "c and b Suraksha Kotte",
-          "bowlerId": 25065,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "CAUGHTBOWLED",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1428404,
-          "name": "Rajmati Airee",
-          "nickName": "Rajmati Airee",
-          "balls": 13,
-          "runs": 8,
-          "fours": 1,
-          "sixes": 0,
-          "dots": 9,
-          "ones": 2,
-          "twos": 1,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 1,
-          "minutes": 19,
-          "strikeRate": "61.54",
-          "outDesc": "run out (Michelle Botha)",
-          "bowlerId": 0,
-          "fielderId1": 1452584,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "RUNOUT",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 24715,
-          "name": "Kabita Kunwar",
-          "nickName": "Kabita Kunwar",
-          "balls": 8,
-          "runs": 5,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 5,
-          "ones": 2,
-          "twos": 0,
-          "threes": 1,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 12,
-          "strikeRate": "62.5",
-          "outDesc": "b Vaishnave Mahesh",
-          "bowlerId": 25072,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "BOWLED",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 11961,
-          "name": "Indu Barma",
-          "nickName": "Indu Barma",
-          "balls": 28,
-          "runs": 30,
-          "fours": 2,
-          "sixes": 0,
-          "dots": 9,
-          "ones": 12,
-          "twos": 5,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 2,
-          "minutes": 62,
-          "strikeRate": "107.14",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": true,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 48787,
-          "name": "Puja Mahato",
-          "nickName": "Puja Mahato",
-          "balls": 19,
-          "runs": 13,
-          "fours": 1,
-          "sixes": 0,
-          "dots": 11,
-          "ones": 5,
-          "twos": 2,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 1,
-          "minutes": 22,
-          "strikeRate": "68.42",
-          "outDesc": "st Theertha Satish b Michelle Botha",
-          "bowlerId": 1452584,
-          "fielderId1": 24713,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "STUMPED",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 11944,
-          "name": "Rubina Chhetry",
-          "nickName": "Rubina Chhetry",
-          "balls": 18,
-          "runs": 23,
-          "fours": 3,
-          "sixes": 0,
-          "dots": 7,
-          "ones": 6,
-          "twos": 1,
-          "threes": 1,
-          "fives": 0,
-          "boundaries": 3,
-          "minutes": 19,
-          "strikeRate": "127.78",
-          "outDesc": "c Heena Hotchandani b Esha Rohit Oza",
-          "bowlerId": 13816,
-          "fielderId1": 13817,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "CAUGHT",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 49620,
-          "name": "Rubi Poddar",
-          "nickName": "Rubi Poddar",
-          "balls": 4,
-          "runs": 6,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 2,
-          "twos": 2,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 11,
-          "strikeRate": "150",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": true,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 26101,
-          "name": "Bindu Rawal",
-          "nickName": "Bindu Rawal",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 26771,
-          "name": "Manisha Upadhayay",
-          "nickName": "Manisha Upadhayay",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": "IN"
-        },
-        {
-          "id": 11952,
-          "name": "Sabnam Rai",
-          "nickName": "Sabnam Rai",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": "IN"
-        },
-        {
-          "id": 1450294,
-          "name": "Riya Sharma",
-          "nickName": "Riya Sharma",
-          "balls": 0,
-          "runs": 0,
-          "fours": 0,
-          "sixes": 0,
-          "dots": 0,
-          "ones": 0,
-          "twos": 0,
-          "threes": 0,
-          "fives": 0,
-          "boundaries": 0,
-          "minutes": 0,
-          "strikeRate": "0.00",
-          "outDesc": "not out",
-          "bowlerId": 0,
-          "fielderId1": 0,
-          "fielderId2": 0,
-          "fielderId3": 0,
-          "wicketCode": "",
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        }
-      ],
-      "bowlers": [
-        {
-          "id": 13817,
-          "name": "Heena Hotchandani",
-          "nickName": "Heena Hotchandani",
-          "overs": "3",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 24,
-          "economy": "8",
-          "balls": 30,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.8,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 13816,
-          "name": "Esha Rohit Oza",
-          "nickName": "Esha Rohit Oza",
-          "overs": "1.3",
-          "maidens": 0,
-          "wickets": 1,
-          "runs": 11,
-          "economy": "7.3",
-          "balls": 13,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.85,
-          "isCaptain": true,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 25065,
-          "name": "Suraksha Kotte",
-          "nickName": "Suraksha Kotte",
-          "overs": "4",
-          "maidens": 1,
-          "wickets": 1,
-          "runs": 12,
-          "economy": "3",
-          "balls": 40,
-          "dots": 1,
-          "noBalls": 0,
-          "wides": 0,
-          "runsPerBall": 0.3,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 13043,
-          "name": "Katie Thompson",
-          "nickName": "Katie Thompson",
-          "overs": "3",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 17,
-          "economy": "5.7",
-          "balls": 30,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 1,
-          "runsPerBall": 0.57,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 25072,
-          "name": "Vaishnave Mahesh",
-          "nickName": "Vaishnave Mahesh",
-          "overs": "3",
-          "maidens": 0,
-          "wickets": 1,
-          "runs": 12,
-          "economy": "4",
-          "balls": 30,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 1,
-          "runsPerBall": 0.4,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1452584,
-          "name": "Michelle Botha",
-          "nickName": "Michelle Botha",
-          "overs": "3",
-          "maidens": 0,
-          "wickets": 1,
-          "runs": 23,
-          "economy": "7.7",
-          "balls": 30,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 1,
-          "runsPerBall": 0.77,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        },
-        {
-          "id": 1452587,
-          "name": "Athige Silva",
-          "nickName": "Athige Silva",
-          "overs": "2",
-          "maidens": 0,
-          "wickets": 0,
-          "runs": 11,
-          "economy": "5.5",
-          "balls": 20,
-          "dots": 0,
-          "noBalls": 0,
-          "wides": 1,
-          "runsPerBall": 0.55,
-          "isCaptain": false,
-          "isKeeper": false,
-          "isOverseas": false,
-          "inMatchChange": "",
-          "playingXIChange": ""
-        }
-      ],
-      "extras": {
-        "legByes": 1,
-        "byes": 4,
-        "wides": 4,
-        "noBalls": 0,
-        "penalty": 0,
-        "total": 9
-      },
-      "partnerships": [
-        {
-          "bat1Id": 44154,
-          "bat1Name": "Samjhana Khadka",
-          "bat1Runs": 17,
-          "bat1Balls": 20,
-          "bat1Dots": 0,
-          "bat1Ones": 5,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 3,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 3,
-          "bat2Id": 1428404,
-          "bat2Name": "Rajmati Airee",
-          "bat2Runs": 8,
-          "bat2Balls": 13,
-          "bat2Dots": 0,
-          "bat2Ones": 2,
-          "bat2Twos": 1,
-          "bat2Threes": 0,
-          "bat2Fours": 1,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 1,
-          "totalRuns": 28,
-          "totalBalls": 33
-        },
-        {
-          "bat1Id": 44154,
-          "bat1Name": "Samjhana Khadka",
-          "bat1Runs": 4,
-          "bat1Balls": 7,
-          "bat1Dots": 0,
-          "bat1Ones": 2,
-          "bat1Twos": 1,
-          "bat1Threes": 0,
-          "bat1Fours": 0,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 24715,
-          "bat2Name": "Kabita Kunwar",
-          "bat2Runs": 2,
-          "bat2Balls": 6,
-          "bat2Dots": 0,
-          "bat2Ones": 2,
-          "bat2Twos": 0,
-          "bat2Threes": 0,
-          "bat2Fours": 0,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 6,
-          "totalBalls": 13
-        },
-        {
-          "bat1Id": 11961,
-          "bat1Name": "Indu Barma",
-          "bat1Runs": 1,
-          "bat1Balls": 1,
-          "bat1Dots": 0,
-          "bat1Ones": 1,
-          "bat1Twos": 0,
-          "bat1Threes": 0,
-          "bat1Fours": 0,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 24715,
-          "bat2Name": "Kabita Kunwar",
-          "bat2Runs": 3,
-          "bat2Balls": 2,
-          "bat2Dots": 0,
-          "bat2Ones": 0,
-          "bat2Twos": 0,
-          "bat2Threes": 1,
-          "bat2Fours": 0,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 4,
-          "totalBalls": 3
-        },
-        {
-          "bat1Id": 11961,
-          "bat1Name": "Indu Barma",
-          "bat1Runs": 5,
-          "bat1Balls": 7,
-          "bat1Dots": 0,
-          "bat1Ones": 3,
-          "bat1Twos": 1,
-          "bat1Threes": 0,
-          "bat1Fours": 0,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 0,
-          "bat2Id": 48787,
-          "bat2Name": "Puja Mahato",
-          "bat2Runs": 13,
-          "bat2Balls": 19,
-          "bat2Dots": 0,
-          "bat2Ones": 5,
-          "bat2Twos": 2,
-          "bat2Threes": 0,
-          "bat2Fours": 1,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 1,
-          "totalRuns": 24,
-          "totalBalls": 26
-        },
-        {
-          "bat1Id": 11961,
-          "bat1Name": "Indu Barma",
-          "bat1Runs": 14,
-          "bat1Balls": 14,
-          "bat1Dots": 0,
-          "bat1Ones": 6,
-          "bat1Twos": 2,
-          "bat1Threes": 0,
-          "bat1Fours": 1,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 1,
-          "bat2Id": 11944,
-          "bat2Name": "Rubina Chhetry",
-          "bat2Runs": 23,
-          "bat2Balls": 18,
-          "bat2Dots": 0,
-          "bat2Ones": 6,
-          "bat2Twos": 1,
-          "bat2Threes": 1,
-          "bat2Fours": 3,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 3,
-          "totalRuns": 37,
-          "totalBalls": 32
-        },
-        {
-          "bat1Id": 11961,
-          "bat1Name": "Indu Barma",
-          "bat1Runs": 10,
-          "bat1Balls": 6,
-          "bat1Dots": 0,
-          "bat1Ones": 2,
-          "bat1Twos": 2,
-          "bat1Threes": 0,
-          "bat1Fours": 1,
-          "bat1Fives": 0,
-          "bat1Sixes": 0,
-          "bat1Boundaries": 1,
-          "bat2Id": 49620,
-          "bat2Name": "Rubi Poddar",
-          "bat2Runs": 6,
-          "bat2Balls": 4,
-          "bat2Dots": 0,
-          "bat2Ones": 2,
-          "bat2Twos": 2,
-          "bat2Threes": 0,
-          "bat2Fours": 0,
-          "bat2Fives": 0,
-          "bat2Sixes": 0,
-          "bat2Boundaries": 0,
-          "totalRuns": 16,
-          "totalBalls": 10
-        }
-      ]
-    }
-  ],
-  "isMatchComplete": true,
-  "responseLastUpdated": "2025-05-19T10:05:13.372Z",
-  "status": "Nepal Women won by 5 wkts",
-  "updatedAt": "2025-05-19T10:05:13.374Z"
+// Type definitions for team stats props
+interface TeamStatsProps {
+  teamName: string
+  teamPrice: number
+  color: string
 }
 
-export default function MatchPage() {
-  const matchId = useSearchParams().get("id");
-  // map match id and avoid tresspassers
-  const [activeTab, setActiveTab] = useState("bhutan");
-  // const [matchScore, setMatchData] = useState()
+export default function BettingInterface() {
+  // Get match ID from URL parameters
+  const searchParams = useSearchParams()
+  const matchId = searchParams.get("id")
 
   // const handleGetScore = useSelectedMatchStore.getState().handleGetScore
   // const smatchData = useSocketStore.getState().scoreData
@@ -1460,14 +38,9 @@ export default function MatchPage() {
   // }, [])
 
   // const matchLiveScore = useSocketStore((state) => state.scoreData)
-  const matchLiveScore = matchData
+  const matchLiveScore = data
   const selectedMatch = useMatchStore.getState().selectedMatch
   console.log("match score data from sockets:", matchLiveScore)
-
-  const createPortfolio = (playerId: number) => {
-    console.log(`Creating portfolio for player ID: ${playerId}`);
-    // Implementation for creating portfolio
-  };
 
   if (!matchLiveScore) {
     return (
@@ -1479,152 +52,514 @@ export default function MatchPage() {
       </div>
     );
   }
+  // State management for UI interactions
+  const [activeTab, setActiveTab] = useState<string>("innings1") // Track active innings tab
+  const [activeSection, setActiveSection] = useState<string>("batsmen") // Track active data section
+  const [expandedPlayers, setExpandedPlayers] = useState<number[]>([]) // Track expanded player cards
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null) // Store selected player for modal
+  const [isModalOpen, setIsModalOpen] = useState(false) // Control modal visibility
+  const [selectedBattingPosition, setSelectedBattingPosition] = useState<number>(0) // Store batting position
 
-  if (!selectedMatch) {
+  const selectedPlayerPortfolio = usePortfolioStore((state) => state.selectedPlayerPortfolio)
+  /**
+   * Toggle player card expansion state
+   * @param playerId - ID of the player to toggle
+   */
+  const togglePlayerExpansion = (playerId: number) => {
+    setExpandedPlayers((prev) => (prev.includes(playerId) ? prev.filter((id) => id !== playerId) : [...prev, playerId]))
+  }
+
+  /**
+   * Open player details modal if player is not out
+   * @param player - Player data object
+   */
+  const openModal = (player: any) => {
+    // Only open modal for players who are still batting
+    if (player.outDesc === "not out") {
+      setSelectedPlayer(player)
+      setIsModalOpen(true)
+    } else {
+      // Player is out, don't open the modal
+      console.log(`Player ${player.name} is out, not opening modal`)
+    }
+  }
+
+  /**
+   * Close player details modal
+   */
+  const closeModal = () => {
+    setSelectedPlayer(null)
+    setIsModalOpen(false)
+  }
+
+  /**
+   * Create portfolio for a player (placeholder function)
+   * @param playerId - ID of the player to add to portfolio
+   */
+  const createPortfolio = (playerId: number) => {
+    console.log(`Creating portfolio for player ID: ${playerId}`)
+    // Implementation for creating portfolio would go here
+  }
+
+  // Show loading state if match data is not available
+  if (!matchLiveScore) {
     return (
-      <div className="space-y-3 mt-20 flex flex-col items-center justify-center">
-        <span className="text-3xl font-medium text-gray-800">
-          No Match Selected
-        </span>
-        <div>
-          <Link href="/live-matches">
-            <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-              Go Back
-            </button>
-          </Link>
-        </div>
+      <div className="flex flex-col items-center justify-center mt-20 space-y-3">
+        <LoaderCircle className="inline-block size-10 animate-spin" />
+        <span className="text-3xl font-medium text-gray-800">Please Wait</span>
       </div>
-    );
+    )
   }
 
   return (
-    <>
-      <div className="min-h-screen bg-gray-950">
-        <main className="container mx-auto px-4 py-6">
-
-          {/* Live Badge */}
-          <div className="flex items-center gap-2 mb-4">
+    <div className="min-h-screen bg-gray-950">
+      <main className="container mx-auto px-4 py-6">
+        {/* Live Badge - Shows match status */}
+        <div className="mb-4 flex items-center gap-2">
+          {matchLiveScore.isMatchComplete ? (
             <div className="flex items-center">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-              </span>
-              <span className="ml-2 text-sm text-red-600 font-extrabold">LIVE</span>
+              <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">Match Finished</span>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center">
+              <span className="animate-pulse rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">LIVE</span>
+            </div>
+          )}
+        </div>
 
-          {/* Match Title */}
-          <div className="mb-6">
-            <h1 className="text-5xl font-bold text-white mb-2">
-              {selectedMatch?.team1} vs {selectedMatch?.team2}
-            </h1>
-            <div className="ml-auto">
-              <span className="bg-red-600 py-1 px-3 rounded-full text-sm font-bold text-white">
-                {matchLiveScore.status}
-              </span>
-            </div>
-          </div>
+        {/* Match Title - Shows competing teams */}
+        <div className="mb-6">
+          <h1 className="mb-2 text-3xl font-bold text-white md:text-5xl">
+            {matchLiveScore.innings[0].batTeamName} <span className="text-cyan-500">VS</span>{" "}
+            {matchLiveScore.innings[1].batTeamName}
+          </h1>
+        </div>
 
-          {/* Match Summary */}
-          <div className="grid grid-cols-1 gap-2 mb-6 text-gray-400">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-2xl text-white">
-                {matchLiveScore.innings[0].batTeamName} - {matchLiveScore.innings[0].score}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-2xl text-white">
-                {matchLiveScore.innings[1].batTeamName} - {matchLiveScore.innings[0].score}
+        {/* Match Summary - Shows score and status for each innings */}
+        <div className="mb-6 grid grid-cols-1 gap-2 text-gray-400">
+          {matchLiveScore.innings.map((inning, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span className="text-xl font-medium text-white md:text-2xl">
+                {inning.batTeamSName} - {inning.score}/{inning.wickets.length} in {inning.overs} Overs (RR:{" "}
+                {inning.runRate})
               </span>
             </div>
+          ))}
+          <div className="mt-2">
+            <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">
+              {matchLiveScore.status}
+            </span>
           </div>
+        </div>
 
-          {/* Team Stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <TeamStats
-              teamName={matchLiveScore.innings[0].batTeamName}
-              teamPrice={matchLiveScore.innings[0].runRate}
-              color="green"
-            />
-            <TeamStats
-              teamName={matchLiveScore.innings[1].batTeamName}
-              teamPrice="N/A"
-              color="red"
-            />
+        {/* Team Stats - Shows comparative team statistics */}
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <TeamStats
+            teamName={matchLiveScore.innings[0].batTeamName}
+            teamPrice={matchLiveScore.innings[0].runRate}
+            color="green"
+          />
+          <TeamStats
+            teamName={matchLiveScore.innings[1].batTeamName}
+            teamPrice={matchLiveScore.innings[1].runRate}
+            color="red"
+          />
+        </div>
+
+        {/* Innings Tabs - Switch between teams */}
+        <div className="mb-4">
+          <div className="mb-6 flex border-b border-gray-800">
+            <button
+              className={`px-4 py-2 font-medium ${activeTab === "innings1"
+                ? "border-b-2 border-purple-500 text-purple-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveTab("innings1")}
+              aria-label={`View ${matchLiveScore.innings[0].batTeamName} innings`}
+            >
+              {matchLiveScore.innings[0].batTeamName}
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${activeTab === "innings2" ? "border-b-2 border-cyan-500 text-cyan-500" : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveTab("innings2")}
+              aria-label={`View ${matchLiveScore.innings[1].batTeamName} innings`}
+            >
+              {matchLiveScore.innings[1].batTeamName}
+            </button>
           </div>
+        </div>
 
-          {/* Statistics */}
-          {/* <div className="min-h-screen bg-gray-900 text-white p-4"> */}
-          {/*   <h1 className="text-4xl font-bold mb-6 text-center">Scoreboard</h1> */}
-          {/*   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> */}
-          {/*     <div className="grid grid-cols-1 gap-4"> */}
-          {/*       {fow1 != undefined ? Array(fow1).map((player, index) => ( */}
-          {/*         <div */}
-          {/*           key={index} */}
-          {/*           className="bg-gray-800 p-4 rounded-2xl shadow-md hover:shadow-lg hover:bg-gray-700 transition duration-300" */}
-          {/*         > */}
-          {/*           <h2 className="text-2xl font-semibold">{player.batName}</h2> */}
-          {/*           <p className="text-lg">Wicket Number: {player.wktNbr}</p> */}
-          {/*           <p className="text-lg">Over: {player.wktOver}</p> */}
-          {/*           <p className="text-lg">Runs: {player.wktRuns}</p> */}
-          {/*           <p className="text-lg">Ball Number: {player.ballNbr}</p> */}
-          {/*         </div> */}
-          {/*       )) : <> */}
-          {/*         no data</>} */}
-          {/*     </div> */}
-          {/*   </div> */}
-          {/* </div> */}
+        {/* Section Tabs - Switch between batting, bowling, and wickets data */}
+        <div className="mb-6">
+          <div className="mb-6 flex border-b border-gray-800">
+            <button
+              className={`px-4 py-2 font-medium ${activeSection === "batsmen"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveSection("batsmen")}
+              aria-label="View batting statistics"
+            >
+              Batting
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${activeSection === "bowlers"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveSection("bowlers")}
+              aria-label="View bowling statistics"
+            >
+              Bowling
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${activeSection === "wickets"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveSection("wickets")}
+              aria-label="View wickets information"
+            >
+              Wickets
+            </button>
+          </div>
+        </div>
 
-
-          {/* Players Section - Tabs */}
-          <div className="mb-8">
-            <div className="flex border-b border-gray-800 mb-6">
-              <button
-                className={`py-2 px-4 font-medium ${activeTab === "bhutan"
-                  ? "text-green-500 border-b-2 border-green-500"
-                  : "text-gray-400 hover:text-white"
-                  }`}
-                onClick={() => setActiveTab("bhutan")}
-              >
-                {matchLiveScore.innings[1].batTeamName}
-              </button>
-              <button
-                className={`py-2 px-4 font-medium ${activeTab === "kuwait"
-                  ? "text-red-500 border-b-2 border-red-500"
-                  : "text-gray-400 hover:text-white"
-                  }`}
-                onClick={() => setActiveTab("kuwait")}
-              >
-                {matchLiveScore.innings[0].batTeamName}
-              </button>
+        {/* Content based on active tab and section */}
+        <div className="mb-8 rounded-xl bg-gray-900 p-4 sm:p-6">
+          {/* Batting Section */}
+          {activeSection === "batsmen" && (
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+                {activeTab === "innings1"
+                  ? `${matchLiveScore.innings[0].batTeamName} Batting`
+                  : `${matchLiveScore.innings[1].batTeamName} Batting`}
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Batter</th>
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Dismissal</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">R</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">B</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">4s</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">6s</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">SR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Map through batsmen data for the active innings */}
+                    {(activeTab === "innings1"
+                      ? matchLiveScore.innings[0].batsmen
+                      : matchLiveScore.innings[1].batsmen
+                    ).map((batsman, index) => (
+                      <tr
+                        key={index}
+                        onClick={() => openModal(batsman)}
+                        className={`${index % 2 === 0 ? "bg-gray-800/30 " : ""} rounded-4xl ${batsman.outDesc === "not out"
+                          ? "cursor-pointer hover:bg-white/10"
+                          : "cursor-default opacity-70"
+                          }`}
+                      >
+                        <td className="px-2 py-3 font-medium text-white sm:px-4">
+                          {batsman.name} {batsman.isCaptain && "(C)"} {batsman.isKeeper && "(WK)"}
+                        </td>
+                        <td className="px-2 py-3 text-gray-400 sm:px-4">{batsman.outDesc}</td>
+                        <td className="px-2 py-3 text-right text-white sm:px-4">{batsman.runs}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.balls}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.fours}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.sixes}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.strikeRate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    {/* Extras row */}
+                    <tr className="border-t border-gray-800">
+                      <td colSpan={2} className="px-2 py-3 font-medium text-white sm:px-4">
+                        Extras
+                      </td>
+                      <td className="px-2 py-3 text-right text-white sm:px-4">
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.total
+                          : matchLiveScore.innings[1].extras.total}
+                      </td>
+                      <td colSpan={5} className="px-2 py-3 text-gray-400 sm:px-4">
+                        (b{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.byes
+                          : matchLiveScore.innings[1].extras.byes}
+                        , lb{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.legByes
+                          : matchLiveScore.innings[1].extras.legByes}
+                        , w{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.wides
+                          : matchLiveScore.innings[1].extras.wides}
+                        , nb{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.noBalls
+                          : matchLiveScore.innings[1].extras.noBalls}
+                        )
+                      </td>
+                    </tr>
+                    {/* Total row */}
+                    <tr>
+                      <td colSpan={2} className="px-2 py-3 font-bold text-white sm:px-4">
+                        Total
+                      </td>
+                      <td className="px-2 py-3 text-right font-bold text-white sm:px-4">
+                        {activeTab === "innings1"
+                          ? `${matchLiveScore.innings[0].score}/${matchLiveScore.innings[0].wickets.length}`
+                          : `${matchLiveScore.innings[1].score}/${matchLiveScore.innings[1].wickets.length}`}
+                      </td>
+                      <td colSpan={5} className="px-2 py-3 text-gray-400 sm:px-4">
+                        ({activeTab === "innings1" ? matchLiveScore.innings[0].overs : matchLiveScore.innings[1].overs}{" "}
+                        Overs, RR:{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].runRate
+                          : matchLiveScore.innings[1].runRate}
+                        )
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </div>
+          )}
 
-            {/* {activeTab === "bhutan" && ( */}
-            {/*   <div className="space-y-4"> */}
-            {/*     {matchScore.team2.players.map((player) => ( */}
-            {/*       <PlayerCard */}
-            {/*         key={player.id} */}
-            {/*         player={player || {}} */}
-            {/*         onCreatePortfolio={() => createPortfolio(player.id)} */}
-            {/*       /> */}
-            {/*     ))} */}
-            {/*   </div> */}
-            {/* )} */}
+          {/* Bowling Section */}
+          {activeSection === "bowlers" && (
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+                {activeTab === "innings1"
+                  ? `${matchLiveScore.innings[0].bowlTeamName} Bowling`
+                  : `${matchLiveScore.innings[1].bowlTeamName} Bowling`}
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Bowler</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">O</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">M</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">R</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">W</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">ECON</th>
+                      <th className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">WD</th>
+                      <th className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">NB</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Map through bowlers data for the active innings */}
+                    {(activeTab === "innings1"
+                      ? matchLiveScore.innings[0].bowlers
+                      : matchLiveScore.innings[1].bowlers
+                    ).map((bowler, index) => (
+                      <tr key={index} className={index % 2 === 0 ? "bg-gray-800/30" : ""}>
+                        <td className="px-2 py-3 font-medium text-white sm:px-4">
+                          {bowler.name} {bowler.isCaptain && "(C)"}
+                        </td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.overs}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.maidens}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.runs}</td>
+                        <td className="px-2 py-3 text-right font-medium text-white sm:px-4">{bowler.wickets}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.economy}</td>
+                        <td className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">
+                          {bowler.wides}
+                        </td>
+                        <td className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">
+                          {bowler.noBalls}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-            {/* {activeTab === "kuwait" && ( */}
-            {/*   <div className="space-y-4"> */}
-            {/*     {matchScore.team1.players.map((player) => ( */}
-            {/*       <PlayerCard */}
-            {/*         key={player.id} */}
-            {/*         player={player || {}} */}
-            {/*         onCreatePortfolio={() => createPortfolio(player.id)} */}
-            {/*       /> */}
-            {/*     ))} */}
-            {/*   </div> */}
-            {/* )} */}
+          {/* Wickets Section */}
+          {activeSection === "wickets" && (
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+                {activeTab === "innings1"
+                  ? `${matchLiveScore.innings[0].batTeamName} Wickets`
+                  : `${matchLiveScore.innings[1].batTeamName} Wickets`}
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Batsman</th>
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Dismissal</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">Runs</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">Over</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Map through wickets data for the active innings */}
+                    {(activeTab === "innings1"
+                      ? matchLiveScore.innings[0].wickets
+                      : matchLiveScore.innings[1].wickets
+                    ).map((wicket, index) => {
+                      // Find the batsman details for this wicket
+                      const batsman = (
+                        activeTab === "innings1" ? matchLiveScore.innings[0].batsmen : matchLiveScore.innings[1].batsmen
+                      ).find((b) => b.id === wicket.batsmanId)
+
+                      return (
+                        <tr key={index} className={index % 2 === 0 ? "bg-gray-800/30" : ""}>
+                          <td className="px-2 py-3 font-medium text-white sm:px-4">{wicket.batsmanName}</td>
+                          <td className="px-2 py-3 text-gray-400 sm:px-4">{batsman?.outDesc || "Dismissed"}</td>
+                          <td className="px-2 py-3 text-right text-white sm:px-4">{wicket.runs}</td>
+                          <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{wicket.overNumber}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Player Cards Section - Responsive grid layout */}
+        <div className="mb-8">
+          <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">
+            {activeTab === "innings1"
+              ? `${matchLiveScore.innings[0].batTeamName} Players`
+              : `${matchLiveScore.innings[1].batTeamName} Players`}
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+            {/* Map through players for the active innings */}
+            {(activeTab === "innings1" ? matchLiveScore.innings[0].batsmen : matchLiveScore.innings[1].batsmen).map(
+              (player) => (
+                <div
+                  key={player.id}
+                  className={`relative overflow-hidden rounded-xl shadow-lg transition-all hover:shadow-xl ${activeTab === "innings1"
+                    ? "border border-purple-800/30 bg-gradient-to-br from-purple-900/80 to-purple-950"
+                    : "border border-cyan-800/30 bg-gradient-to-br from-cyan-900/80 to-cyan-950"
+                    }`}
+                >
+                  {/* Player header with avatar */}
+                  <div className="relative p-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`relative h-12 w-12 rounded-full border-2 sm:h-14 sm:w-14 ${activeTab === "innings1" ? "border-purple-500" : "border-cyan-500"
+                          }`}
+                      >
+                        <Image
+                          src={`/teams/india.png`}
+                          alt={player.name}
+                          width={56}
+                          height={56}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="flex flex-wrap items-center gap-1 text-lg font-bold text-white sm:text-xl">
+                          {player.name}
+                          {/* Player role badges */}
+                          <div className="flex flex-wrap gap-1">
+                            {player.isKeeper && (
+                              <span
+                                className={`rounded-full px-1.5 py-0.5 text-xs ${activeTab === "innings1"
+                                  ? "bg-purple-500/20 text-purple-300"
+                                  : "bg-cyan-500/20 text-cyan-300"
+                                  }`}
+                              >
+                                Keeper
+                              </span>
+                            )}
+                            {player.isCaptain && (
+                              <span
+                                className={`rounded-full px-1.5 py-0.5 text-xs ${activeTab === "innings1"
+                                  ? "bg-purple-500/20 text-purple-300"
+                                  : "bg-cyan-500/20 text-cyan-300"
+                                  }`}
+                              >
+                                Captain
+                              </span>
+                            )}
+                          </div>
+                        </h3>
+                        <p className={`text-sm ${activeTab === "innings1" ? "text-purple-300" : "text-cyan-300"}`}>
+                          {player.outDesc ? player.outDesc : "Not Out"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Player stats */}
+                  <div
+                    className={`p-4 ${activeTab === "innings1" ? "border-purple-800/30" : "border-cyan-800/30"} border-t ${activeTab === "innings1" ? "bg-purple-950/50" : "bg-cyan-950/50"
+                      }`}
+                  >
+                    {/* Primary stats - runs, balls, strike rate */}
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <p className="text-xl font-bold text-white sm:text-2xl">{player.runs}</p>
+                        <p className="text-xs text-gray-400">Runs</p>
+                      </div>
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <p className="text-xl font-bold text-white sm:text-2xl">{player.balls}</p>
+                        <p className="text-xs text-gray-400">Balls</p>
+                      </div>
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <p className="text-xl font-bold text-white sm:text-2xl">{player.strikeRate}</p>
+                        <p className="text-xs text-gray-400">SR</p>
+                      </div>
+                    </div>
+
+                    {/* Secondary stats - fours and sixes */}
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-base font-bold text-white sm:text-lg">{player.fours}</span>
+                          <span className="text-xs text-gray-400">Fours</span>
+                        </div>
+                      </div>
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-base font-bold text-white sm:text-lg">{player.sixes}</span>
+                          <span className="text-xs text-gray-400">Sixes</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ),
+            )}
           </div>
-        </main>
-      </div>
-    </>
-  );
+        </div>
+
+        {/* Player Modal - Using the new component */}
+        {selectedPlayerPortfolio &&
+          <PlayerModal
+            player={selectedPlayer}
+            battingPosition={selectedBattingPosition}
+          />
+        }
+      </main>
+    </div>
+  )
 }

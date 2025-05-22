@@ -11,11 +11,13 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { useUserStore } from "@/store/user-store";
 
+
 const Navbar = () => {
+  const setUser = useUserStore((state) => state.setUser)
+  const user = useUserStore((state) => state.user)
   const pathname = usePathname();
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 
-  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     // Check for token in cookies
@@ -32,7 +34,7 @@ const Navbar = () => {
     <>
       <div
         className={cn(
-          "max-w-screen w-full mx-auto bg-background/60 border-b border-gray-800 backdrop-blur-sm px-5 flex justify-between items-center transition-normal duration-500"
+          "max-w-screen w-full mx-auto bg-background/60 border-b border-white backdrop-blur-sm px-5 flex justify-between items-center transition-normal duration-500"
         )}
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
