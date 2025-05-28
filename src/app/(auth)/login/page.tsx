@@ -3,6 +3,7 @@
 import type React from "react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,17 +115,17 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
-const validReferral = () => {
-  if(!form.referral_code){
-    toast.error("Enter Referral Code !")
-  }else{
-    if(!form.referral_code.startsWith("CRST-") || form.referral_code.length < 19){
-      toast.error("Unknown Referral Code !")
-    }else{
-      toast.success("Referral Code Added !")
+  const validReferral = () => {
+    if (!form.referral_code) {
+      toast.error("Enter Referral Code !")
+    } else {
+      if (!form.referral_code.startsWith("CRST-") || form.referral_code.length < 19) {
+        toast.error("Unknown Referral Code !")
+      } else {
+        toast.success("Referral Code Added !")
+      }
     }
   }
-}
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -286,7 +287,7 @@ const validReferral = () => {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8 animate-slide-down-lg">
-          <h1 className="text-3xl font-bold text-white mb-2">CricStock11</h1>
+          <Image src="/logo.png" alt="Logo" width={150} height={100} className="mx-auto mb-2" />
           <p className="text-gray-400">Your cricket stock trading platform</p>
         </div>
 

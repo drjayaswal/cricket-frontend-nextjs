@@ -19,6 +19,8 @@ import { Match } from "@/store/match-store";
 
 export default function LiveMatches() {
   const fetchMatchData = useMatchStore((s) => s.fetchMatches);
+  console.log("fetched match data :", fetchMatchData);
+
   const matchesData = useMatchStore((s) => s.matchData);
   const setSelectedMatch = useMatchStore.getState().setSelectedMatch
 

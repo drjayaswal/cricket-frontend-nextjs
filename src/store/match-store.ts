@@ -39,13 +39,13 @@ export const useMatchStore = create(
           set({ isLoading: true, error: null });
 
           const response = await fetch(`${BACKEND_URL}/matches/all-stored-matches`);
-          // console.log("Response:", response);
 
           if (!response.ok) {
             throw new Error("Failed to fetch match data");
           }
 
           const data = await response.json();
+          // console.log("Response:", data);
 
           const extractedMatches: Match[] =
             data?.matches?.flatMap((series: any) =>
@@ -63,6 +63,8 @@ export const useMatchStore = create(
               ) || []
             ) || [];
 
+          // console.log("Extracted Matches:", extractedMatches);
+
           const today = new Date();
           const todayMatches = extractedMatches.filter((match) => {
             if (!match.startDate) return false;
@@ -74,6 +76,8 @@ export const useMatchStore = create(
               (match.format === "T20" || match.seriesName.includes("IPL"))
             );
           });
+
+          // console.log("today Matches:", todayMatches);
 
           const currentTime = Date.now();
           const matchesBySeries = extractedMatches.reduce<Record<string, Match[]>>((acc, match) => {
