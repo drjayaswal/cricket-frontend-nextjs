@@ -34,7 +34,7 @@ const Navbar = () => {
     <>
       <div
         className={cn(
-          "max-w-screen w-full mx-auto bg-background/60 border-b border-white backdrop-blur-sm px-5 flex justify-between items-center transition-normal duration-500"
+          "max-w-screen w-full mx-auto bg-background/60 border-b border-white/20 backdrop-blur-sm px-5 flex justify-between items-center transition-normal duration-500"
         )}
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">

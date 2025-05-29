@@ -1,4 +1,5 @@
 "use client";
+
 import { useMatchStore } from "@/store/match-store";
 import { Button } from "@/components/ui/button";
 import { useSocketStore } from "@/store/socket-store";
@@ -111,7 +112,7 @@ export default function LiveMatches() {
         <div {...{ className: "grid gap-6 md:grid-cols-2 lg:grid-cols-1" }}>
           {matchesData.map((match) => (
             <div key={match.matchId}>
-              <Card className="bg-gray-900 border-4 border-accent-light/70 hover:border- text-gray-100 overflow-hidden transition-all duration-300 group">
+              <Card className="bg-gray-900 border-2 border-accent-light/30 hover:border-accent-light/60 text-gray-100 overflow-hidden transition-all duration-300 group">
                 {/* Header */}
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-base font-medium">
@@ -185,7 +186,7 @@ export default function LiveMatches() {
                 <CardFooter className="border-t border-gray-800 flex justify-center transition-opacity">
                   {Date.now() >= match.startDate! ? (
                     <Button
-                      className="hover:bg-accent-dark bg-dark border-2 hover:border-accent-dark border-accent-light text-accent-light p-6 text-xl w-full hover:text-white transition-colors"
+                      className="hover:bg-accent-dark bg-accent-dark/40 text-white/70 p-6 py-7 text-xl w-full hover:text-white transition-colors"
                       asChild
                       onClick={() => handleAddToPortfolio(match)}
                     >
