@@ -555,6 +555,8 @@ export default function BettingInterface() {
         {/* Player Modal - Using the new component */}
         {selectedPlayerPortfolio &&
           <PlayerModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
             player={selectedPlayer}
             battingPosition={selectedBattingPosition}
           />

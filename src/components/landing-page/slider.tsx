@@ -22,7 +22,7 @@ const BannerSlider = () => {
   return (
     <Carousel
       plugins={[plugin.current]}
-      className="w-full bg-green-400/20 **:bg-green-400/20  relative"
+      className="w-full   relative"
     >
       <CarouselContent className="">
         <div />
