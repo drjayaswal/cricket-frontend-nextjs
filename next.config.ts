@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'onrender.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cricket-frontend-nextjs.onrender.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*',
       }
     ], // Add the domain here
   },
