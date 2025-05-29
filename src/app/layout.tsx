@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CricStock11",
-  description: "Developed by Coadal with love",
+  description: "Developed by CricStock11 with love",
 };
 
 export default function RootLayout({

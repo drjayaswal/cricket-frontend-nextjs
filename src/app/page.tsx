@@ -1,7 +1,8 @@
 import Navlinks from "@/components/landing-page/navlinks";
+import MobileNav from "@/components/landing-page/mobile-nav";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowRight, ChevronRight, ChevronsRight, BarChart2, Users, Trophy, Gift, Shield, Zap, Star, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronRight, ChevronsRight, BarChart2, Users, Trophy, Gift, Shield, Zap, Star, Sparkles, TrendingUp, Smartphone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/footer/footer";
@@ -15,35 +16,35 @@ const testimonials = [
       "No luck in this game, really requires thinking and analysis. Can't get over how exciting it is to use my cricket knowledge to trade stocks of my favorite cricketers.",
     name: "Aakash J",
     designation: "Meant For Real Analysts",
-    src: "/userdp.jpg",
+    src: "/images/userdp.jpg",
   },
   {
     quote:
       "Really changing how to think about player performance and fantasy. Scoring takes into account so many factors, makes it really interesting to predict.",
     name: "Preeti K",
     designation: "Incredible UI",
-    src: "/userdpf.jpg",
+    src: "/images/userdpf.jpg",
   },
   {
     quote:
       "I have been on CricStock11 for the past three years, and my portfolio has increased by over 800%. I love the concept of the app with an incredible UI and excellent customer support.",
     name: "Aarsh T",
     designation: "Love The Concept",
-    src: "/userdp.jpg",
+    src: "/images/userdp.jpg",
   },
   {
     quote:
       "CricStock11 has completely transformed my fantasy cricket experience. The trading aspect adds a whole new level of excitement and strategy. Highly recommend it!",
     name: "Rahul S",
     designation: "Game Changer",
-    src: "/userdp.jpg",
+    src: "/images/userdp.jpg",
   },
   {
     quote:
       "The app is user-friendly and the customer support is top-notch. I love how I can trade players just like stocks. It's addictive!",
     name: "Sneha M",
     designation: "User-Friendly & Addictive",
-    src: "/userdpf.jpg",
+    src: "/images/userdpf.jpg",
   }
 
 ];
@@ -52,22 +53,24 @@ export default function LandingPage() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-white/10 pt-2">
-        <div className=" flex justify-between items-center py-1 px-6 max-w-[90rem] mx-auto bg-white/5 backdrop-blur-md rounded-2xl">
+      <header className="sticky top-0 z-50 border-white/10 pt-2 px-2 backdrop-blur-md">
+        <div className="flex justify-between items-center py-1 px-4 sm:px-6 max-w-[90rem] mx-auto bg-white/5 backdrop-blur-md rounded-2xl">
           <div>
-            <Image src="/logo.png" alt="Logo" width={180} height={100} className="rounded-md object-cover" />
+            <Image src="/images/logo.png" alt="Logo" width={180} height={100} className="rounded-md object-cover w-[140px] sm:w-[180px]" />
           </div>
 
-          <Navlinks />
+          <div className="hidden lg:block">
+            <Navlinks />
+          </div>
 
-          <div>
-            <Button className="group bg-purple-700 text-base border-b border-transparent hover:rounded-none hover:border-purple-500 flex justify-center items-center rounded-sm " asChild>
-              <Link href={"/login"} className="flex justify-center items-center ">
-                <span className=""> Trade Now </span>
-                <Image src="/trade.svg" alt="trade now" width={50} height={50} className="invert size-0 group-hover:size-6 transition-all duration-400" />
-                {/* <ChevronRight className="size-0 group-hover:size-5 transition-all duration-400" /> */}
+          <div className="flex items-center gap-4">
+            <Button className="hidden sm:flex group bg-purple-700 text-base border-b border-transparent hover:rounded-none hover:border-purple-500 justify-center items-center rounded-sm" asChild>
+              <Link href={"/login"} className="flex justify-center items-center">
+                <span>Trade Now</span>
+                <Image src="/images/trade.svg" alt="trade now" width={50} height={50} className="invert size-0 group-hover:size-6 transition-all duration-400" />
               </Link>
             </Button>
+            <MobileNav />
           </div>
         </div>
       </header>
@@ -77,30 +80,30 @@ export default function LandingPage() {
         <BannerSlider />
 
         {/* Slim Get the App Section */}
-        <section className="px-30 mt-10">
+        <section className="mt-10 w-[90%] mx-auto">
           <div className="relative overflow-hidden">
-            <div className="relative flex items-center justify-between gap-8 bg-white/6 rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center gap-4">
+            <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 bg-white/6 rounded-2xl p-4 sm:p-6 shadow-xl">
+              <div className="flex items-center max-sm:flex-col justify-center max-sm:text-center gap-4 w-full sm:w-auto">
                 <div className="w-12 h-12 bg-gradient-to-r from-white/20 to-purple-500/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                  <Image src="/graph.svg" alt="trade now" width={50} height={50} className="size-6 invert" />
+                  <Image src="/images/graph.svg" alt="trade now" width={50} height={50} className="size-6 invert" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-white">Trade Anywhere, Anytime</h3>
                   <p className="text-sm text-slate-300">Download our app for the best trading experience</p>
                 </div>
               </div>
-              <div className="flex gap-4 items-center">
-                <a href="#" className="transform hover:scale-105 transition-transform duration-300">
+              <div className="flex flex-col sm:flex-row gap-4 items-center w-full sm:w-auto">
+                <a href="#" className="transform flex justify-center items-center hover:scale-105 transition-transform duration-300 w-full sm:w-auto">
                   <Image
-                    src="/playstore.png"
+                    src="/images/playstore.png"
                     alt="Get it on Google Play"
                     width={150}
                     height={32}
-                    className=""
+                    className="max-sm:w-30"
                   />
                 </a>
-                <div className="h-8 w-px bg-white/30"></div>
-                <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-white/5" asChild>
+                <div className="hidden sm:block h-8 w-px bg-white/30"></div>
+                <Button variant="ghost" className="w-full sm:w-auto text-purple-400 hover:text-purple-300 hover:bg-white/5" asChild>
                   <Link href="/login">
                     <span>Continue on Web</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -114,37 +117,76 @@ export default function LandingPage() {
         {/* Features Section with modern cards */}
         <section className="mt-40" id="features">
           <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Why Choose CricStock11?</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Why Cricstock11?</h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Experience the future of fantasy cricket trading with our cutting-edge platform
+              Here's what makes Cricstock11 stand out in the world of fantasy sports
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: "/trophy.svg",
-                title: "India's 1st Cricket Market",
-                desc: "Revolutionary trading platform",
+                icon: "/images/trophy.svg",
+                title: "Cricket Meets Stock Market",
+                desc: "Experience a first-of-its-kind platform that combines fantasy cricket with live stock market-style trading. Trade players and teams like stocks, with prices that fluctuate based on real-time match performance.",
                 gradient: "from-yellow-500/20 to-orange-500/20",
               },
               {
-                icon: "/globe.svg",
-                title: "100% Secure & Legal",
-                desc: "Bank-grade security",
+                icon: "/images/globe.svg",
+                title: "Skill-Based Gameplay",
+                desc: "Success depends on your cricket knowledge, prediction accuracy, and timing, not luck. Analyze form, pitch conditions, and match-ups to make informed trading decisions.",
                 gradient: "from-green-500/20 to-emerald-500/20",
               },
               {
-                icon: "/user.svg",
-                title: "24/7 Customer Support",
-                desc: "Always here to help",
+                icon: "/images/user.svg",
+                title: "Real-Time Trading & Dynamic Pricing",
+                desc: "Player and team stock prices change in real-time based on live performances. Take advantage of momentum shifts during matches to buy low and sell high.",
                 gradient: "from-blue-500/20 to-cyan-500/20",
               },
               {
-                icon: "/gift.svg",
-                title: "Get Rewarded for Referrals",
-                desc: "Earn with friends",
+                icon: "/images/gift.svg",
+                title: "Portfolio Management",
+                desc: "Build your own custom portfolio of players and teams. Track your investments, returns, and performance stats like a true market trader.",
                 gradient: "from-purple-500/20 to-pink-500/20",
+              },
+              {
+                icon: "/images/graph.svg",
+                title: "Engaging & Educational",
+                desc: "Learn the basics of stock trading in a fun and gamified environment. Great for cricket fans curious about how markets work.",
+                gradient: "from-indigo-500/20 to-violet-500/20",
+              },
+              {
+                icon: "/images/star.svg",
+                title: "Interactive Match Experience",
+                desc: "Stay engaged throughout the game, not just at the start. Your decisions during the match can directly impact your outcome.",
+                gradient: "from-red-500/20 to-pink-500/20",
+                lucideIcon: <Zap className="w-8 h-8" />,
+              },
+              {
+                icon: "/images/shield.svg",
+                title: "Secure & Fair Play",
+                desc: "Fully compliant, secure platform with robust fraud detection and user verification. Transparent rules and equal opportunity for all players.",
+                gradient: "from-teal-500/20 to-cyan-500/20",
+                lucideIcon: <Shield className="w-8 h-8" />,
+              },
+              {
+                icon: "/images/trophy.svg",
+                title: "Win Rewards & Climb the Leaderboard",
+                desc: "Compete in daily, weekly, and seasonal contests to win exciting prizes. Prove your trading and cricket skills against other users.",
+                gradient: "from-amber-500/20 to-yellow-500/20",
+              },
+              {
+                icon: "/images/phone.svg",
+                title: "User-Friendly Interface",
+                desc: "Simple, intuitive design for seamless navigation and trading. Trade instantly with real-time updates, even during fast-paced matches.",
+                gradient: "from-blue-500/20 to-indigo-500/20",
+                lucideIcon: <Smartphone className="w-8 h-8" />,
+              },
+              {
+                icon: "/images/globe.svg",
+                title: "Available Anytime, Anywhere",
+                desc: "Join the action from your smartphone or tablet – any match, any format, any time.",
+                gradient: "from-purple-500/20 to-indigo-500/20",
               },
             ].map((feature, i) => (
               <div
@@ -154,7 +196,11 @@ export default function LandingPage() {
                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10 flex flex-col items-center text-center">
                   <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Image src={feature.icon || "/placeholder.svg"} alt={feature.title} width={32} height={32} className="invert" />
+                    {feature.lucideIcon ? (
+                      feature.lucideIcon
+                    ) : (
+                      <Image src={feature.icon || "/placeholder.svg"} alt={feature.title} width={32} height={32} className="invert" />
+                    )}
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
                   <p className="text-slate-300 text-sm">{feature.desc}</p>
@@ -315,7 +361,7 @@ export default function LandingPage() {
                 <div className="flex gap-4 items-center">
                   <a href="#" className="transform hover:scale-105 transition-transform duration-300">
                     <Image
-                      src="/playstore.png"
+                      src="/images/playstore.png"
                       alt="Get it on Google Play"
                       width={150}
                       height={32}
@@ -338,7 +384,7 @@ export default function LandingPage() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-blue-500/30 rounded-3xl blur-2xl transform rotate-6"></div>
                   <Image
-                    src="/logo.png"
+                    src="/images/logo.png"
                     alt="CricStock11 Mobile App"
                     width={280}
                     height={450}

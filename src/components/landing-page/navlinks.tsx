@@ -6,10 +6,9 @@ import { usePathname } from "next/navigation"
 
 const navlinks = [
   { href: "/", label: "Home" },
-  { href: "/game-rules", label: "Game Rules" },
-  { href: "/scoring-system", label: "Scoring System" },
+  { href: "/game-rules", label: "Game Rules & Scoring" },
   { href: "/legality", label: "Security & Legality" },
-  { href: "/contact", label: "Contact Us" },
+  { href: "/contact-us", label: "Contact Us" },
 ]
 
 const Navlinks = () => {

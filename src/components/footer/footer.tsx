@@ -155,10 +155,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm pt-6">
           <div>© {new Date().getFullYear()} CricStock11. All rights reserved.</div>
           <div className="mt-4 md:mt-0 flex gap-6">
-            <Link href="#" className="hover:text-accent transition-colors">
+            <Link href="/privacy-policy" className="hover:text-accent transition-colors">
               Privacy Policy
             </Link>
-            <Link href="#" className="hover:text-accent transition-colors">
+            <Link href="terms-and-conditions" className="hover:text-accent transition-colors">
               Terms of Service
             </Link>
             <Link href="#" className="hover:text-accent transition-colors">
