@@ -9,6 +9,7 @@ const navlinks = [
   { href: "/game-rules", label: "Game Rules & Scoring" },
   { href: "/legality", label: "Security & Legality" },
   { href: "/contact-us", label: "Contact Us" },
+  { href: "/about", label: "About Us" },
 ]
 
 const Navlinks = () => {

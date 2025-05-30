@@ -286,8 +286,16 @@ export default function AuthPage() {
       <TradingBackground />
 
       <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-8 animate-slide-down-lg">
-          <Image src="/logo.png" alt="Logo" width={150} height={100} className="mx-auto mb-2" />
+        <div className="text-center mb-8 flex flex-col items-center gap-2 animate-slide-down-lg">
+          <Link href={"/"} className="" >
+            <Image
+              src={"/logo.png"}
+              alt="Logo"
+              width={150}
+              height={100}
+              className="rounded-full object-cover"
+            />
+          </Link>
           <p className="text-gray-400">Your cricket stock trading platform</p>
         </div>
 

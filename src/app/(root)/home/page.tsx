@@ -296,7 +296,7 @@ const CricketSchedulePage = () => {
     };
     fetchData();
   }, []);
-  
+
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section */}
@@ -345,7 +345,7 @@ const CricketSchedulePage = () => {
           <Link href="/live-matches" className="mt-10">
             <Button
               size="lg"
-              className="border-2 border-green-600 text-green-500 bg-transparent hover:bg-green-600 font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:text-white"
+              className="text-green-500 bg-green-500/15 backdrop-blur-md hover:bg-green-600 font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:text-white"
             >
               Watch Live Matches
               <ArrowRight className="ml-2 h-4 w-4" />

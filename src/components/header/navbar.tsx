@@ -71,7 +71,7 @@ const Navbar = () => {
           }
 
           <Link href="/user-profile">
-            <Avatar className="size-11 border-2 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center" >
+            <Avatar className="size-11 border-2 transition-all duration-250 border-white/40 hover:border-accent shadow-md cursor-pointer flex justify-center items-center" >
               {
                 user?.profileImage
                   ? <AvatarImage src={user?.profileImage} alt="User Profile" className="object-cover" />

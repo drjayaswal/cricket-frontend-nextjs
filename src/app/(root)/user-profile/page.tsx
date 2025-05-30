@@ -110,11 +110,11 @@ export default function UserProfile() {
                     accept="image/*"
                     className="hidden"
                     onChange={handleImageUpload}
-                    />
+                  />
 
                   {/* Avatar */}
                   <Avatar
-                    className="h-16 w-16 border-4 border-amber-600 mt-3 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center"
+                    className="h-16 w-16 border-2 border-amber-600 mt-3 transition-all duration-250 hover:border-accent shadow-md cursor-pointer flex justify-center items-center"
                     onClick={triggerFileInput}
                   >
                     {loading
@@ -143,7 +143,7 @@ export default function UserProfile() {
               </div>
               <Button
                 variant="ghost"
-                className="mt-5 text-white hover:text-red-500 hover:border-red-500/50 cursor-pointer hover:bg-transparent border-2 border-transparent flex items-center gap-1"
+                className="mt-5 text-red-500 hover:text-red-500 hover:bg-red-500/10 border-red-500/50 cursor-pointer border-1 flex items-center gap-1"
                 onClick={() => setLogoutOpen(true)}
               >
                 <LogOut className="h-4 w-4" />

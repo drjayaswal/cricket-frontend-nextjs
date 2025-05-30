@@ -17,6 +17,7 @@ import {
   Smartphone,
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function Footer() {
   return (
@@ -27,8 +28,7 @@ export default function Footer() {
           {/* Column 1: Company Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Cricket className="w-6 h-6 text-accent" />
-              <h3 className="text-xl font-semibold text-white">CricStock11</h3>
+              <Image src="/logo.png" alt="CricStock11 Logo" width={140} height={40} className="rounded-full" />
             </div>
             <p className="text-gray-400 text-sm">
               Your premier platform for cricket stock trading and fantasy league investments.

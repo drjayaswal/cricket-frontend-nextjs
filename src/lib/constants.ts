@@ -12,5 +12,9 @@ export const UNPROTECTED_ROUTES = [
   "/terms-and-conditions",
   "/privacy-policy",
   "/about-us",
+  "/about",
   "/contact",
+  "/contact-us",
+  "/game-rules",
+  "/legality",
 ]
