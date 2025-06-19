@@ -63,11 +63,11 @@ const BannerSlider = () => {
               <div className="flex-1 flex justify-center lg:justify-end w-full lg:w-auto">
                 <div className="relative w-full max-w-[500px]">
                   <Image
-                    src="/bg5.jpg"
+                    src="/images/bg5.jpg"
                     alt="CricStock11 Trading Platform"
                     width={500}
                     height={500}
-                    className="relative w-full rounded-3xl shadow-2xl object-cover border border-white/20"
+                    className="relative w-full max-h-60 rounded-3xl shadow-2xl object-cover border border-white/20"
                   />
 
                   <div className="mt-8 lg:mt-12 flex flex-wrap items-center gap-4 lg:gap-8">
