@@ -121,7 +121,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3 text-gray-400 group">
                 <Phone className="w-4 h-4 text-accent group-hover:text-accent/80" />
-                <span className="group-hover:text-gray-300 transition-colors">+91 9999999999</span>
+                <span className="group-hover:text-gray-300 transition-colors">+91 7877804889</span>
               </div>
               <div className="flex items-center gap-3 text-gray-400 group">
                 <Globe className="w-4 h-4 text-accent group-hover:text-accent/80" />

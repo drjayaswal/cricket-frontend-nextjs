@@ -117,6 +117,30 @@ Withdrawals are processed only after successful KYC verification and may be subj
 We are not responsible for delays caused by third-party payment gateways or banks.`,
     },
     {
+      id: "refund-policy",
+      title: "Refund Policy",
+      content: `
+At CricStock11 Private Limited, we strive to deliver a transparent and fair online experience for all users engaging with our cricket-based stock trading platform. Please read our refund policy carefully before making any transactions.
+
+• NO REFUND POLICY
+All purchases, deposits, and transactions made on CricStock11 are final and non-refundable. Once a user has successfully completed a transaction—whether it's for buying cricket player stocks, wallet top-ups, or any related services—no refund or reversal will be provided under any circumstances, including but not limited to:
+
+User dissatisfaction,
+
+Incorrect or accidental purchases,
+
+Changes in player performance,
+
+Account termination due to violation of our terms and conditions
+
+• USER RESPONSIBILITY
+Users are solely responsible for understanding the terms of services and for making informed decisions before executing any transaction. We encourage all users to review their actions carefully before confirming any operation on the platform.
+
+• FRAUD & POLICY VIOLATION
+In the event of any fraudulent activity or breach of our platform's terms and conditions, CricStock11 reserves the right to withhold or deny any claims or access to funds.
+`,
+    },
+    {
       id: "service-disruptions",
       title: "Service Disruptions",
       content: `Cricstock11 strives to provide seamless service but cannot guarantee uninterrupted access at all times. The platform may be temporarily unavailable due to:
@@ -247,7 +271,48 @@ All efforts shall be made to resolve disputes amicably through arbitration or me
 
                       {expandedSection === section.id && (
                         <div className="mt-2 text-gray-300">
-                          <p className="leading-relaxed">{section.content}</p>
+                          {(() => {
+                            const lines = section.content.split('\n').filter(line => line.trim());
+                            const heading = lines[0];
+                            const contentLines = lines.slice(1);
+
+                            // Check if content has bullet points
+                            const hasBulletPoints = contentLines.some(line => line.trim().startsWith('•'));
+
+                            return (
+                              <div>
+                                {heading && (
+                                  <p className="leading-relaxed mb-3">{heading}</p>
+                                )}
+
+                                {hasBulletPoints ? (
+                                  <ul className="list-disc list-inside space-y-1 leading-relaxed">
+                                    {contentLines.map((line, index) => {
+                                      const trimmedLine = line.trim();
+                                      if (trimmedLine.startsWith('•')) {
+                                        return (
+                                          <li key={index} className="ml-4">
+                                            {trimmedLine.substring(1).trim()}
+                                          </li>
+                                        );
+                                      } else if (trimmedLine) {
+                                        return (
+                                          <p key={index} className="leading-relaxed mt-2">
+                                            {trimmedLine}
+                                          </p>
+                                        );
+                                      }
+                                      return null;
+                                    })}
+                                  </ul>
+                                ) : (
+                                  <p className="leading-relaxed">
+                                    {contentLines.join(' ')}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </div>
                       )}
 

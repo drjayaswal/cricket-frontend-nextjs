@@ -167,21 +167,21 @@ export default function ContactForm() {
             <Phone className="text-purple-400" />
             <div>
               <p className="font-medium">Phone</p>
-              <p className="text-gray-400">+91 98765 43210</p>
+              <p className="text-gray-400">+91 7877804889</p>
             </div>
           </div>
           <div className="flex items-start space-x-4">
             <Mail className="text-purple-400" />
             <div>
               <p className="font-medium">Email</p>
-              <p className="text-gray-400">support@example.com</p>
+              <p className="text-gray-400">support@cricstock11.com</p>
             </div>
           </div>
           <div className="flex items-start space-x-4">
             <MapPin className="text-purple-400" />
             <div>
               <p className="font-medium">Location</p>
-              <p className="text-gray-400">Ahmedabad, Gujarat, India</p>
+              <p className="text-gray-400"> Vaishali nagar, Jaipur 302021</p>
             </div>
           </div>
         </div>

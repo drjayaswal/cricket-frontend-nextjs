@@ -57,7 +57,7 @@ export default function LandingPage() {
         <div className="flex justify-between items-center py-1 px-4 sm:px-6 max-w-[90rem] mx-auto bg-white/5 backdrop-blur-md rounded-2xl">
           <Link href={"/"} >
             <Image
-              src={"/logo.png"}
+              src={"/images/logo.png"}
               alt="Logo"
               width={160}
               height={100}

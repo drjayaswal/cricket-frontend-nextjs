@@ -28,18 +28,19 @@ export default function ContactPage() {
                 <div className="flex items-start gap-4">
                   <MapPin className="mt-1 h-6 w-6 text-accent-light" />
                   <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-                    123 Cricket Avenue, Suite 456<br />
-                    New Delhi, 110001
+                    flat no- 734 silver crown apartments
+                    <br />
+                    Vaishali nagar, Jaipur 302021
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <Phone className="h-6 w-6 text-accent-light" />
                   <a
-                    href="tel:+919876543210"
+                    href="tel:+917877804889"
                     className="text-gray-300 hover:text-accent-light transition-colors text-sm sm:text-base"
                   >
-                    +91 98765 43210
+                    +91 7877804889
                   </a>
                 </div>
 
