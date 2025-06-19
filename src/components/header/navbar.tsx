@@ -44,7 +44,7 @@ const Navbar = () => {
               className="text-xl font-bold bg-gradient-to-r from-purple-500 to-cyan-500 text-transparent bg-clip-text"
             >
               <Image
-                src={"/logo.png"}
+                src={"/images/logo.png"}
                 alt="Logo"
                 width={160}
                 height={100}
