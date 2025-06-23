@@ -18,7 +18,7 @@ export default function TermsAndConditions() {
       // Scroll to section
       const element = document.getElementById(section)
       if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
+        element.scrollIntoView({ behavior: "smooth", block: "nearest" })
       }
     }
   }
@@ -241,8 +241,8 @@ All efforts shall be made to resolve disputes amicably through arbitration or me
   ]
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen text-gray-100">
+      <div className="container mx-auto px-4 ">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">

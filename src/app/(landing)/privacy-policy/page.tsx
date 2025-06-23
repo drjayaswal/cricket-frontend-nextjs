@@ -3,7 +3,7 @@ import { Shield, Lock, Eye, FileText, Bell, Clock, Database, Globe, Cookie, User
 
 export default function PrivacyPolicy() {
   return (
-    <main className="container mx-auto px-4 py-12">
+    <main className="container mx-auto px-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center space-x-3 mb-8">
           <Lock className="h-8 w-8 text-purple-500" />
@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
             </div>
             <div className="pl-9">
               <p className="mb-4 text-gray-300">We collect information in the following ways:</p>
-              
+
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">A. Information You Provide</h3>
               <p className="mb-4 text-gray-300">When You register or use our Services, We may collect:</p>
               <ul className="list-disc pl-5 mb-4 text-gray-300 space-y-2">
