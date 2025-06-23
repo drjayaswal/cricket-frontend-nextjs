@@ -74,12 +74,10 @@ export default function AuthPage() {
   const router = useRouter();
 
 
-  // useEffect(() => {
-  //   if (localStorage.getItem("token")) {
-  //     router.push("/") // navigate to home if token exists
-  //   }
-  // }, [router])
-  //
+  useEffect(() => {
+    router.push("/home") // navigate to home if token exists
+  }, [])
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({

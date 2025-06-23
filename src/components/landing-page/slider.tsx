@@ -46,7 +46,7 @@ const BannerSlider = () => {
 
                 <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
                   <Button className="group bg-purple-700 text-base hover:border-b hover:rounded-none border-purple-500 hover:border-purple-500 flex justify-center items-center rounded-sm px-6 lg:px-8 py-4 lg:py-6" asChild>
-                    <Link href="/login" className="flex justify-center items-center">
+                    <Link href="#" className="flex justify-center items-center">
                       <TrendingUp className="size-4 lg:size-5 text-purple-400" />
                       <span className="ml-2 text-base lg:text-lg">Start Trading Now</span>
                       <ChevronRight className="size-0 group-hover:size-4 lg:group-hover:size-5 transition-all duration-400" />
