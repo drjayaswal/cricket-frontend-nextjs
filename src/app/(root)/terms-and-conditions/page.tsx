@@ -141,6 +141,27 @@ In the event of any fraudulent activity or breach of our platform's terms and co
 `,
     },
     {
+      id: "pricing-investment-Structure",
+      title: "Pricing & Investment Structure",
+      content: `
+
+At CricStock11 Private Limited, we make fantasy cricket investing easy, transparent, and rewarding for everyone.
+
+📊 INVESTMENT RANGE:
+	•	Minimum Investment: ₹100
+	•	Maximum Investment: ₹25,000 per player
+
+Whether you’re a beginner or a seasoned investor, you can choose how much you want to invest in your favorite players within this range. Our dynamic platform lets you build a cricket team portfolio based on your strategy and risk appetite.
+
+⚠️ NOTE:
+	•	You can distribute your total investment across multiple players.
+	•	Returns are based on real-time player performance and market trends.
+	•	Investments are fully transparent and updated live during matches.
+
+Join the cricket stock revolution and invest smart, play smart with CricStock11!
+`,
+    },
+    {
       id: "service-disruptions",
       title: "Service Disruptions",
       content: `Cricstock11 strives to provide seamless service but cannot guarantee uninterrupted access at all times. The platform may be temporarily unavailable due to:
@@ -275,16 +296,16 @@ All efforts shall be made to resolve disputes amicably through arbitration or me
                             const lines = section.content.split('\n').filter(line => line.trim());
                             const heading = lines[0];
                             const contentLines = lines.slice(1);
-                            
+
                             // Check if content has bullet points
                             const hasBulletPoints = contentLines.some(line => line.trim().startsWith('•'));
-                            
+
                             return (
                               <div>
                                 {heading && (
                                   <p className="leading-relaxed mb-3">{heading}</p>
                                 )}
-                                
+
                                 {hasBulletPoints ? (
                                   <ul className="list-disc list-inside space-y-1 leading-relaxed">
                                     {contentLines.map((line, index) => {
