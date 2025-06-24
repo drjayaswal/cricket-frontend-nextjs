@@ -26,10 +26,6 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'cricket-frontend-nextjs.onrender.com',
       },
-      {
-        protocol: 'https',
-        hostname: '*',
-      }
     ], // Add the domain here
   },
 };

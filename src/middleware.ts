@@ -3,7 +3,16 @@ import type { NextRequest } from "next/server";
 import { isAuthenticated } from "@/lib/helper";
 import { UNPROTECTED_ROUTES } from "./lib/constants";
 
+type Environment = "production" | "development" | "other";
 export async function middleware(request: NextRequest) {
+  const currentEnv = process.env.DEPLOY_ENV as Environment;
+
+  if (currentEnv === 'production' && request.headers.get("x-forwarded-proto") !== "https") {
+    return NextResponse.redirect(
+      `https://${request.headers.get('host')}${request.nextUrl.pathname}`,
+      301
+    );
+  }
   const { pathname } = request.nextUrl;
 
   const isPublicPath = UNPROTECTED_ROUTES.includes(pathname);
