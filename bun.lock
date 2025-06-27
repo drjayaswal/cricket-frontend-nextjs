@@ -4,6 +4,7 @@
     "": {
       "name": "cricket-frontend-next",
       "dependencies": {
+        "@cashfreepayments/cashfree-js": "^1.0.5",
         "@chakra-ui/react": "^3.19.1",
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.0",
@@ -85,6 +86,8 @@
     "@babel/traverse": ["@babel/traverse@7.27.1", "", { "dependencies": { "@babel/code-frame": "^7.27.1", "@babel/generator": "^7.27.1", "@babel/parser": "^7.27.1", "@babel/template": "^7.27.1", "@babel/types": "^7.27.1", "debug": "^4.3.1", "globals": "^11.1.0" } }, "sha512-ZCYtZciz1IWJB4U61UPu4KEaqyfj+r5T1Q5mqPo+IBpcG9kHv30Z0aD8LXPgC1trYa6rK0orRyAhqUgk4MjmEg=="],
 
     "@babel/types": ["@babel/types@7.27.1", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.27.1" } }, "sha512-+EzkxvLNfiUeKMgy/3luqfsCWFRXLb7U6wNQTk60tovuckwB15B191tJWvpp4HjiQWdJkCxO3Wbvc6jlk3Xb2Q=="],
+
+    "@cashfreepayments/cashfree-js": ["@cashfreepayments/cashfree-js@1.0.5", "", {}, "sha512-fP9wi9mseXJmESGIkD9vb6RAKdSZw42jXiQY2LUt5A2STyEqMv0mYLgK2zqpMNSbdK9QdN1c4YnEv9mmyxC8mg=="],
 
     "@chakra-ui/react": ["@chakra-ui/react@3.19.1", "", { "dependencies": { "@ark-ui/react": "5.9.1", "@emotion/is-prop-valid": "1.3.1", "@emotion/serialize": "1.3.3", "@emotion/use-insertion-effect-with-fallbacks": "1.2.0", "@emotion/utils": "1.4.2", "@pandacss/is-valid-prop": "0.53.6", "csstype": "3.1.3", "fast-safe-stringify": "2.1.1" }, "peerDependencies": { "@emotion/react": ">=11", "react": ">=18", "react-dom": ">=18" } }, "sha512-NxmJUIxy9Uqs2/2WbMBQjU2TdK2AdCO1AfoMz/kI3ia4ig1FJ5NzXRGSEnTGrdOfrqL8GJp4ztbPfc4yspqWsQ=="],
 

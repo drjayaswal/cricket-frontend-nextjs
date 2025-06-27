@@ -28,9 +28,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DatePickerWithRange } from "./date-range-picker";
 import { useUserStore } from "@/store/user-store";
 import { TransactionModal } from "./transaction-modal";
+import { load } from "@cashfreepayments/cashfree-js";
+
+
+let cashfree: any = null;
 
 export default function MoneyTransactionsPage() {
   const [addtxnAmount, setAddtxnAmount] = useState("")
@@ -50,6 +53,67 @@ export default function MoneyTransactionsPage() {
     from: undefined,
     to: undefined,
   })
+  const [paymentSessionId, setPaymentSessionId] = useState('');
+  const [paymentLink, setPaymentLink] = useState('');
+
+  // Load Cashfree SDK once
+  useEffect(() => {
+      (async () => {
+          cashfree = await load({ mode: "production" });
+      })();
+  }, []);
+
+  const createOrder = async () => {
+      try {
+          const response = await fetch("http://localhost:5002/payment/create-order", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+          });
+
+          const data = await response.json();
+          console.log("Order Created:", data);
+
+          if (data.payment_session_id) {
+              setPaymentSessionId(data.payment_session_id);
+              setPaymentLink(data.payment_link);
+              alert("Order created! Click 'Pay' to continue.");
+          } else {
+              alert("Failed to create order.");
+          }
+      } catch (error) {
+          console.error("Error creating order:", error);
+          alert("Something went wrong while creating the payment.");
+      }
+  };
+
+  const doPayment = async () => {
+      if (!paymentSessionId) {
+          alert("Please create an order first.");
+          return;
+      }
+
+      const checkoutOptions = {
+          paymentSessionId: paymentSessionId,
+          redirectTarget: "_blank",
+      };
+
+      try {
+          const result = await cashfree.checkout(checkoutOptions);
+          console.log("Payment Result:", result);
+
+          if (result?.paymentDetails?.order?.order_status === "PAID") {
+              alert("Payment successful!");
+          } else if (result.error) {
+              alert("Payment failed or cancelled.");
+          }
+      } catch (err) {
+          console.error("Checkout Error:", err);
+          alert("Something went wrong during payment.");
+      }
+  };
+
 
   // Filtered transactions
   const [filteredTransactions, setFilteredTransactions] = useState(transactions)
@@ -274,7 +338,8 @@ export default function MoneyTransactionsPage() {
                     onChange={(e) => setAddtxnAmount(e.target.value)}
                     className="border-2 border-transparent focus-visible:border-green-600 bg-gray-800 text-gray-200 placeholder:text-gray-500"
                   />
-                  <Button className="bg-green-600 text-white font-bold hover:bg-green-600/60">Pay</Button>
+                  <Button onClick={createOrder} className="bg-green-600 text-white font-bold hover:bg-green-600/60">Create Order</Button>
+                  <Button onClick={doPayment} className="bg-green-600 text-white font-bold hover:bg-green-600/60">Pay</Button>
                 </div>
               </div>
             </CardContent>
