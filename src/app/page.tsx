@@ -61,7 +61,7 @@ export default function LandingPage() {
               alt="Logo"
               width={160}
               height={100}
-              className="rounded-full object-cover"
+              className=" w-[8.8rem] rounded-full object-cover"
             />
           </Link>
 

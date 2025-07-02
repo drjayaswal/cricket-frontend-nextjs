@@ -36,6 +36,7 @@
 
   --animate-slide-left-sm: slide-left-sm 0.4s ease-out;
   --animate-slide-left-md: slide-left-md 0.4s ease-out;
+  --animate-slide-left-md-no-fade: slide-left-md-no-fade 0.4s ease-out;
   --animate-slide-left-lg: slide-left-lg 0.4s ease-out;
 
   --animate-slide-right-sm: slide-right-sm 0.4s ease-out;
@@ -212,6 +213,16 @@
 
     to {
       opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-left-md-no-fade {
+    from {
+      transform: translateX(40px);
+    }
+
+    to {
       transform: translateX(0);
     }
   }
