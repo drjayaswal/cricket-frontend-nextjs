@@ -81,7 +81,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="max-w-[90rem] mt-10 mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="max-w-[90rem] overflow-hidden  mt-10 mx-auto px-4 sm:px-6 lg:px-8">
 
         <BannerSlider />
 

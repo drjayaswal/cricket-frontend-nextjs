@@ -40,11 +40,11 @@ const MobileNav = () => {
       {/* Mobile Menu */}
       <div
         className={cn(
-          "fixed inset-y-0 animate-slide-left-md-no-fade right-0 z-40 w-full max-w-sm shadow-lg transition-transform duration-300 ease-in-out",
-          isOpen ? "block " : "hidden"
+          "fixed right-1 top-0 z-40 w-full max-w-sm animate-slide-left-md-no-fade shadow-lg transition-transform duration-300 ease-in-out",
+          isOpen ? "block" : "hidden"
         )}
       >
-        <div className="flex flex-col space-y-4 bg-white/5 backdrop-blur-md mt-16 p-10 rounded-2xl">
+        <div className="flex flex-col space-y-4 bg-background border-white/30 border-1 backdrop-blur-md mt-16 p-10 rounded-2xl">
           {navlinks.map((link) => (
             <Link
               key={link.href}
@@ -56,7 +56,7 @@ const MobileNav = () => {
             </Link>
           ))}
 
-          <Button className=" group bg-purple-700 text-base border-b border-transparent hover:rounded-none hover:border-purple-500 justify-center items-center rounded-sm" asChild>
+          <Button className="mt-5 group bg-purple-700 text-base border-b border-transparent hover:rounded-none hover:border-purple-500 justify-center items-center rounded-sm" asChild>
             <Link href={"/login"} className="flex justify-center items-center">
               <span>Trade Now</span>
               <TrendingUp className="size-0 group-hover:size-5 transition-all duration-300" />
