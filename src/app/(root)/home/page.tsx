@@ -23,34 +23,13 @@ import MatchesSection from "./matchSections";
 import { toast } from "sonner";
 import { setUserIntoGlobalStore } from "@/lib/helper";
 
-interface Match {
-  matchDesc: string;
-  matchFormat: string;
-  team1: { teamName: string };
-  team2: { teamName: string };
-  startDate: string;
-  venueInfo: {
-    ground: string;
-    city: string;
-    country: string;
-  };
-}
-
-interface Series {
-  seriesCategory: string;
-  seriesName: string;
-  matchInfo: Match[];
-}
-
-interface MatchDay {
-  date: string;
-  matchScheduleList: Series[];
-}
 
 const CricketSchedulePage = () => {
-  const [matches, setMatches] = useState<MatchDay[]>([]);
+
+  const [matches, setMatches] = useState<[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -284,12 +263,13 @@ const CricketSchedulePage = () => {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/matches/all-stored-matches`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/cricket/competitions`
         );
         if (!res.ok) throw new Error("API Error");
         const data = await res.json();
-        console.log(data)
-        setMatches(data?.matches);
+        const matchesData = data.data;
+        setMatches(matchesData);
+        return
       } catch (e) {
         console.error("Fetch error:", e);
       } finally {
@@ -317,21 +297,13 @@ const CricketSchedulePage = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      {/* Hero Section */}
-      {/* Hero Section with Stock Chart and Gradient Overlay */}
       <section className="relative h-[500px] overflow-hidden bg-gray-900">
-        {/* Canvas background */}
         <div className="absolute inset-0 z-0">
           <canvas ref={canvasRef} className="w-full h-full opacity-100" />
         </div>
-
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/70 to-gray-950/70 z-10" />
-
-        {/* Main Content */}
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center">
           <div className="max-w-3xl">
-            {/* Subheading with icon */}
             <div className="flex items-center gap-2 text-green-400 mb-3 animate-fade-in">
               <TrendingUp className="h-5 w-5 animate-pulse" />
               <span className="text-sm font-semibold uppercase tracking-widest">
@@ -339,12 +311,10 @@ const CricketSchedulePage = () => {
               </span>
             </div>
 
-            {/* Main Heading */}
             <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
               Don't Miss The Action
             </h1>
 
-            {/* Subtext */}
             <p className="text-gray-300 mb-6 flex items-center gap-2 text-base">
               <BarChart2 className="h-4 w-4 text-green-400" />
               Track live matches and performance stats in real-time
@@ -374,15 +344,9 @@ const CricketSchedulePage = () => {
 
       {/* Matches Section */}
       <MatchesSection matches={matches} isLoading={isLoading} />
+
     </div>
   );
 };
 
 export default CricketSchedulePage;
-function setIsLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
-
-function setMatches(matches: any) {
-  throw new Error("Function not implemented.");
-}

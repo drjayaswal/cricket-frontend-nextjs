@@ -1,653 +1,495 @@
-"use client"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { BarChart3, MapPin, ThermometerSun, Users, Award, Droplets, TrendingUp, Zap, Target } from "lucide-react"
-import { useSocketStore } from "@/store/socket-store"
-import { useEffect } from "react"
+"use client";
 
-interface TeamStats {
-  runs: number
-  wickets: number
-  overs: number
-  runRate: number
-  extras: number
-  boundaries: {
-    fours: number
-    sixes: number
-  }
-  partnerships: {
-    players: string
-    runs: number
-  }[]
-  powerplay: number
-}
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 
-interface Team {
-  name: string
-  score: string
-  color: string
-  stats: TeamStats
-}
+export default function BettingPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [matchData, setMatchData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<string>("innings1") // Track active innings tab
+  const [activeSection, setActiveSection] = useState<string>("batsmen") // Track active data section
+  const [expandedPlayers, setExpandedPlayers] = useState<number[]>([]) // Track expanded player cards
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null) // Store selected player for modal
+  const [isModalOpen, setIsModalOpen] = useState(false) // Control modal visibility
+  const [selectedBattingPosition, setSelectedBattingPosition] = useState<number>(0) // Store batting position
 
-interface MatchStatsData {
-  venue: string
-  toss: string
-  umpires: string
-  referee: string
-  weather: string
-  pitch: string
-  requiredRunRate: number
-  projectedScore: number
-}
 
-interface MatchStatisticsProps {
-  team1: Team
-  team2: Team
-  matchStats: MatchStatsData
-  className?: string
-}
+  const searchParams = useSearchParams();
+  const matchId = searchParams.get("id");
 
-export function MatchStatistics({ team1, team2, matchStats, className = "" }: MatchStatisticsProps) {
-  // Calculate max values for proper scaling
-  const maxRuns = Math.max(team1.stats.runs, team2.stats.runs)
-  const maxBoundaries = Math.max(
-    team1.stats.boundaries.fours + team1.stats.boundaries.sixes,
-    team2.stats.boundaries.fours + team2.stats.boundaries.sixes,
-  )
-  const maxWickets = Math.max(team1.stats.wickets, team2.stats.wickets)
-  const maxRunRate = Math.max(team1.stats.runRate, team2.stats.runRate)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/cricket/live/${matchId}`
+        );
+        if (!res.ok) throw new Error("API Error");
+        const data = await res.json();
+        setMatchData(data.data);
+      } catch (e) {
+        console.error("Fetch error:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [matchId]);
+
+  if (isLoading) return <div className="text-white p-10">Loading match...</div>;
+  if (!matchId || !matchData) return <div className="text-white p-10">No match data.</div>;
+
 
   return (
-    <div className={className}>
-      <Card className="border-none bg-gradient-to-br from-gray-800/80 to-gray-900/90 shadow-xl overflow-hidden">
-        <div className="p-4 md:p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white flex items-center">
-              <BarChart3 className="mr-2 h-5 w-5 text-indigo-400" />
-              Match Statistics
-            </h2>
-          </div>
-
-          <Tabs defaultValue="overview">
-            <TabsList className="bg-gray-800/70 p-1 h-9 mb-6">
-              <TabsTrigger
-                value="overview"
-                className="text-xs px-3 py-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-md"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger
-                value="batting"
-                className="text-xs px-3 py-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-md"
-              >
-                Batting
-              </TabsTrigger>
-              <TabsTrigger
-                value="bowling"
-                className="text-xs px-3 py-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-md"
-              >
-                Bowling
-              </TabsTrigger>
-              <TabsTrigger
-                value="info"
-                className="text-xs px-3 py-1.5 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-md"
-              >
-                Info
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="mt-0 space-y-6">
-              {/* Team Comparison Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <div
-                        className={`w-2 h-8 rounded-full ${team1.color === "red" ? "bg-red-500" : "bg-green-500"} mr-3`}
-                      ></div>
-                      <h3 className="text-lg font-medium text-white">{team1.name}</h3>
-                    </div>
-                    <Badge
-                      className={`${team1.color === "red" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"} border-none`}
-                    >
-                      {team1.stats.runs}/{team1.stats.wickets}
-                    </Badge>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Run Rate</span>
-                        <span
-                          className={`text-sm font-medium ${team1.color === "red" ? "text-red-400" : "text-green-400"}`}
-                        >
-                          {team1.stats.runRate.toFixed(2)}
-                        </span>
-                      </div>
-                      <Progress
-                        value={(team1.stats.runRate / maxRunRate) * 100}
-                        className="h-1.5 bg-gray-700"
-                        style={{ backgroundColor: team1.color === "red" ? "rgb(239, 68, 68)" : "rgb(34, 197, 94)" }}
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Boundaries</span>
-                        <span
-                          className={`text-sm font-medium ${team1.color === "red" ? "text-red-400" : "text-green-400"}`}
-                        >
-                          {team1.stats.boundaries.fours + team1.stats.boundaries.sixes}
-                        </span>
-                      </div>
-                      <Progress
-                        value={((team1.stats.boundaries.fours + team1.stats.boundaries.sixes) / maxBoundaries) * 100}
-                        className={`h-1.5 bg-gray-700 ${team1.color === "red" ? "bg-red-500" : "bg-green-500"}`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    <div className="bg-gray-800/80 rounded-lg p-2 text-center">
-                      <div className="text-xs text-gray-400 mb-1">Fours</div>
-                      <div className="text-lg font-bold text-white">{team1.stats.boundaries.fours}</div>
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-2 text-center">
-                      <div className="text-xs text-gray-400 mb-1">Sixes</div>
-                      <div className="text-lg font-bold text-white">{team1.stats.boundaries.sixes}</div>
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-2 text-center">
-                      <div className="text-xs text-gray-400 mb-1">Extras</div>
-                      <div className="text-lg font-bold text-white">{team1.stats.extras}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <div
-                        className={`w-2 h-8 rounded-full ${team2.color === "red" ? "bg-red-500" : "bg-green-500"} mr-3`}
-                      ></div>
-                      <h3 className="text-lg font-medium text-white">{team2.name}</h3>
-                    </div>
-                    <Badge
-                      className={`${team2.color === "red" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"} border-none`}
-                    >
-                      {team2.stats.runs}/{team2.stats.wickets}
-                    </Badge>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Run Rate</span>
-                        <span
-                          className={`text-sm font-medium ${team2.color === "red" ? "text-red-400" : "text-green-400"}`}
-                        >
-                          {team2.stats.runRate.toFixed(2)}
-                        </span>
-                      </div>
-                      <Progress
-                        value={(team2.stats.runRate / maxRunRate) * 100}
-                        className="h-1.5 bg-gray-700"
-                        style={{ backgroundColor: team2.color === "red" ? "rgb(239, 68, 68)" : "rgb(34, 197, 94)" }}
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Boundaries</span>
-                        <span
-                          className={`text-sm font-medium ${team2.color === "red" ? "text-red-400" : "text-green-400"}`}
-                        >
-                          {team2.stats.boundaries.fours + team2.stats.boundaries.sixes}
-                        </span>
-                      </div>
-                      <Progress
-                        value={((team2.stats.boundaries.fours + team2.stats.boundaries.sixes) / maxBoundaries) * 100}
-                        className="h-1.5 bg-gray-700"
-                        style={{ backgroundColor: team2.color === "red" ? "rgb(239, 68, 68)" : "rgb(34, 197, 94)" }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    <div className="bg-gray-800/80 rounded-lg p-2 text-center">
-                      <div className="text-xs text-gray-400 mb-1">Fours</div>
-                      <div className="text-lg font-bold text-white">{team2.stats.boundaries.fours}</div>
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-2 text-center">
-                      <div className="text-xs text-gray-400 mb-1">Sixes</div>
-                      <div className="text-lg font-bold text-white">{team2.stats.boundaries.sixes}</div>
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-2 text-center">
-                      <div className="text-xs text-gray-400 mb-1">Extras</div>
-                      <div className="text-lg font-bold text-white">{team2.stats.extras}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Head to Head Comparison */}
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                <h3 className="text-lg font-medium text-white mb-4">Head to Head</h3>
-
-                <div className="space-y-4">
-                  {/* Runs Comparison */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center">
-                        <TrendingUp className="h-4 w-4 text-indigo-400 mr-2" />
-                        <span className="text-gray-300">Total Runs</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-red-400 font-medium">{team1.stats.runs}</span>
-                        <span className="text-xs text-gray-500">vs</span>
-                        <span className="text-green-400 font-medium">{team2.stats.runs}</span>
-                      </div>
-                    </div>
-                    <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div className="absolute inset-0 flex">
-                        <div
-                          className="bg-red-500 h-full"
-                          style={{ width: `${(team1.stats.runs / (team1.stats.runs + team2.stats.runs)) * 100}%` }}
-                        ></div>
-                        <div
-                          className="bg-green-500 h-full"
-                          style={{ width: `${(team2.stats.runs / (team1.stats.runs + team2.stats.runs)) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Wickets Comparison */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center">
-                        <Zap className="h-4 w-4 text-amber-400 mr-2" />
-                        <span className="text-gray-300">Wickets Lost</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-red-400 font-medium">{team1.stats.wickets}</span>
-                        <span className="text-xs text-gray-500">vs</span>
-                        <span className="text-green-400 font-medium">{team2.stats.wickets}</span>
-                      </div>
-                    </div>
-                    <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div className="absolute inset-0 flex">
-                        <div
-                          className="bg-red-500 h-full"
-                          style={{
-                            width: `${(team1.stats.wickets / (team1.stats.wickets + team2.stats.wickets)) * 100}%`,
-                          }}
-                        ></div>
-                        <div
-                          className="bg-green-500 h-full"
-                          style={{
-                            width: `${(team2.stats.wickets / (team1.stats.wickets + team2.stats.wickets)) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Powerplay Comparison */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center">
-                        <Target className="h-4 w-4 text-purple-400 mr-2" />
-                        <span className="text-gray-300">Powerplay Score</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-red-400 font-medium">{team1.stats.powerplay}</span>
-                        <span className="text-xs text-gray-500">vs</span>
-                        <span className="text-green-400 font-medium">{team2.stats.powerplay}</span>
-                      </div>
-                    </div>
-                    <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div className="absolute inset-0 flex">
-                        <div
-                          className="bg-red-500 h-full"
-                          style={{
-                            width: `${(team1.stats.powerplay / (team1.stats.powerplay + team2.stats.powerplay)) * 100}%`,
-                          }}
-                        ></div>
-                        <div
-                          className="bg-green-500 h-full"
-                          style={{
-                            width: `${(team2.stats.powerplay / (team1.stats.powerplay + team2.stats.powerplay)) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="batting" className="mt-0 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Team 1 Batting */}
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                  <div className="flex items-center mb-4">
-                    <div
-                      className={`w-2 h-8 rounded-full ${team1.color === "red" ? "bg-red-500" : "bg-green-500"} mr-3`}
-                    ></div>
-                    <h3 className="text-lg font-medium text-white">{team1.name}</h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    {/* Partnerships */}
-                    <div className="bg-gray-800/80 rounded-lg p-3">
-                      <h4 className="text-sm font-medium text-gray-300 mb-3">Key Partnerships</h4>
-                      <div className="space-y-3">
-                        {team1.stats.partnerships.map((partnership, index) => (
-                          <div key={index} className="relative">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-sm text-white">{partnership.players}</span>
-                              <span className="text-sm font-medium text-red-400">{partnership.runs}</span>
-                            </div>
-                            <Progress
-                              value={(partnership.runs / 50) * 100}
-                              className="h-1.5 bg-gray-700"
-                              style={{ backgroundColor: "rgb(239, 68, 68)" }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Batting Stats */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-800/80 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-400">Boundary %</span>
-                          <span className="text-sm font-medium text-red-400">
-                            {Math.round(
-                              ((team1.stats.boundaries.fours + team1.stats.boundaries.sixes) /
-                                (team1.stats.overs * 6)) *
-                              100,
-                            )}
-                            %
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <span className="text-xs text-gray-400 mr-1">4s:</span>
-                            <span className="text-sm text-white">{team1.stats.boundaries.fours}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="text-xs text-gray-400 mr-1">6s:</span>
-                            <span className="text-sm text-white">{team1.stats.boundaries.sixes}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-gray-800/80 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-400">Dot Ball %</span>
-                          <span className="text-sm font-medium text-red-400">
-                            {Math.round((team1.stats.extras / (team1.stats.overs * 6)) * 100)}%
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-400">Extras:</span>
-                          <span className="text-sm text-white">{team1.stats.extras}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Team 2 Batting */}
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                  <div className="flex items-center mb-4">
-                    <div
-                      className={`w-2 h-8 rounded-full ${team2.color === "red" ? "bg-red-500" : "bg-green-500"} mr-3`}
-                    ></div>
-                    <h3 className="text-lg font-medium text-white">{team2.name}</h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    {/* Partnerships */}
-                    <div className="bg-gray-800/80 rounded-lg p-3">
-                      <h4 className="text-sm font-medium text-gray-300 mb-3">Key Partnerships</h4>
-                      <div className="space-y-3">
-                        {team2.stats.partnerships.map((partnership, index) => (
-                          <div key={index} className="relative">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-sm text-white">{partnership.players}</span>
-                              <span className="text-sm font-medium text-green-400">{partnership.runs}</span>
-                            </div>
-                            <Progress
-                              value={(partnership.runs / 50) * 100}
-                              className="h-1.5 bg-gray-700"
-                              style={{ backgroundColor: "rgb(34, 197, 94)" }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Batting Stats */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-800/80 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-400">Boundary %</span>
-                          <span className="text-sm font-medium text-green-400">
-                            {Math.round(
-                              ((team2.stats.boundaries.fours + team2.stats.boundaries.sixes) /
-                                (team2.stats.overs * 6)) *
-                              100,
-                            )}
-                            %
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <span className="text-xs text-gray-400 mr-1">4s:</span>
-                            <span className="text-sm text-white">{team2.stats.boundaries.fours}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="text-xs text-gray-400 mr-1">6s:</span>
-                            <span className="text-sm text-white">{team2.stats.boundaries.sixes}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-gray-800/80 rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-400">Dot Ball %</span>
-                          <span className="text-sm font-medium text-green-400">
-                            {Math.round((team2.stats.extras / (team2.stats.overs * 6)) * 100)}%
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-400">Extras:</span>
-                          <span className="text-sm text-white">{team2.stats.extras}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="bowling" className="mt-0 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Team 1 Bowling */}
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                  <div className="flex items-center mb-4">
-                    <div
-                      className={`w-2 h-8 rounded-full ${team1.color === "red" ? "bg-red-500" : "bg-green-500"} mr-3`}
-                    ></div>
-                    <h3 className="text-lg font-medium text-white">{team1.name}</h3>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gray-800/80 rounded-lg p-3 flex flex-col justify-between">
-                      <span className="text-xs text-gray-400">Economy Rate</span>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-white">{team2.stats.runRate.toFixed(2)}</span>
-                        <span className="text-xs text-gray-400 ml-1">runs/over</span>
-                      </div>
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-3 flex flex-col justify-between">
-                      <span className="text-xs text-gray-400">Wickets Taken</span>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-white">{team2.stats.wickets}</span>
-                        <span className="text-xs text-gray-400 ml-1">wickets</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    <div className="bg-gray-800/80 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Extras Given</span>
-                        <span className="text-sm font-medium text-white">{team2.stats.extras}</span>
-                      </div>
-                      <Progress
-                        value={(team2.stats.extras / 20) * 100}
-                        className="h-1.5bg-amber-500"
-                      />
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Dot Balls</span>
-                        <span className="text-sm font-medium text-white">{Math.round(team2.stats.extras)}</span>
-                      </div>
-                      <Progress
-                        value={(Math.round(team2.stats.extras) / (team2.stats.overs * 6)) * 100}
-                        className="h-1.5 bg-gray-700"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Team 2 Bowling */}
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                  <div className="flex items-center mb-4">
-                    <div
-                      className={`w-2 h-8 rounded-full ${team2.color === "red" ? "bg-red-500" : "bg-green-500"} mr-3`}
-                    ></div>
-                    <h3 className="text-lg font-medium text-white">{team2.name}</h3>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gray-800/80 rounded-lg p-3 flex flex-col justify-between">
-                      <span className="text-xs text-gray-400">Economy Rate</span>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-white">{team1.stats.runRate.toFixed(2)}</span>
-                        <span className="text-xs text-gray-400 ml-1">runs/over</span>
-                      </div>
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-3 flex flex-col justify-between">
-                      <span className="text-xs text-gray-400">Wickets Taken</span>
-                      <div className="mt-2">
-                        <span className="text-2xl font-bold text-white">{team1.stats.wickets}</span>
-                        <span className="text-xs text-gray-400 ml-1">wickets</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    <div className="bg-gray-800/80 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Extras Given</span>
-                        <span className="text-sm font-medium text-white">{team1.stats.extras}</span>
-                      </div>
-                      <Progress
-                        value={(team1.stats.extras / 20) * 100}
-                        className="h-1.5 bg-gray-700"
-                      />
-                    </div>
-                    <div className="bg-gray-800/80 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-400">Dot Balls</span>
-                        <span className="text-sm font-medium text-white">{Math.round(team1.stats.extras)}</span>
-                      </div>
-                      <Progress
-                        value={(Math.round(team1.stats.extras) / (team1.stats.overs * 6)) * 100}
-                        className="h-1.5 bg-gray-700"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="info" className="mt-0">
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-indigo-500/20 p-2 rounded-lg">
-                        <MapPin className="h-5 w-5 text-indigo-400" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">Venue</div>
-                        <div className="text-white font-medium">{matchStats.venue}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-4">
-                      <div className="bg-amber-500/20 p-2 rounded-lg">
-                        <Award className="h-5 w-5 text-amber-400" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">Toss</div>
-                        <div className="text-white font-medium">{matchStats.toss}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-4">
-                      <div className="bg-orange-500/20 p-2 rounded-lg">
-                        <ThermometerSun className="h-5 w-5 text-orange-400" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">Weather</div>
-                        <div className="text-white font-medium">{matchStats.weather}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-blue-500/20 p-2 rounded-lg">
-                        <Users className="h-5 w-5 text-blue-400" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">Umpires</div>
-                        <div className="text-white font-medium">{matchStats.umpires}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-4">
-                      <div className="bg-purple-500/20 p-2 rounded-lg">
-                        <Users className="h-5 w-5 text-purple-400" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">Match Referee</div>
-                        <div className="text-white font-medium">{matchStats.referee}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-4">
-                      <div className="bg-green-500/20 p-2 rounded-lg">
-                        <Droplets className="h-5 w-5 text-green-400" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400 mb-1">Pitch Condition</div>
-                        <div className="text-white font-medium">{matchStats.pitch}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+    <div className="min-h-screen bg-gray-950">
+      <main className="container mx-auto px-4 py-6">
+        {/* Live Badge - Shows match status */}
+        <div className="mb-4 flex items-center gap-2">
+          {match.isMatchComplete ? (
+            <div className="flex items-center">
+              <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">Match Finished</span>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <span className="animate-pulse rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">LIVE</span>
+            </div>
+          )}
         </div>
-      </Card>
+
+        {/* Match Title - Shows competing teams */}
+        <div className="mb-6">
+          <h1 className="mb-2 text-3xl font-bold text-white md:text-5xl">
+            {matchLiveScore.innings[0].batTeamName} <span className="text-cyan-500">VS</span>{" "}
+            {matchLiveScore.innings[1].batTeamName}
+          </h1>
+        </div>
+
+        {/* Match Summary - Shows score and status for each innings */}
+        <div className="mb-6 grid grid-cols-1 gap-2 text-gray-400">
+          {matchLiveScore.innings.map((inning, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span className="text-xl font-medium text-white md:text-2xl">
+                {inning.batTeamSName} - {inning.score}/{inning.wickets.length} in {inning.overs} Overs (RR:{" "}
+                {inning.runRate})
+              </span>
+            </div>
+          ))}
+          <div className="mt-2">
+            <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold text-white">
+              {matchLiveScore.status}
+            </span>
+          </div>
+        </div>
+
+        {/* Team Stats - Shows comparative team statistics */}
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <TeamStats
+            teamName={matchLiveScore.innings[0].batTeamName}
+            teamPrice={matchLiveScore.innings[0].runRate}
+            color="green"
+          />
+          <TeamStats
+            teamName={matchLiveScore.innings[1].batTeamName}
+            teamPrice={matchLiveScore.innings[1].runRate}
+            color="red"
+          />
+        </div>
+
+        {/* Innings Tabs - Switch between teams */}
+        <div className="mb-4">
+          <div className="mb-6 flex border-b border-gray-800">
+            <button
+              className={`px-4 py-2 font-medium ${activeTab === "innings1"
+                ? "border-b-2 border-purple-500 text-purple-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveTab("innings1")}
+              aria-label={`View ${matchLiveScore.innings[0].batTeamName} innings`}
+            >
+              {matchLiveScore.innings[0].batTeamName}
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${activeTab === "innings2" ? "border-b-2 border-cyan-500 text-cyan-500" : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveTab("innings2")}
+              aria-label={`View ${matchLiveScore.innings[1].batTeamName} innings`}
+            >
+              {matchLiveScore.innings[1].batTeamName}
+            </button>
+          </div>
+        </div>
+
+        {/* Section Tabs - Switch between batting, bowling, and wickets data */}
+        <div className="mb-6">
+          <div className="mb-6 flex border-b border-gray-800">
+            <button
+              className={`px-4 py-2 font-medium ${activeSection === "batsmen"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveSection("batsmen")}
+              aria-label="View batting statistics"
+            >
+              Batting
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${activeSection === "bowlers"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveSection("bowlers")}
+              aria-label="View bowling statistics"
+            >
+              Bowling
+            </button>
+            <button
+              className={`px-4 py-2 font-medium ${activeSection === "wickets"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-400 hover:text-white"
+                }`}
+              onClick={() => setActiveSection("wickets")}
+              aria-label="View wickets information"
+            >
+              Wickets
+            </button>
+          </div>
+        </div>
+
+        {/* Content based on active tab and section */}
+        <div className="mb-8 rounded-xl bg-gray-900 p-4 sm:p-6">
+          {/* Batting Section */}
+          {activeSection === "batsmen" && (
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+                {activeTab === "innings1"
+                  ? `${matchLiveScore.innings[0].batTeamName} Batting`
+                  : `${matchLiveScore.innings[1].batTeamName} Batting`}
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Batter</th>
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Dismissal</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">R</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">B</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">4s</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">6s</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">SR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Map through batsmen data for the active innings */}
+                    {(activeTab === "innings1"
+                      ? matchLiveScore.innings[0].batsmen
+                      : matchLiveScore.innings[1].batsmen
+                    ).map((batsman, index) => (
+                      <tr
+                        key={index}
+                        onClick={() => openModal(batsman)}
+                        className={`${index % 2 === 0 ? "bg-gray-800/30 " : ""} rounded-4xl ${batsman.outDesc === "not out"
+                          ? "cursor-pointer hover:bg-white/10"
+                          : "cursor-default opacity-70"
+                          }`}
+                      >
+                        <td className="px-2 py-3 font-medium text-white sm:px-4">
+                          {batsman.name} {batsman.isCaptain && "(C)"} {batsman.isKeeper && "(WK)"}
+                        </td>
+                        <td className="px-2 py-3 text-gray-400 sm:px-4">{batsman.outDesc}</td>
+                        <td className="px-2 py-3 text-right text-white sm:px-4">{batsman.runs}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.balls}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.fours}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.sixes}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{batsman.strikeRate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    {/* Extras row */}
+                    <tr className="border-t border-gray-800">
+                      <td colSpan={2} className="px-2 py-3 font-medium text-white sm:px-4">
+                        Extras
+                      </td>
+                      <td className="px-2 py-3 text-right text-white sm:px-4">
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.total
+                          : matchLiveScore.innings[1].extras.total}
+                      </td>
+                      <td colSpan={5} className="px-2 py-3 text-gray-400 sm:px-4">
+                        (b{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.byes
+                          : matchLiveScore.innings[1].extras.byes}
+                        , lb{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.legByes
+                          : matchLiveScore.innings[1].extras.legByes}
+                        , w{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.wides
+                          : matchLiveScore.innings[1].extras.wides}
+                        , nb{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].extras.noBalls
+                          : matchLiveScore.innings[1].extras.noBalls}
+                        )
+                      </td>
+                    </tr>
+                    {/* Total row */}
+                    <tr>
+                      <td colSpan={2} className="px-2 py-3 font-bold text-white sm:px-4">
+                        Total
+                      </td>
+                      <td className="px-2 py-3 text-right font-bold text-white sm:px-4">
+                        {activeTab === "innings1"
+                          ? `${matchLiveScore.innings[0].score}/${matchLiveScore.innings[0].wickets.length}`
+                          : `${matchLiveScore.innings[1].score}/${matchLiveScore.innings[1].wickets.length}`}
+                      </td>
+                      <td colSpan={5} className="px-2 py-3 text-gray-400 sm:px-4">
+                        ({activeTab === "innings1" ? matchLiveScore.innings[0].overs : matchLiveScore.innings[1].overs}{" "}
+                        Overs, RR:{" "}
+                        {activeTab === "innings1"
+                          ? matchLiveScore.innings[0].runRate
+                          : matchLiveScore.innings[1].runRate}
+                        )
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Bowling Section */}
+          {activeSection === "bowlers" && (
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+                {activeTab === "innings1"
+                  ? `${matchLiveScore.innings[0].bowlTeamName} Bowling`
+                  : `${matchLiveScore.innings[1].bowlTeamName} Bowling`}
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Bowler</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">O</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">M</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">R</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">W</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">ECON</th>
+                      <th className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">WD</th>
+                      <th className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">NB</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Map through bowlers data for the active innings */}
+                    {(activeTab === "innings1"
+                      ? matchLiveScore.innings[0].bowlers
+                      : matchLiveScore.innings[1].bowlers
+                    ).map((bowler, index) => (
+                      <tr key={index} className={index % 2 === 0 ? "bg-gray-800/30" : ""}>
+                        <td className="px-2 py-3 font-medium text-white sm:px-4">
+                          {bowler.name} {bowler.isCaptain && "(C)"}
+                        </td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.overs}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.maidens}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.runs}</td>
+                        <td className="px-2 py-3 text-right font-medium text-white sm:px-4">{bowler.wickets}</td>
+                        <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{bowler.economy}</td>
+                        <td className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">
+                          {bowler.wides}
+                        </td>
+                        <td className="hidden px-2 py-3 text-right text-gray-400 sm:table-cell sm:px-4">
+                          {bowler.noBalls}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Wickets Section */}
+          {activeSection === "wickets" && (
+            <div>
+              <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">
+                {activeTab === "innings1"
+                  ? `${matchLiveScore.innings[0].batTeamName} Wickets`
+                  : `${matchLiveScore.innings[1].batTeamName} Wickets`}
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-800">
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Batsman</th>
+                      <th className="px-2 py-3 text-gray-400 sm:px-4">Dismissal</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">Runs</th>
+                      <th className="px-2 py-3 text-right text-gray-400 sm:px-4">Over</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Map through wickets data for the active innings */}
+                    {(activeTab === "innings1"
+                      ? matchLiveScore.innings[0].wickets
+                      : matchLiveScore.innings[1].wickets
+                    ).map((wicket, index) => {
+                      // Find the batsman details for this wicket
+                      const batsman = (
+                        activeTab === "innings1" ? matchLiveScore.innings[0].batsmen : matchLiveScore.innings[1].batsmen
+                      ).find((b) => b.id === wicket.batsmanId)
+
+                      return (
+                        <tr key={index} className={index % 2 === 0 ? "bg-gray-800/30" : ""}>
+                          <td className="px-2 py-3 font-medium text-white sm:px-4">{wicket.batsmanName}</td>
+                          <td className="px-2 py-3 text-gray-400 sm:px-4">{batsman?.outDesc || "Dismissed"}</td>
+                          <td className="px-2 py-3 text-right text-white sm:px-4">{wicket.runs}</td>
+                          <td className="px-2 py-3 text-right text-gray-400 sm:px-4">{wicket.overNumber}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Player Cards Section - Responsive grid layout */}
+        <div className="mb-8">
+          <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">
+            {activeTab === "innings1"
+              ? `${matchLiveScore.innings[0].batTeamName} Players`
+              : `${matchLiveScore.innings[1].batTeamName} Players`}
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+            {/* Map through players for the active innings */}
+            {(activeTab === "innings1" ? matchLiveScore.innings[0].batsmen : matchLiveScore.innings[1].batsmen).map(
+              (player) => (
+                <div
+                  key={player.id}
+                  className={`relative overflow-hidden rounded-xl shadow-lg transition-all hover:shadow-xl ${activeTab === "innings1"
+                    ? "border border-purple-800/30 bg-gradient-to-br from-purple-900/80 to-purple-950"
+                    : "border border-cyan-800/30 bg-gradient-to-br from-cyan-900/80 to-cyan-950"
+                    }`}
+                >
+                  {/* Player header with avatar */}
+                  <div className="relative p-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`relative h-12 w-12 rounded-full border-2 sm:h-14 sm:w-14 ${activeTab === "innings1" ? "border-purple-500" : "border-cyan-500"
+                          }`}
+                      >
+                        <Image
+                          src={`/teams/india.png`}
+                          alt={player.name}
+                          width={56}
+                          height={56}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="flex flex-wrap items-center gap-1 text-lg font-bold text-white sm:text-xl">
+                          {player.name}
+                          {/* Player role badges */}
+                          <div className="flex flex-wrap gap-1">
+                            {player.isKeeper && (
+                              <span
+                                className={`rounded-full px-1.5 py-0.5 text-xs ${activeTab === "innings1"
+                                  ? "bg-purple-500/20 text-purple-300"
+                                  : "bg-cyan-500/20 text-cyan-300"
+                                  }`}
+                              >
+                                Keeper
+                              </span>
+                            )}
+                            {player.isCaptain && (
+                              <span
+                                className={`rounded-full px-1.5 py-0.5 text-xs ${activeTab === "innings1"
+                                  ? "bg-purple-500/20 text-purple-300"
+                                  : "bg-cyan-500/20 text-cyan-300"
+                                  }`}
+                              >
+                                Captain
+                              </span>
+                            )}
+                          </div>
+                        </h3>
+                        <p className={`text-sm ${activeTab === "innings1" ? "text-purple-300" : "text-cyan-300"}`}>
+                          {player.outDesc ? player.outDesc : "Not Out"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Player stats */}
+                  <div
+                    className={`p-4 ${activeTab === "innings1" ? "border-purple-800/30" : "border-cyan-800/30"} border-t ${activeTab === "innings1" ? "bg-purple-950/50" : "bg-cyan-950/50"
+                      }`}
+                  >
+                    {/* Primary stats - runs, balls, strike rate */}
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <p className="text-xl font-bold text-white sm:text-2xl">{player.runs}</p>
+                        <p className="text-xs text-gray-400">Runs</p>
+                      </div>
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <p className="text-xl font-bold text-white sm:text-2xl">{player.balls}</p>
+                        <p className="text-xs text-gray-400">Balls</p>
+                      </div>
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <p className="text-xl font-bold text-white sm:text-2xl">{player.strikeRate}</p>
+                        <p className="text-xs text-gray-400">SR</p>
+                      </div>
+                    </div>
+
+                    {/* Secondary stats - fours and sixes */}
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-base font-bold text-white sm:text-lg">{player.fours}</span>
+                          <span className="text-xs text-gray-400">Fours</span>
+                        </div>
+                      </div>
+                      <div
+                        className={`rounded-lg p-2 text-center ${activeTab === "innings1" ? "bg-purple-900/50" : "bg-cyan-900/50"
+                          }`}
+                      >
+                        <div className="flex items-center justify-center gap-1">
+                          <span className="text-base font-bold text-white sm:text-lg">{player.sixes}</span>
+                          <span className="text-xs text-gray-400">Sixes</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+
+        {/* {selectedPlayerPortfolio &&
+          <PlayerModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            player={selectedPlayer}
+            battingPosition={selectedBattingPosition}
+          />
+        } */}
+      </main>
     </div>
-  )
+  );
 }

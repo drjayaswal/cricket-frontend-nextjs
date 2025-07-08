@@ -1,207 +1,90 @@
-import { useEffect, useState } from "react";
-import {
-  Trophy,
-  Globe2,
-  Flag,
-  Landmark,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import MatchCard from "./match-card";
-interface Match {
-  matchDesc: string;
-  matchFormat: string;
-  team1: { teamName: string };
-  team2: { teamName: string };
-  startDate: string;
-  venueInfo: {
-    ground: string;
-    city: string;
-    country: string;
-  };
-}
-interface MatchesSectionProps {
-  matches: {
-    date: string;
-    matchScheduleList: {
-      seriesCategory: string;
-      seriesName: string;
-      matchInfo: Match[];
-    }[];
-  }[];
-  isLoading: boolean;
-}
+"use client";
+import { Sparkles } from "lucide-react";
+import { MatchesSectionProps } from "@/types/match-schedule";
+import { formatDate } from "@/lib/helper";
+import { trends } from "@/lib/constants";
 
 const MatchesSection: React.FC<MatchesSectionProps> = ({
   matches,
   isLoading,
 }) => {
-  const getTomorrow = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
-  };
-  const [expandedSeries, setExpandedSeries] = useState<Record<string, boolean>>(
-    {}
-  );
-  const today = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
-  useEffect(() => {
-    console.log(matches);
-  }, [matches]);
-  const toggleSeries = (key: string) => {
-    setExpandedSeries((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
   return (
-    <section className="relative z-10 py-10 px-4 md:px-8 bg-gray-950">
-      <div className="max-w-[1500px] mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold mb-8 text-white">
-          Upcoming Matches This Week
+    <section className="relative z-10 py-16 px-4 md:px-8">
+      <div className="max-w-[1000px] mx-auto relative">
+        <h2 className="text-3xl md:text-5xl font-bold mb-12 text-white text-center">
+          Upcoming Competitions Timeline
         </h2>
 
+        {/* Vertical Line */}
+        <div className="absolute left-6 md:left-1/2 transform md:-translate-x-1/2 h-full border-l-4 border-purple-950"></div>
+
         {isLoading ? (
-          <p className="text-gray-400">Loading matches...</p>
+          <p className="text-gray-400 text-center">Loading Competitions...</p>
         ) : (
           matches
-            .filter((matchDay) => matchDay.date !== today)
-            .map((matchDay, index) => (
-              <div key={index} className="mb-8">
-                {matchDay.matchScheduleList.map((series, seriesIdx) => {
-                  const filteredMatches = series.matchInfo.filter(
-                    (match) => match.matchFormat.toLowerCase() === "t20"
-                  );
+            .slice()
+            .reverse()
+            .map((match, index) => (
+              <div
+                key={index}
+                className={`relative mb-8 flex flex-col md:flex-row ${index % 2 === 0 ? "md:justify-start" : "md:justify-end"
+                  }`}
+              >
+                {/* Timeline Dot */}
+                <div className="absolute left-1 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 bg-purple-500 rounded-full border-4 border-purple-500 shadow-lg z-20"></div>
 
-                  if (filteredMatches.length === 0) return null;
+                {/* Card */}
+                <div
+                  className={`relative bg-gray-900  rounded-4xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 w-full md:w-[45%] ${index % 2 === 0 ? "md:ml-7" : "md:mr-7"
+                    }`}
+                >
+                  {/* Trend */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-5 h-5 text-pink-400" />
+                    <span className="text-[11px] font-bold text-pink-300 uppercase tracking-wider">
+                      {trends[Math.floor(Math.random() * trends.length)]}
+                    </span>
+                  </div>
 
-                  const key = `${matchDay.date}-${series.seriesName}`;
-                  const isExpanded = expandedSeries[key] || false;
-                  const firstMatch = filteredMatches[0];
-                  const remainingMatches = filteredMatches.slice(1);
+                  {/* Title */}
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-4 leading-tight">
+                    {match.title}
+                  </h3>
 
-                  return (
-                    <div key={seriesIdx} className="mb-6 pb-4">
-                      {/* Series Header */}
-                      <div className="mb-2 flex justify-between items-center flex-wrap">
-                        <div className="flex items-center gap-2">
-                          {/* Icons based on keywords */}
-                          {series.seriesName.toLowerCase().includes("cup") && (
-                            <Trophy className="text-yellow-400 w-6 h-6" />
-                          )}
-                          {series.seriesName.toLowerCase().includes("tour") && (
-                            <Globe2 className="text-blue-400 w-6 h-6" />
-                          )}
-                          {series.seriesName
-                            .toLowerCase()
-                            .includes("league") && (
-                            <ShieldCheck className="text-green-400 w-6 h-6" />
-                          )}
-                          {series.seriesName
-                            .toLowerCase()
-                            .includes("trophy") && (
-                            <Flag className="text-red-400 w-6 h-6" />
-                          )}
-                          {series.seriesName
-                            .toLowerCase()
-                            .includes("stars") && (
-                            <Sparkles className="text-pink-400 w-6 h-6" />
-                          )}
+                  {/* Tags */}
+                  <div className="flex flex-wrap items-center gap-3 mb-6">
+                    <span className="bg-indigo-600/20 text-indigo-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase">
+                      {match.match_format.toUpperCase()}
+                    </span>
+                    <span className="bg-green-600/20 text-green-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase">
+                      {match.category}
+                    </span>
+                    <span className="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-[11px] font-bold uppercase">
+                      Season {match.season}
+                    </span>
+                  </div>
 
-                          <span className="text-white font-bold ml-1 text-2xl md:text-3xl">
-                            {series.seriesName}
-                          </span>
-                        </div>
-                        {(() => {
-                          const categoryColors: Record<string, string> = {
-                            International: "bg-blue-800/30 text-blue-400",
-                            League: "bg-green-800/30 text-green-400",
-                            "World Cup": "bg-yellow-900/30 text-yellow-600",
-                            Men: "bg-orange-800/30 text-orange-400",
-                            Women: "bg-pink-800/30 text-pink-400",
-                            Others: "bg-gray-700/30 text-gray-300",
-                          };
-                          const category = series.seriesCategory;
+                  {/* Dates */}
+                  <div className="flex items-center gap-2 text-blue-400 text-sm font-semibold mb-4">
+                    <span>{formatDate(match.datestart)}</span>
+                    <span>→</span>
+                    <span>{formatDate(match.dateend)}</span>
+                  </div>
 
-                          const lowerName = series.seriesName.toLowerCase();
+                  {/* Stats */}
+                  <div className="flex flex-wrap gap-3 text-[13px] text-gray-300 mb-4">
+                    <span className="bg-gray-700/40 px-3 py-1 rounded-full">
+                      {match.total_matches} Matches
+                    </span>
+                    <span className="bg-gray-700/40 px-3 py-1 rounded-full">
+                      {match.total_teams} Teams
+                    </span>
+                  </div>
 
-                          const rawCategories: string[] = [];
-
-                          // Keyword-based tagging
-                          if (lowerName.includes("world cup"))
-                            rawCategories.push("World Cup");
-                          if (lowerName.includes("league"))
-                            rawCategories.push("League");
-
-                          // Series category-based tagging
-                          if (series.seriesCategory === "International")
-                            rawCategories.push("International");
-                          if (series.seriesCategory === "League")
-                            rawCategories.push("League");
-                          if (series.seriesCategory === "Women")
-                            rawCategories.push("Women");
-                          if (series.seriesCategory === "Men")
-                            rawCategories.push("Men");
-
-                          // Default fallback if no tag was detected
-                          if (rawCategories.length === 0)
-                            rawCategories.push("Others");
-
-                          // Final unique categories
-                          const categoriesToRender = Array.from(
-                            new Set(rawCategories)
-                          );
-                          return (
-                            <div className="flex gap-1 flex-wrap">
-                              {categoriesToRender.map((cat) => {
-                                const badgeClass =
-                                  categoryColors[cat] ||
-                                  "bg-gray-700/30 text-gray-300";
-                                return (
-                                  <span
-                                    key={cat}
-                                    className={`text-sm font-semibold px-3 py-2 rounded-3xl ${badgeClass} mb-2`}
-                                  >
-                                    {cat}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          );
-                        })()}{" "}
-                      </div>
-                      {/* First Match */}
-                      <MatchCard match={firstMatch} />
-                      {/* Expandable Section */}
-                      <AnimatePresence>
-                        {isExpanded && remainingMatches.length > 0 && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <div className="mt-4 space-y-4">
-                              {remainingMatches.map((match, idx) => (
-                                <MatchCard key={idx} match={match} />
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                      {filteredMatches.length > 1 && (
-                        <button
-                          onClick={() => toggleSeries(key)}
-                          className="inline-flex items-center px-4 py-1.5 rounded-br-2xl rounded-bl-2xl bg-gray-800 hover:bg-gray-950 border-4 border-gray-800 text-sm font-medium active:scale-95 transition-all duration-200 border-t-0"
-                        >
-                          {isExpanded ? "Show Less" : `Show More`}
-                        </button>
-                      )}{" "}
-                    </div>
-                  );
-                })}
+                  <span className="text-yellow-400 font-extrabold uppercase tracking-wider text-[12px]">
+                    {match.status}
+                  </span>
+                </div>
               </div>
             ))
         )}

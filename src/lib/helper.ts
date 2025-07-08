@@ -22,6 +22,16 @@ export const validatePassword = (password: string): string => {
     : "";
 };
 
+export const formatDate = (date: string) => {
+  const d = new Date(date);
+  return d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+
 export const validatePhone = (phone: string): string => {
   if (!phone) return "Phone number is required";
 

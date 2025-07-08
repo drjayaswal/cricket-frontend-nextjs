@@ -29,15 +29,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUserStore } from "@/store/user-store";
-import { TransactionModal } from "./transaction-modal";
+import { TransactionModal } from "./components/transaction-modal";
 import { load } from "@cashfreepayments/cashfree-js";
+import { useParams, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import WithdrawModal from "./components/withdrawl";
 
 
 let cashfree: any = null;
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export default function MoneyTransactionsPage() {
+  const searchParams = useSearchParams()
+  const payment = searchParams.get("payment")
+  const router = useRouter()
+  useEffect(() => {
+    if (payment == "success") {
+      toast("Payment Successfull")
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("payment");
+      router.replace("/", { scroll: false });
+    }
+  }, [payment])
   const [addtxnAmount, setAddtxnAmount] = useState("")
-  const [withdrawtxnAmount, setWithdrawtxnAmount] = useState("")
   const [depositsAvailable, setDepositsAvailable] = useState(false)
   const [withdrawlAvailable, setWithdrawlAvailable] = useState(false)
   const [transactionsAvailable, setTransactionsAvailable] = useState(false)
@@ -45,7 +60,6 @@ export default function MoneyTransactionsPage() {
   const user = useUserStore((state) => state.user)
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null)
 
-  // Search and filter states
   const [searchQuery, setSearchQuery] = useState("")
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -56,62 +70,69 @@ export default function MoneyTransactionsPage() {
   const [paymentSessionId, setPaymentSessionId] = useState('');
   const [paymentLink, setPaymentLink] = useState('');
 
-  // Load Cashfree SDK once
   useEffect(() => {
-      (async () => {
-          cashfree = await load({ mode: "production" });
-      })();
+    (async () => {
+      cashfree = await load({ mode: "production" });
+    })();
   }, []);
 
   const createOrder = async () => {
-      try {
-          const response = await fetch("http://localhost:5002/payment/create-order", {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-          });
-
-          const data = await response.json();
-          console.log("Order Created:", data);
-
-          if (data.payment_session_id) {
-              setPaymentSessionId(data.payment_session_id);
-              setPaymentLink(data.payment_link);
-              alert("Order created! Click 'Pay' to continue.");
-          } else {
-              alert("Failed to create order.");
-          }
-      } catch (error) {
-          console.error("Error creating order:", error);
-          alert("Something went wrong while creating the payment.");
+    try {
+      const toastID = toast.loading(`Creating Order For ₹ ${addtxnAmount}`)
+      const orderBody = {
+        name: user?.name,
+        mobile: user?.mobile,
+        amount: addtxnAmount
       }
+      const response = await fetch(`${BACKEND}/payment/order/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderBody)
+      });
+
+      const data = await response.json();
+      if (data.orderDetails.paymentSessionId) {
+        setPaymentSessionId(data.orderDetails.paymentSessionId);
+        setPaymentLink(data.orderDetails.paymentSessionId);
+        toast.dismiss(toastID)
+        toast("Order created! Click 'Pay' to continue.");
+      } else {
+        toast("Failed to create order.");
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast("Something went wrong while creating the payment.");
+    }
   };
 
   const doPayment = async () => {
-      if (!paymentSessionId) {
-          alert("Please create an order first.");
-          return;
+    if (!paymentSessionId) {
+      toast("Please create an order first.");
+      return;
+    }
+    const checkoutOptions = {
+      paymentSessionId: paymentSessionId,
+      redirectTarget: "_blank",
+    };
+
+    try {
+      setPaymentLink("")
+      setPaymentSessionId("")
+      const result = await cashfree.checkout(checkoutOptions);
+
+      console.log("Payment Result:", result);
+
+      if (result?.paymentDetails?.order?.order_status === "PAID") {
+        toast("Payment successful!");
+      } else if (result.error) {
+        toast("Payment failed or cancelled.");
       }
-
-      const checkoutOptions = {
-          paymentSessionId: paymentSessionId,
-          redirectTarget: "_blank",
-      };
-
-      try {
-          const result = await cashfree.checkout(checkoutOptions);
-          console.log("Payment Result:", result);
-
-          if (result?.paymentDetails?.order?.order_status === "PAID") {
-              alert("Payment successful!");
-          } else if (result.error) {
-              alert("Payment failed or cancelled.");
-          }
-      } catch (err) {
-          console.error("Checkout Error:", err);
-          alert("Something went wrong during payment.");
-      }
+    } catch (err) {
+      console.error("Checkout Error:", err);
+      toast("Something went wrong during payment.");
+    }
   };
 
 
@@ -136,18 +157,15 @@ export default function MoneyTransactionsPage() {
   useEffect(() => {
     let results = [...transactions]
 
-    // Filter by search query (check ID, reference, and amount)
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       results = results.filter(
         (transaction) =>
           transaction.txnId.toLowerCase().includes(query) ||
-          (transaction.reference && transaction.reference.toLowerCase().includes(query)) ||
           transaction.txnAmount.toString().includes(query),
       )
     }
 
-    // Filter by payment method
     if (paymentMethodFilter !== "all") {
       results = results.filter(
         (transaction) => transaction.txnPaymentMethod.toLowerCase() === paymentMethodFilter.toLowerCase(),
@@ -179,8 +197,21 @@ export default function MoneyTransactionsPage() {
     setFilteredTransactions(results)
   }, [searchQuery, paymentMethodFilter, statusFilter, dateRange])
 
-  const presettxnAmounts = ["₹100", "₹500", "₹1,000", "₹2,000", "₹5,000", "₹10,000"]
+  const presettxnAmounts = [
+    "₹100",
+    "₹500",
+    "₹1,000",
+    "₹5,000",
+    "₹7,500",
+    "₹10,000",
+    "₹12,500",
+    "₹15,000",
+    "₹17,500",
+    "₹20,000",
+    "₹22,500",
+    "₹25,000",
 
+  ];
   const parsetxnAmount = (txnAmount: string) => txnAmount.replace(/[^\d]/g, "")
 
   const handleTransactionClick = (transaction: any) => {
@@ -207,7 +238,7 @@ export default function MoneyTransactionsPage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-spacing-x-0.5 border-transparent hover:border-white text-white hover:bg-transparent p-4 sm:size-default"
+              className="border-spacing-x-0.5 border-transparent bg-white/10 text-white hover:bg-white/70 hover:text-gray-800 p-4 sm:size-default"
             >
               <Download className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Export Transactions</span>
@@ -241,12 +272,12 @@ export default function MoneyTransactionsPage() {
                     Last updated :{" "}
                     {user?.lastSeen
                       ? (() => {
-                          const diffMs = Date.now() - new Date(user.lastSeen).getTime()
-                          const diffSec = Math.floor(diffMs / 1000)
-                          const hours = Math.floor(diffSec / 3600)
-                          const minutes = Math.floor((diffSec % 3600) / 60)
-                          return `${hours} hrs ${minutes} mins ago`
-                        })()
+                        const diffMs = Date.now() - new Date(user.lastSeen).getTime()
+                        const diffSec = Math.floor(diffMs / 1000)
+                        const hours = Math.floor(diffSec / 3600)
+                        const minutes = Math.floor((diffSec % 3600) / 60)
+                        return `${hours} hrs ${minutes} mins ago`
+                      })()
                       : "N/A"}
                   </p>
                 </div>
@@ -309,22 +340,28 @@ export default function MoneyTransactionsPage() {
           </Card>
         </div>
 
-        <div className="grid gap-4 sm:gap-6 sm:mb-2 grid-cols-1 md:grid-cols-2">
+        <div>
           {/* Quick Add Money Card */}
-          <Card className="bg-gray-900 backdrop-blur-sm">
-            <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4">
-              <CardTitle className="text-4xl text-white">Quick Add Funds</CardTitle>
-              <CardDescription className="text-lg text-gray-400">Add funds to your wallet</CardDescription>
+          <Card className="bg-gray-900 gap-2 backdrop-blur-sm">
+            <CardHeader className="px-7 py-2">
+              <div className="flex justify-between">
+                <div>
+                  <CardTitle className="text-4xl text-white">Add Funds</CardTitle>
+                  <CardDescription className="text-lg text-gray-400">Add funds to your wallet</CardDescription>
+                </div>
+                <WithdrawModal />
+
+              </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:p-6">
+            <CardContent className="px-7">
               <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {presettxnAmounts.map((txnAmount) => (
                     <Button
                       key={txnAmount}
                       variant="outline"
                       onClick={() => setAddtxnAmount(parsetxnAmount(txnAmount))}
-                      className="border-gray-900 bg-gray-800 text-gray-200 hover:border-white hover:bg-gray-900 hover:text-white"
+                      className="border-0 bg-gray-800 text-gray-200 hover:bg-white/70 hover:text-gray-900"
                     >
                       {txnAmount}
                     </Button>
@@ -333,69 +370,41 @@ export default function MoneyTransactionsPage() {
                 <div className="flex items-center gap-2">
                   <Input
                     type="number"
-                    placeholder="Enter txnAmount"
+                    placeholder="Enter Amount"
                     value={addtxnAmount}
                     onChange={(e) => setAddtxnAmount(e.target.value)}
                     className="border-2 border-transparent focus-visible:border-green-600 bg-gray-800 text-gray-200 placeholder:text-gray-500"
                   />
-                  <Button onClick={createOrder} className="bg-green-600 text-white font-bold hover:bg-green-600/60">Create Order</Button>
-                  <Button onClick={doPayment} className="bg-green-600 text-white font-bold hover:bg-green-600/60">Pay</Button>
+                  {!paymentLink && addtxnAmount != "" &&
+                    <Button onClick={createOrder} className="bg-green-600 text-white font-bold hover:bg-green-600/60">Create Order</Button>
+                  }{paymentLink &&
+                    <Button onClick={doPayment} className="bg-green-600 text-white font-bold hover:bg-green-600/60">Pay</Button>
+                  }
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Quick Withdraw Card */}
-          <Card className="bg-gray-900 backdrop-blur-sm">
-            <CardHeader className="px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3">
-              <CardTitle className="text-4xl text-white">Quick Withdraw Funds</CardTitle>
-              <CardDescription className="text-lg text-gray-400">Withdraw funds from your wallet</CardDescription>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:p-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {presettxnAmounts.map((txnAmount) => (
-                    <Button
-                      key={txnAmount}
-                      variant="outline"
-                      onClick={() => setWithdrawtxnAmount(parsetxnAmount(txnAmount))}
-                      className="border-gray-900 bg-gray-800 text-gray-200 hover:border-white hover:bg-gray-900 hover:text-white"
-                    >
-                      {txnAmount}
-                    </Button>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter txnAmount"
-                    value={withdrawtxnAmount}
-                    onChange={(e) => setWithdrawtxnAmount(e.target.value)}
-                    className="border-2 border-transparent focus-visible:border-orange-500 bg-gray-800 text-gray-200 placeholder:text-gray-500"
-                  />
-                  <Button className="bg-orange-500 font-bold hover:bg-orange-500/60">Withdraw</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
         <Tabs defaultValue="all">
           <TabsList className="mt-10 h-12 w-100 p-0 bg-gray-900 text-gray-400 rounded-full">
             <TabsTrigger
               value="all"
-              className="data-[state=active]:bg-accent border data-[state=active]:border-accent data-[state=active]:text-white rounded-none rounded-tl-full rounded-bl-full"
+              className="data-[state=active]:bg-accent border data-[state=active]:border-accent data-[state=active]:text-white rounded-none rounded-l-full cursor-pointer"
             >
               All Transactions
             </TabsTrigger>
             <TabsTrigger
               value="deposits"
-              className="data-[state=active]:bg-accent data-[state=active]:text-white rounded-none"
+              className="data-[state=active]:bg-accent border data-[state=active]:border-accent data-[state=active]:text-white rounded-none rounded-l-none cursor-pointer"
+
             >
               Deposits
             </TabsTrigger>
             <TabsTrigger
               value="withdrawals"
-              className="data-[state=active]:bg-accent data-[state=active]:text-white rounded-none rounded-tr-full rounded-br-full"
+              className="data-[state=active]:bg-accent border data-[state=active]:border-accent data-[state=active]:text-white rounded-none rounded-r-full cursor-pointer"
+
             >
               Withdrawals
             </TabsTrigger>
@@ -482,7 +491,6 @@ export default function MoneyTransactionsPage() {
                                   </td>
                                   <td className="px-4 py-4 text-sm text-gray-300">
                                     <div className="font-mono">{transaction.txnId}</div>
-                                    <div className="text-xs text-gray-400">{transaction.reference}</div>
                                   </td>
                                   <td className="px-4 py-4 text-sm text-gray-300">
                                     <div className="flex items-center">
@@ -491,19 +499,17 @@ export default function MoneyTransactionsPage() {
                                     </div>
                                   </td>
                                   <td
-                                    className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${
-                                      transaction.txnType === "deposit" ? "text-green-400" : "text-orange-400"
-                                    }`}
+                                    className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${transaction.txnType === "deposit" ? "text-green-400" : "text-orange-400"
+                                      }`}
                                   >
                                     {transaction.txnType === "deposit" ? "+" : "-"}₹{transaction.txnAmount}
                                   </td>
                                   <td className="whitespace-nowrap px-4 py-4 text-center text-sm">
                                     <Badge
-                                      className={`${
-                                        transaction.txnType === "deposit"
-                                          ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                                          : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                                      }`}
+                                      className={`${transaction.txnType === "deposit"
+                                        ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                                        : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
+                                        }`}
                                     >
                                       <span className="flex items-center">
                                         {transaction.txnType === "deposit" ? (
@@ -599,7 +605,6 @@ export default function MoneyTransactionsPage() {
                                   </td>
                                   <td className="px-4 py-4 text-sm text-gray-300">
                                     <div className="font-mono">{transaction.txnId}</div>
-                                    <div className="text-xs text-gray-400">{transaction.reference}</div>
                                   </td>
                                   <td className="px-4 py-4 text-sm text-gray-300">
                                     <div className="flex items-center">
@@ -608,19 +613,17 @@ export default function MoneyTransactionsPage() {
                                     </div>
                                   </td>
                                   <td
-                                    className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${
-                                      transaction.txnType === "deposit" ? "text-green-400" : "text-orange-400"
-                                    }`}
+                                    className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${transaction.txnType === "deposit" ? "text-green-400" : "text-orange-400"
+                                      }`}
                                   >
                                     {transaction.txnType === "deposit" ? "+" : "-"}₹{transaction.txnAmount}
                                   </td>
                                   <td className="whitespace-nowrap px-4 py-4 text-center text-sm">
                                     <Badge
-                                      className={`${
-                                        transaction.txnType === "deposit"
-                                          ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                                          : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                                      }`}
+                                      className={`${transaction.txnType === "deposit"
+                                        ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                                        : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
+                                        }`}
                                     >
                                       <span className="flex items-center">
                                         {transaction.txnType === "deposit" ? (
@@ -701,7 +704,6 @@ export default function MoneyTransactionsPage() {
                                   </td>
                                   <td className="px-4 py-4 text-sm text-gray-300">
                                     <div className="font-mono">{transaction.txnId}</div>
-                                    <div className="text-xs text-gray-400">{transaction.reference}</div>
                                   </td>
                                   <td className="px-4 py-4 text-sm text-gray-300">
                                     <div className="flex items-center">
@@ -710,19 +712,17 @@ export default function MoneyTransactionsPage() {
                                     </div>
                                   </td>
                                   <td
-                                    className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${
-                                      transaction.txnType === "deposit" ? "text-green-400" : "text-orange-400"
-                                    }`}
+                                    className={`whitespace-nowrap px-4 py-4 text-right text-sm font-medium ${transaction.txnType === "deposit" ? "text-green-400" : "text-orange-400"
+                                      }`}
                                   >
                                     {transaction.txnType === "deposit" ? "+" : "-"}₹{transaction.txnAmount}
                                   </td>
                                   <td className="whitespace-nowrap px-4 py-4 text-center text-sm">
                                     <Badge
-                                      className={`${
-                                        transaction.txnType === "deposit"
-                                          ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                                          : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                                      }`}
+                                      className={`${transaction.txnType === "deposit"
+                                        ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                                        : "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
+                                        }`}
                                     >
                                       <span className="flex items-center">
                                         {transaction.txnType === "deposit" ? (
@@ -771,7 +771,6 @@ const transactions = [
     id: 1,
     txnDate: "May 12, 2023 • 14:32",
     txnId: "TXN123456789",
-    reference: "Add money to wallet",
     txnPaymentMethod: "UPI",
     txnAmount: "5,000.00",
     txnType: "deposit",
@@ -781,7 +780,6 @@ const transactions = [
     id: 2,
     txnDate: "May 10, 2023 • 09:15",
     txnId: "TXN123456788",
-    reference: "Withdrawal to bank account",
     txnPaymentMethod: "Bank Transfer",
     txnAmount: "2,500.00",
     txnType: "withdrawal",
@@ -791,7 +789,6 @@ const transactions = [
     id: 3,
     txnDate: "May 8, 2023 • 18:45",
     txnId: "TXN123456787",
-    reference: "Add money to wallet",
     txnPaymentMethod: "Credit Card",
     txnAmount: "10,000.00",
     txnType: "deposit",
@@ -801,7 +798,6 @@ const transactions = [
     id: 4,
     txnDate: "May 5, 2023 • 11:20",
     txnId: "TXN123456786",
-    reference: "Withdrawal to bank account",
     txnPaymentMethod: "Bank Transfer",
     txnAmount: "7,500.00",
     txnType: "withdrawal",
@@ -811,7 +807,6 @@ const transactions = [
     id: 5,
     txnDate: "May 3, 2023 • 16:05",
     txnId: "TXN123456785",
-    reference: "Add money to wallet",
     txnPaymentMethod: "Net Banking",
     txnAmount: "3,000.00",
     txnType: "deposit",
@@ -821,7 +816,6 @@ const transactions = [
     id: 6,
     txnDate: "Apr 30, 2023 • 20:18",
     txnId: "TXN123456784",
-    reference: "Add money to wallet",
     txnPaymentMethod: "UPI",
     txnAmount: "2,000.00",
     txnType: "deposit",
@@ -840,7 +834,6 @@ const transactions = [
     id: 8,
     txnDate: "Apr 25, 2023 • 09:55",
     txnId: "TXN123456782",
-    reference: "Add money to wallet",
     txnPaymentMethod: "Debit Card",
     txnAmount: "7,500.00",
     txnType: "deposit",
@@ -850,7 +843,6 @@ const transactions = [
     id: 9,
     txnDate: "Apr 22, 2023 • 17:30",
     txnId: "TXN123456781",
-    reference: "Add money to wallet",
     txnPaymentMethod: "UPI",
     txnAmount: "1,250.00",
     txnType: "deposit",
@@ -860,7 +852,6 @@ const transactions = [
     id: 10,
     txnDate: "Apr 20, 2023 • 14:15",
     txnId: "TXN123456780",
-    reference: "Withdrawal to bank account",
     txnPaymentMethod: "Bank Transfer",
     txnAmount: "6,181.25",
     txnType: "withdrawal",

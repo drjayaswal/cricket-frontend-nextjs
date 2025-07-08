@@ -4,7 +4,7 @@ import { useSocketStore } from "./socket-store";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export interface Match {
+interface Match {
   matchId: string | null;
   seriesName: string;
   format: string;

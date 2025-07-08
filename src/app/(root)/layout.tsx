@@ -9,7 +9,7 @@ export default function HomeLayout({
   return (
     <>
       <Header className="h-20" />
-      <div className="h-[4.8rem] " /> {/* Used as a space between FIXED header and rest of layout */}
+      <div className="h-[4.8rem] " />
       <main className="">
         {children}
       </main>
