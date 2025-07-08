@@ -61,7 +61,7 @@ export default function LandingPage() {
               alt="Logo"
               width={160}
               height={100}
-              className="rounded-full object-cover"
+              className=" w-[8.8rem] rounded-full object-cover"
             />
           </Link>
 
@@ -71,7 +71,7 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             <Button className="hidden sm:flex group bg-purple-700 text-base border-b border-transparent hover:rounded-none hover:border-purple-500 justify-center items-center rounded-sm" asChild>
-              <Link href={"#"} className="flex justify-center items-center">
+              <Link href={"/login"} className="flex justify-center items-center">
                 <span>Trade Now</span>
                 <TrendingUp className="size-0 group-hover:size-5 transition-all duration-300" />
               </Link>
@@ -81,7 +81,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="max-w-[90rem] mt-10 mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="max-w-[90rem] overflow-hidden  mt-10 mx-auto px-4 sm:px-6 lg:px-8">
 
         <BannerSlider />
 
@@ -110,7 +110,7 @@ export default function LandingPage() {
                 </a>
                 <div className="hidden sm:block h-8 w-px bg-white/30"></div>
                 <Button variant="ghost" className="w-full sm:w-auto text-purple-400 hover:text-purple-300 hover:bg-white/5" asChild>
-                  <Link href="#">
+                  <Link href="/login">
                     <span>Continue on Web</span>
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Link>
@@ -369,7 +369,7 @@ export default function LandingPage() {
                   </a>
                   <div className="h-8 w-px bg-white/30"></div>
                   <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-white/5" asChild>
-                    <Link href="#">
+                    <Link href="/login">
                       <span>Continue on Web</span>
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </Link>

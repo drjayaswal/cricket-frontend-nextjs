@@ -2,17 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Menu, X } from "lucide-react"
+import { Menu, TrendingUp, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 
 const navlinks = [
   { href: "/", label: "Home" },
-  { href: "/game-rules", label: "Game Rules" },
-  { href: "/scoring-system", label: "Scoring System" },
+  { href: "/game-rules", label: "Game Rules & Scoring" },
   { href: "/legality", label: "Security & Legality" },
-  { href: "/contact", label: "Contact Us" },
+  { href: "/contact-us", label: "Contact Us" },
+  { href: "/about", label: "About Us" },
 ]
 
 const MobileNav = () => {
@@ -40,11 +40,11 @@ const MobileNav = () => {
       {/* Mobile Menu */}
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-40 w-full max-w-sm shadow-lg transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "translate-x-96"
+          "fixed right-1 top-0 z-40 w-full max-w-sm animate-slide-left-md-no-fade shadow-lg transition-transform duration-300 ease-in-out",
+          isOpen ? "block" : "hidden"
         )}
       >
-        <div className="flex flex-col space-y-4 bg-white/5 backdrop-blur-md mt-16 p-10 rounded-2xl">
+        <div className="flex flex-col space-y-4 bg-background border-white/30 border-1 backdrop-blur-md mt-16 p-10 rounded-2xl">
           {navlinks.map((link) => (
             <Link
               key={link.href}
@@ -55,6 +55,13 @@ const MobileNav = () => {
               {link.label}
             </Link>
           ))}
+
+          <Button className="mt-5 group bg-purple-700 text-base border-b border-transparent hover:rounded-none hover:border-purple-500 justify-center items-center rounded-sm" asChild>
+            <Link href={"/login"} className="flex justify-center items-center">
+              <span>Trade Now</span>
+              <TrendingUp className="size-0 group-hover:size-5 transition-all duration-300" />
+            </Link>
+          </Button>
         </div>
       </div>
     </div>
