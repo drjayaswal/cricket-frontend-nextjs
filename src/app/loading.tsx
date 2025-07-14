@@ -15,7 +15,7 @@ export default function GlobalLoading() {
               </div>
             </div>
           </div>
-          <CardTitle className="text-xl font-semibold text-white/70">Loading Match Data</CardTitle>
+          <CardTitle className="text-xl font-semibold text-white/70">Loading...</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Skeleton className="h-4 w-full" />

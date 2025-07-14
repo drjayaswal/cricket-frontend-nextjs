@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -29,6 +29,10 @@ import {
 import Link from "next/link";
 import { useUserStore } from "@/store/user-store";
 import { toast } from "sonner";
+import { formatINR } from "@/lib/helper";
+
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL
+
 
 export default function UserProfile() {
   const setUser = useUserStore((state) => state.setUser)
@@ -84,13 +88,39 @@ export default function UserProfile() {
   // console.log("Current user in store:", user);
   const [isLogoutOpen, setLogoutOpen] = useState(false);
   const router = useRouter();
+  useEffect(() => {
+    (async () => {
+      try {
+        const getTokenFromCookies = () => {
+          if (typeof document === "undefined") return null;
+          const cookies = document.cookie.split("; ");
+          const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+          return tokenCookie ? tokenCookie.split("=")[1] : null;
+        };
+        const token = getTokenFromCookies();
+        const res = await fetch(`${BACKEND}/user/data`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+          },
+        });
+        const data = await res.json();
+        if (data.data && data.success) {
+          setUser(data.data);
+          console.log(data.data.transactions)
+        } else {
+          toast.error(data?.message || "Failed to fetch user data");
+        }
+      } catch (e: any) {
+        toast.error("Error fetching user data: " + (e?.message || e));
+      }
+    })();
 
+  }, []);
   const handleLogout = () => {
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
+    // Remove only the "token" cookie
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     router.replace("/login");
   };
 
@@ -161,7 +191,7 @@ export default function UserProfile() {
                 <p className="text-md font-normal text-gray-400">
                   Wallet Balance
                 </p>
-                <h3 className="text-5xl font-medium text-white mt-1">₹{user?.amount || 0}</h3>
+                <h3 className="text-5xl font-medium text-white mt-1">{formatINR(Number(user?.amount))}</h3>
               </div>
               <Button
                 className="bg-[#f5f5f5] text-[#121212] hover:bg-white/70 shadow-md"

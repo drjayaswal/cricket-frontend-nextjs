@@ -148,7 +148,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                     <TabsContent value="live" className="space-y-6 mt-6">
                         <Card className="bg-gradient-to-r via-sky-700 from-transparent to-transparent rounded-none shadow-none overflow-hidden">
                             <CardContent className="p-6 text-center space-y-4">
-                                <h2 className="text-5xl font-bold text-white uppercase tracking-wide">{currentInnings.name.split(" ")[0]}</h2>
+                                <h2 className="text-5xl font-bold text-white uppercase tracking-wide">{battingTeam.name}</h2>
                                 <div className="text-6xl md:text-7xl font-extrabold text-white">
                                     {currentInnings?.scores}
                                     {/* {currentInnings?.equations.runs}/{currentInnings?.equations.wickets} */}

@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import WithdrawModal from "./components/withdrawl";
 import { Transaction, UserV2 } from "@/types/user";
+import { formatINR } from "@/lib/helper";
 
 
 let cashfree: any = null;
@@ -211,15 +212,6 @@ export default function MoneyTransactionsPage() {
     }
   };
 
-
-  function formatINR(amount: number) {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 2,
-    }).format(Number(amount))
-  }
-
   const presettxnAmounts = [
     "₹100",
     "₹500",
@@ -332,7 +324,7 @@ export default function MoneyTransactionsPage() {
               <div className="flex items-center">
                 <Wallet className="h-10 w-10 mr-3 text-emerald-500" />
                 <div>
-                  <div className="text-3xl font-bold text-white">{user?.amount}</div>
+                  <div className="text-3xl font-bold text-white">{formatINR(user?.amount)}</div>
                   <p className="mt-1 text-sm text-gray-400">
                     Last updated :{" "}
                     {user?.lastSeen
