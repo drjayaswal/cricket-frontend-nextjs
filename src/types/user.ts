@@ -2,11 +2,57 @@ export type TransactionStatus = "PENDING" | "SUCCESS" | "FAILED";
 export type Role = "marketing" | "financial" | "super_admin" | "user";
 
 export interface Transaction {
-  TID: string;
-  OID: string;
+  tID: string;
+  oID: string;
   amount: number;
-  status: TransactionStatus;
-  time: Date;
+  status: string;
+  type: string;
+  method: string;
+  txnDate: string;
+  _id: string;
+}
+export interface PlayerPortfolio {
+  matchId: string;
+  playerId: string;
+  playerName: string;
+  quantity: string;
+  boughtPrice: string;
+  soldPrice: string;
+  profit: string;
+  profitPercentage: string;
+  status: string;
+  reason: string;
+  timestamp: string;
+  _id: string;
+}
+
+export interface TeamPortfolio {
+  // Define fields as per your teamPortfolios structure if needed
+}
+
+export interface UserV2 {
+  _id: string;
+  name: string;
+  mobile: string;
+  isVerified: boolean;
+  isAdmin: boolean;
+  role: string;
+  email: string;
+  lastSeen: string;
+  amount: number;
+  referralCodes: string[];
+  playerPortfolios: PlayerPortfolio[];
+  teamPortfolios: TeamPortfolio[];
+  transactions: {
+    tID: string;
+    oID: string;
+    amount: number;
+    status: string;
+    type: string;
+    method: string;
+    txnDate: string;
+    _id: string;
+  }[];
 }
 
 export interface PortfolioTransaction {

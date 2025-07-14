@@ -39,28 +39,9 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
     const [bettingPlayer, setBettingPlayer] = useState<BettingPlayer | null>(null)
     const [isBettingModalOpen, setIsBettingModalOpen] = useState(false)
     const [quantity, setQuantity] = useState(1);
-    // const data: CricketMatchData = matchData
-    // Patch sample to fix type error: match_notes should be string, not string[][]
-    // Patch sample to fix type error: match_notes should be string, not string[][]
-    // Also patch match_number to be string[][] as required by CricketMatchData
-    const patchedSample = {
-        ...sample,
-        match_notes: Array.isArray(sample.match_notes)
-            ? (sample.match_notes.flat().join(" | ") || "")
-            : (sample.match_notes ?? ""),
-        match_number: Array.isArray(sample.match_number)
-            ? sample.match_number
-            : (typeof sample.match_number === "string"
-                ? [[sample.match_number]]
-                : [[""]])
-    }
-    const data: CricketMatchData = patchedSample as CricketMatchData
+    const data: CricketMatchData = matchData
+
     const match_id = data.match_id
-
-    useEffect(() => {
-        console.log(data)
-    }, [])
-
     const currentInnings = data.innings[data.innings.length - 1]
     const battingTeam = currentInnings?.batting_team_id === data.teama.team_id ? data.teama : data.teamb
     const bowlingTeam = currentInnings?.batting_team_id === data.teama.team_id ? data.teamb : data.teama

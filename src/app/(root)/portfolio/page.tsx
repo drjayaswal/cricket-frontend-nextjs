@@ -531,7 +531,7 @@ export default function Portfolio() {
                                   </div>
                                 </td>
                                   <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
-                                    {p.quantity ? `${p.quantity}` : "--"}
+                                    {t.quantity ? `${t.quantity}` : "--"}
                                   </td>
                                 <td className="px-4 py-4 text-right text-sm font-bold text-gray-300">
                                   ₹{t.boughtPrice}
@@ -614,7 +614,7 @@ export default function Portfolio() {
                                 </div>
                               </td>
                                 <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
-                                  {p.quantity ? `${p.quantity}` : "--"}
+                                  {t.quantity ? `${t.quantity}` : "--"}
                                 </td>
                               <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
                                 ₹{t.boughtPrice}
