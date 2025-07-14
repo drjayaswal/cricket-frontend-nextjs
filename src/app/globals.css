@@ -510,3 +510,40 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation-name: marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: 30s;
+  will-change: transform;
+}
+
+
+@keyframes animated-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient-bg {
+  background: linear-gradient(90deg, transparent 0%, #0ea5e9 30%, #2563eb 60%, #06b6d4 100%);
+  background-size: 200% 200%;
+  animation: animated-gradient 3s ease-in-out infinite;
+  transition: background 0.3s;
+}

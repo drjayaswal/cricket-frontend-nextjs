@@ -84,13 +84,24 @@ export default function MoneyTransactionsPage() {
         mobile: user?.mobile,
         amount: addtxnAmount
       }
+      // Get token from cookies
+      const getTokenFromCookies = () => {
+        if (typeof document === "undefined") return null;
+        const cookies = document.cookie.split("; ");
+        const tokenCookie = cookies.find((cookie) => cookie.startsWith("token="));
+        return tokenCookie ? tokenCookie.split("=")[1] : null;
+      };
+      const token = getTokenFromCookies();
+
       const response = await fetch(`${BACKEND}/payment/order/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(orderBody)
       });
+
 
       const data = await response.json();
       if (data.orderDetails.paymentSessionId) {

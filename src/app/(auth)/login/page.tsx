@@ -37,6 +37,7 @@ import { handleGoogleSuccess, login } from "@/lib/actions";
 import { toast } from "sonner";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 
@@ -73,10 +74,21 @@ export default function AuthPage() {
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const router = useRouter();
 
-
   useEffect(() => {
-    router.push("/home") // navigate to home if token exists
-  }, [])
+    // Check for token in cookies
+    const checkToken = () => {
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+
+      if (token) {
+        router.push("/home"); // navigate to home if token exists
+      }
+    };
+
+    checkToken();
+  }, [router]);
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {

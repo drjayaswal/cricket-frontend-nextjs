@@ -79,8 +79,8 @@ export function FeaturedBanner() {
           />
           <defs>
             <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#10B981" stopOpacity="0.7" />
-              <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#a78bfa" stopOpacity="0" />
             </linearGradient>
           </defs>
         </motion.svg>
@@ -111,8 +111,8 @@ export function FeaturedBanner() {
           />
           <defs>
             <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#EF4444" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
+              <stop offset="0%" stopColor="#d946ef" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
             </linearGradient>
           </defs>
         </motion.svg>
@@ -122,7 +122,7 @@ export function FeaturedBanner() {
           <div className="flex-1">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
               <div className="flex items-center gap-2 mb-4">
-                <span className="border-2 border-green-800 bg-transparent text-green-600 animate-pulse text-xs font-bold px-3 py-1.5 rounded-md flex items-center">
+                <span className="bg-gradient-to-r from-[#19317b] via-[#2c256c] to-[#4b1577] animate-pulse px-4 text-xl font-extrabold py-2 rounded-md flex items-center">
                   <TrendingUp className="h-3 w-3 mr-1" /> FEATURED MATCH
                 </span>
               </div>
@@ -147,9 +147,9 @@ export function FeaturedBanner() {
               <div className="flex flex-wrap gap-4">
                 <Button
                   size="lg"
-                  className="bg-green-900 hover:bg-green-700 text-base"
+                  className="bg-white/50 hover:text-gray-500 hover:bg-white text-lg font-bold "
                 >
-                  <PlusCircle className="mr-2 h-5 w-5" />
+                  <PlusCircle className="h-7 stroke-3 w-7" />
                   Create Portfolio
                 </Button>
               </div>
