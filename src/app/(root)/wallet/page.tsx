@@ -16,6 +16,7 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Wallet,
+  RefreshCcw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { TransactionModal } from "./components/transaction-modal";
@@ -38,6 +39,7 @@ export default function MoneyTransactionsPage() {
   const router = useRouter()
 
   const [addtxnAmount, setAddtxnAmount] = useState("")
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [depositsAvailable, setDepositsAvailable] = useState(false)
   const [withdrawlAvailable, setWithdrawlAvailable] = useState(false)
   const [transactionsAvailable, setTransactionsAvailable] = useState(false)
@@ -53,6 +55,12 @@ export default function MoneyTransactionsPage() {
   })
   const [paymentSessionId, setPaymentSessionId] = useState('');
   const [paymentLink, setPaymentLink] = useState('');
+
+  useEffect(() => {
+    setDepositsAvailable(true)
+    setTransactionsAvailable(true)
+    setWithdrawlAvailable(true)
+  }, [])
 
   useEffect(() => {
     (async () => {
@@ -85,10 +93,10 @@ export default function MoneyTransactionsPage() {
           }
 
         } else {
-          toast.error(data?.message || "Failed to fetch user data");
+          toast(data?.message || "Failed to fetch user data");
         }
       } catch (e: any) {
-        toast.error("Error fetching user data: " + (e?.message || e));
+        toast("Error fetching user data: " + (e?.message || e));
       }
     })();
 
@@ -116,17 +124,18 @@ export default function MoneyTransactionsPage() {
           });
 
           const data = await res.json();
-          console.log(data)
           if (!data.status) {
-            toast.error(data.message);
-          } else if (data.status !== "paid") {
             toast(data.message);
+            return
           }
-          else {
-            toast("Payment Successfull");
-          }
+          toast(data.message);
         } catch (e: any) {
-          toast.error("Error verifying payment: " + (e?.message || e));
+          toast("Error verifying payment: " + (e?.message || e));
+          return
+        } finally {
+          setTimeout(() => {
+            refreshTransactions()
+          }, 1000);
         }
       })();
     }
@@ -135,12 +144,67 @@ export default function MoneyTransactionsPage() {
     params.delete("ODR");
     router.replace(`/wallet?${params.toString()}`, { scroll: false });
   }, [payment, router, searchParams]);
-  useEffect(() => {
-    setDepositsAvailable(true)
-    setTransactionsAvailable(true)
-    setWithdrawlAvailable(true)
-  }, [])
 
+  const exportTransactions = () => {
+    if (!transactions || transactions.length === 0) {
+      alert("No transactions to export.");
+      return;
+    }
+    // Prepare CSV header
+    const headers = [
+      "ID",
+      "Type",
+      "Status",
+      "Amount",
+      "Txn Date",
+      "Reference",
+      "Remarks"
+    ];
+    // Prepare CSV rows
+    const rows = transactions.map((t) => [
+      t._id ?? "",
+      t.type ?? "",
+      t.status ?? "",
+      t.amount ?? "",
+      t.txnDate
+        ? new Date(t.txnDate).toLocaleString("en-IN", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+        : ""
+    ]);
+    // Convert to CSV string
+    const csvContent =
+      [headers, ...rows]
+        .map((row) =>
+          row
+            .map((field) =>
+              typeof field === "string" && (field.includes(",") || field.includes('"') || field.includes("\n"))
+                ? `"${field.replace(/"/g, '""')}"`
+                : field
+            )
+            .join(",")
+        )
+        .join("\r\n");
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "transactions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  const refreshTransactions = () => {
+    setIsRefreshing(true);
+    window.location.reload();
+  }
   const createOrder = async () => {
     try {
       const toastID = toast.loading(`Creating Order For ₹ ${addtxnAmount}`)
@@ -288,8 +352,10 @@ export default function MoneyTransactionsPage() {
       <div className="container mx-auto px-4 py-4 sm:py-6 md:py-8">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white">My Wallet Transactions</h1>
-            <p className="text-gray-400">Manage your wallet here</p>
+            <h1 className="text-5xl font-bold tracking-tight text-white">My Wallet</h1>
+            <p className="text-gray-400 text-lg font-bold">
+              Manage your wallet, view your available balance, and keep track of all your deposit and withdrawal transactions
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <Button
@@ -297,20 +363,37 @@ export default function MoneyTransactionsPage() {
               size="sm"
               className="border-spacing-x-0.5 border-transparent bg-white/10 text-white hover:bg-white/70 hover:text-gray-800 p-4 sm:size-default"
             >
-              <Download className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Export Transactions</span>
-              <span className="sm:hidden">Export</span>
+              <span
+                className="flex items-center cursor-pointer"
+                onClick={() => exportTransactions()}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Export Transactions</span>
+                <span className="sm:hidden">Export</span>
+              </span>
             </Button>
-            {/* <Button className="bg-green-500 text-white hover:bg-green-600" size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Add Money</span>
-              <span className="sm:hidden">Add</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-spacing-x-0.5 border-transparent bg-white/10 text-white hover:bg-white/70 hover:text-gray-800 p-4 sm:size-default relative overflow-hidden"
+              onClick={() => refreshTransactions()}
+            >
+              <span className="flex items-center cursor-pointer select-none">
+                <span className="relative flex items-center">
+                  <RefreshCcw
+                    className={`mr-2 h-4 w-4 transition-transform duration-500 ${isRefreshing ? "animate-spin" : ""}`}
+                  />
+                  {isRefreshing && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="w-6 h-6 rounded-full animate-spin opacity-40"></span>
+                    </span>
+                  )}
+                </span>
+                <span className={`transition-opacity duration-300 ${isRefreshing ? "opacity-50" : "opacity-100"}`}>Refresh</span>
+              </span>
             </Button>
-            <Button className="bg-white text-gray-900 hover:bg-gray-100" size="sm">
-              <ArrowUpRight className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Withdraw</span>
-              <span className="sm:hidden">Withdraw</span>
-            </Button> */}
+            {/* Add this state at the top of your component: */}
+            {/* const [isRefreshing, setIsRefreshing] = useState(false); */}
           </div>
         </div>
 

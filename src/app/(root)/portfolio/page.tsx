@@ -17,76 +17,36 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PlayerPortfolio, TeamPortfolio } from "./types";
 import { Loading } from "../betting-interface/components/Loading";
+import { formatINR } from "@/lib/helper";
+
+function formatTimestamp(ts: Date | string | undefined): string {
+  if (!ts) return "--";
+  const date = typeof ts === "string" ? new Date(ts) : ts;
+  if (isNaN(date.getTime())) return "--";
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
 
 export default function Portfolio() {
-  // const [playerPortfolios, setPlayerPortfolios] = useState([
-  //   {
-  //     matchId: "match1",
-  //     team: "MI",
-  //     playerId: "p1",
-  //     playerName: "Virat Kohli",
-  //     quantity: "10",
-  //     boughtPrice: "150",
-  //     soldPrice: "180",
-  //     profit: "300",
-  //     profitPercentage: "20",
-  //     status: "Auto-sold",
-  //     reason: "Target reached",
-  //     timestamp: new Date(),
-  //   },
-  //   {
-  //     matchId: "match2",
-  //     team: "CSK",
-  //     playerId: "p2",
-  //     playerName: "MS Dhoni",
-  //     quantity: "5",
-  //     boughtPrice: "200",
-  //     soldPrice: "250",
-  //     profit: "250",
-  //     profitPercentage: "25",
-  //     status: "Sold",
-  //     reason: "Manual sell",
-  //     timestamp: new Date(),
-  //   },
-  // ])
-  // const [teamPortfolios, setTeamPortfolios] = useState([
-  //   {
-  //     matchId: "match1",
-  //     team: "RCB",
-  //     teamName: "Royal Challengers Bangalore",
-  //     quantity: "2",
-  //     boughtPrice: "1000",
-  //     soldPrice: "1200",
-  //     profit: "400",
-  //     profitPercentage: "20",
-  //     status: "Auto-sold",
-  //     reason: "Target reached",
-  //     timestamp: new Date(),
-  //   },
-  //   {
-  //     matchId: "match2",
-  //     team: "MI",
-  //     teamName: "Mumbai Indians",
-  //     quantity: "1",
-  //     boughtPrice: "900",
-  //     soldPrice: "950",
-  //     profit: "50",
-  //     profitPercentage: "5.56",
-  //     status: "Sold",
-  //     reason: "Manual sell",
-  //     timestamp: new Date(),
-  //   },
-  // ])
-
+  const [loading, setLoading] = useState(true);
   const [playerPortfolios, setPlayerPortfolios] = useState<PlayerPortfolio[]>([]);
   const [teamPortfolios, setTeamPortfolios] = useState<TeamPortfolio[]>([]);
   const [playerPortfoliosHistorys, setPlayerPortfoliosHistorys] = useState<PlayerPortfolio[]>([]);
   const [teamPortfoliosHistorys, setTeamPortfoliosHistorys] = useState<TeamPortfolio[]>([]);
+  const [value, setValue] = useState();
+  const [profit, setProfit] = useState();
 
 
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
+        setLoading(true)
         // Get token from cookies
         const getTokenFromCookies = () => {
           if (typeof document === "undefined") return null;
@@ -105,12 +65,14 @@ export default function Portfolio() {
         });
 
         const apiData = await res.json();
-        console.log(apiData)
         if (!apiData.success) {
           toast(apiData.message)
           return
         }
-
+        console.log(apiData)
+        setProfit(apiData.profit)
+        setValue(apiData.value)
+        // setProfit(apiData.p)
         // Helper to split active/history
         function splitByStatus<T extends { status?: string }>(arr: T[]): { active: T[]; history: T[] } {
           const active: T[] = [];
@@ -123,6 +85,7 @@ export default function Portfolio() {
               active.push(item);
             }
           });
+          setLoading(false)
           return { active, history };
         }
 
@@ -135,22 +98,45 @@ export default function Portfolio() {
         const teamResult = splitByStatus<TeamPortfolio>(apiData.teamPortfolios || []);
         setTeamPortfolios(teamResult.active);
         setTeamPortfoliosHistorys(teamResult.history);
+        setLoading(false)
+
       } catch (e: any) {
         toast("Fetch error: " + (e?.message || e));
+        setLoading(false)
       }
     };
     fetchPortfolios();
   }, []);
 
-  if (playerPortfolios && teamPortfolios) {
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-tl from-transparent via-transparent to-sky-600/30 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-transparent border-t-white/70 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-white/70 rounded-full animate-pulses"></div>
+                </div>
+              </div>
+            </div>
+            <CardTitle className="text-xl font-semibold text-white/70">Loading Portfolio...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+  else {
     return (
       <div className="p-5 min-h-screen">
         <main className="container mx-auto px-4 py-8">
           {/* Portfolio Header */}
           <div className="mb-8">
             <h1 className="text-5xl font-bold text-white mb-2">
-              {/* {user && user.name?.split(" ")[0] || "User"}'s Portfolio */}
-              Stock Portfolio
+              My Portfolio
             </h1>
             <p className="text-gray-400 text-lg font-bold">
               Monitor your cricket investment portfolio, analyze your player and team positions, and review your performance over time
@@ -164,28 +150,10 @@ export default function Portfolio() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-purple-400 text-sm font-bold tracking-wide uppercase mb-1">
-                      Total Value
+                      Total Balance
                     </p>
                     <h3 className="text-4xl font-extrabold text-white drop-shadow-sm tracking-tight mt-1">
-                      {(() => {
-                        const sumPortfolio = (arr: any[]) =>
-                          arr.reduce((acc, p) => {
-                            const qty = parseFloat(p.quantity || "0");
-                            const price = parseFloat(p.boughtPrice || "0");
-                            return acc + qty * price;
-                          }, 0);
-
-                        const totalActive =
-                          sumPortfolio(playerPortfolios || []) +
-                          sumPortfolio(teamPortfolios || []);
-                        const totalHistory =
-                          sumPortfolio(playerPortfoliosHistorys || []) +
-                          sumPortfolio(teamPortfoliosHistorys || []);
-                        const total = totalActive + totalHistory;
-
-                        return `₹${total.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
-
-                      })()}
+                      {formatINR(value)}
                     </h3>
                   </div>
                   <div className="flex items-center justify-center bg-purple-500/20 p-4 rounded-full shadow-inner">
@@ -236,11 +204,7 @@ export default function Portfolio() {
                       Total Profit
                     </p>
                     <h3 className="text-4xl font-extrabold text-white drop-shadow-sm tracking-tight mt-1">
-                      ₹{
-                        [...playerPortfolios, ...teamPortfolios, ...teamPortfoliosHistorys, ...playerPortfoliosHistorys]
-                          .reduce((acc, curr) => acc + (parseFloat(curr.profit) || 0), 0)
-                          .toLocaleString("en-IN", { maximumFractionDigits: 2 })
-                      }
+                      {formatINR(profit)}
                     </h3>
                     <p className="text-emerald-500 text-sm flex items-center mt-1">
                       <TrendingUp className="h-4 w-4 mr-1" />
@@ -331,16 +295,10 @@ export default function Portfolio() {
                                 Buy Price
                               </th>
                               <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                                Sell Price
-                              </th>
-                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                                Profit
-                              </th>
-                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                                Percentage
-                              </th>
-                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300 pr-6">
                                 Status
+                              </th>
+                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
+                                Timestamp
                               </th>
                             </tr>
                           </thead>
@@ -359,17 +317,6 @@ export default function Portfolio() {
                                 <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
                                   {p.boughtPrice ? `₹${p.boughtPrice}` : "--"}
                                 </td>
-                                <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
-                                  {p.soldPrice ? `₹${p.soldPrice}` : "--"}
-                                </td>
-                                <td className="px-4 py-4 text-right text-sm font-bold text-emerald-500">
-                                  {p.profit ? `₹${p.profit}` : "--"}
-                                </td>
-                                <td className="px-4 py-4 text-right">
-                                  <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold">
-                                    {p.profitPercentage ? `+${p.profitPercentage}%` : "--"}
-                                  </Badge>
-                                </td>
                                 <td className="px-4 py-4 text-right">
                                   <Badge
                                     variant="outline"
@@ -377,6 +324,9 @@ export default function Portfolio() {
                                   >
                                     {p.status || "--"}
                                   </Badge>
+                                </td>
+                                <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
+                                  {formatTimestamp(p.timestamp)}
                                 </td>
                               </tr>
                             ))}
@@ -412,23 +362,26 @@ export default function Portfolio() {
                             Sell Price
                           </th>
                           <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                            Profit
+                            Profit / Loss
                           </th>
                           <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                             Percentage
                           </th>
-                          <th className="px-4 py-3 text-right text-sm font-bold text-gray-300 pr-6">
+                          <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                             Status
+                          </th>
+                          <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
+                            Timestamp
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         {playerPortfoliosHistorys.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="text-center text-gray-400 py-4">No player portfolio history</td>
+                            <td colSpan={8} className="text-center text-gray-400 py-4">No player portfolio history</td>
                           </tr>
                         ) : (
-                          playerPortfoliosHistorys.map((p,idx) => (
+                          playerPortfoliosHistorys.map((p, idx) => (
                             <tr key={idx}>
                               <td className="px-4 py-4">
                                 <div className="flex items-center gap-3">
@@ -446,11 +399,14 @@ export default function Portfolio() {
                                 ₹{p.soldPrice}
                               </td>
                               <td className="px-4 py-4 text-right text-sm font-bold text-emerald-500">
-                                ₹{p.profit}
+                                <span className={parseFloat(p.profit) >= 0 ? "text-emerald-500" : "text-red-500"}>
+                                  ₹{parseFloat(p.profit) >= 0 ? parseFloat(p.profit).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : `-${Math.abs(parseFloat(p.profit)).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`}
+                                </span>
                               </td>
                               <td className="px-4 py-4 text-right">
-                                <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold">
-                                  +{p.profitPercentage}%
+                                <Badge className={parseFloat(p.profit) >= 0 ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold" : "bg-red-500/20 text-red-400 hover:bg-red-500/30 font-bold"}>
+                                  {parseFloat(p.profit) >= 0 ? "+" : "-"}
+                                  {Math.abs(parseFloat(p.profitPercentage)).toLocaleString("en-IN", { maximumFractionDigits: 2 })}%
                                 </Badge>
                               </td>
                               <td className="px-4 py-4 text-right">
@@ -460,6 +416,9 @@ export default function Portfolio() {
                                 >
                                   {p.status}
                                 </Badge>
+                              </td>
+                              <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
+                                {formatTimestamp(p.timestamp)}
                               </td>
                             </tr>
                           ))
@@ -501,9 +460,9 @@ export default function Portfolio() {
                               <th className="px-4 py-3 text-left text-sm font-bold text-gray-300 pl-6">
                                 Player
                               </th>
-                                <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                                  Quantity(s)
-                                </th>
+                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
+                                Quantity(s)
+                              </th>
                               <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                                 Buy Price
                               </th>
@@ -511,18 +470,21 @@ export default function Portfolio() {
                                 Sell Price
                               </th>
                               <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                                Profit
+                                Profit / Loss
                               </th>
                               <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                                 Percentage
                               </th>
-                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300 pr-6">
+                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                                 Status
+                              </th>
+                              <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
+                                Timestamp
                               </th>
                             </tr>
                           </thead>
                           <tbody>
-                              {teamPortfolios.map((t, idx) => (
+                            {teamPortfolios.map((t, idx) => (
                               <tr key={idx}>
                                 <td className="px-4 py-4">
                                   <div className="flex items-center gap-3">
@@ -530,9 +492,9 @@ export default function Portfolio() {
                                     <p className="text-xs text-gray-400">{t.team}</p>
                                   </div>
                                 </td>
-                                  <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
-                                    {t.quantity ? `${t.quantity}` : "--"}
-                                  </td>
+                                <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
+                                  {t.quantity ? `${t.quantity}` : "--"}
+                                </td>
                                 <td className="px-4 py-4 text-right text-sm font-bold text-gray-300">
                                   ₹{t.boughtPrice}
                                 </td>
@@ -543,7 +505,7 @@ export default function Portfolio() {
                                   ₹{t.profit}
                                 </td>
                                 <td className="px-4 py-4 text-right">
-                                  <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold">
+                                  <Badge className={parseFloat(t.profit) >= 0 ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold" : "bg-red-500/20 text-red-400 hover:bg-red-500/30 font-bold"}>
                                     +{t.profitPercentage}%
                                   </Badge>
                                 </td>
@@ -554,6 +516,9 @@ export default function Portfolio() {
                                   >
                                     {t.status}
                                   </Badge>
+                                </td>
+                                <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
+                                  {formatTimestamp(t.timestamp)}
                                 </td>
                               </tr>
                             ))}
@@ -589,33 +554,36 @@ export default function Portfolio() {
                             Sell Price
                           </th>
                           <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
-                            Profit
+                            Profit / Loss
                           </th>
                           <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                             Percentage
                           </th>
-                          <th className="px-4 py-3 text-right text-sm font-bold text-gray-300 pr-6">
+                          <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
                             Status
+                          </th>
+                          <th className="px-4 py-3 text-right text-sm font-bold text-gray-300">
+                            Timestamp
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         {teamPortfoliosHistorys.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="text-center text-gray-400 py-4">No team portfolio history</td>
+                            <td colSpan={8} className="text-center text-gray-400 py-4">No team portfolio history</td>
                           </tr>
                         ) : (
-                            teamPortfoliosHistorys.map((t,idx) => (
-                              <tr key={idx}>
+                          teamPortfoliosHistorys.map((t, idx) => (
+                            <tr key={idx}>
                               <td className="px-4 py-4">
                                 <div className="flex items-center gap-3">
                                   <p className="font-bold text-white">{t.teamName}</p>
                                   <p className="text-xs font-bold text-gray-400">{t.team}</p>
                                 </div>
                               </td>
-                                <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
-                                  {t.quantity ? `${t.quantity}` : "--"}
-                                </td>
+                              <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
+                                {t.quantity ? `${t.quantity}` : "--"}
+                              </td>
                               <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
                                 ₹{t.boughtPrice}
                               </td>
@@ -626,7 +594,7 @@ export default function Portfolio() {
                                 ₹{t.profit}
                               </td>
                               <td className="px-4 py-4 text-right">
-                                <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold">
+                                <Badge className={parseFloat(t.profit) >= 0 ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-bold" : "bg-red-500/20 text-red-400 hover:bg-red-500/30 font-bold"}>
                                   +{t.profitPercentage}%
                                 </Badge>
                               </td>
@@ -639,6 +607,9 @@ export default function Portfolio() {
                                   {t.status}
                                 </Badge>
                               </td>
+                              <td className="px-4 py-4 text-right text-sm text-gray-300 font-bold">
+                                {formatTimestamp(t.timestamp)}
+                              </td>
                             </tr>
                           ))
                         )}
@@ -649,15 +620,8 @@ export default function Portfolio() {
               </div>
             </TabsContent>
           </Tabs>
-
-          {/* Transaction History */}
         </main>
       </div>
     );
-  }
-  else {
-    return (
-      <Loading />
-    )
   }
 }

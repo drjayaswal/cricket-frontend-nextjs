@@ -168,6 +168,17 @@ export interface Innings {
     max_over: string
     target: string
 }
+export interface BettingTeam {
+    team_id: string
+    name: string
+    short_name: string
+    logo_url: string
+    thumb_url: string
+    scores_full: string
+    scores: string
+    overs: string
+}
+
 export interface BettingPlayer {
     name: string
     batsman_id: string

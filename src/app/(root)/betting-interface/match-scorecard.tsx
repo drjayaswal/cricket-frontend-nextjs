@@ -26,21 +26,29 @@ import {
     Radio,
     Files,
 } from "lucide-react"
-import type { CricketMatchData, Player, BettingPlayer, MatchScorecardProps } from "./types"
-import { getRoleColor, formatMatchNotes, buyPlayer, sellPlayer } from "./services"
+import type { CricketMatchData, Player, BettingPlayer, MatchScorecardProps, Team, BettingTeam } from "./types"
+import { getRoleColor, formatMatchNotes, buyPlayer, sellPlayer, buyTeam, sellTeam } from "./services"
 import { toast } from "sonner"
 import sample from "./sample.json"
 
 
 export default function MatchScorecard({ matchData }: MatchScorecardProps) {
     const [activeTab, setActiveTab] = useState<string>("live")
-    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [bettingPlayer, setBettingPlayer] = useState<BettingPlayer | null>(null)
     const [bettingNumber, setBettingNumber] = useState(0)
-    const [currentPrice, setCurrentPrice] = useState(0)
+    const [currentPlayerPrice, setCurrentPlayerPrice] = useState(0)
+    const [currentTeamPrice, setCurrentTeamPrice] = useState(0)
     const [isBettingModalOpen, setIsBettingModalOpen] = useState(false)
     const [quantity, setQuantity] = useState(1);
+
+    const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false)
+    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
+    const [bettingPlayer, setBettingPlayer] = useState<BettingPlayer | null>(null)
+
+    const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+    // Team betting modal state
+    const [teamQuantity, setTeamQuantity] = useState(1);
+    const [teamPrice, setTeamPrice] = useState(0);
     // const data: CricketMatchData = matchData
     const patchedSample = {
         ...sample,
@@ -65,7 +73,9 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
             : bettingNumber < 6
                 ? 30
                 : 25;
-
+    useEffect(() => {
+        console.log(data)
+    })
     return (
         <div className="min-h-screen bg-gradient-to-br from-sky-600 via-transparent to-transparent">
             <div className="container mx-auto px-3 py-4 space-y-4">
@@ -86,7 +96,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 text-white">
-                        <div className="flex items-center gap-4 group">
+                        <div className="flex items-center gap-4 group cursor-pointer" onClick={() => { setSelectedTeam(data.teama); setIsTeamModalOpen(true); }}>
                             <img
                                 src={data.teama.logo_url}
                                 alt={data.teama.name}
@@ -100,7 +110,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
 
                         <span className="text-3xl font-extrabold text-sky-400 animate-pulse">VS</span>
 
-                        <div className="flex items-center gap-4 group">
+                        <div className="flex items-center gap-4 group cursor-pointer" onClick={() => { setSelectedTeam(data.teamb); setIsTeamModalOpen(true); }}>
                             <div className="text-right">
                                 <span className="text-xl md:text-2xl font-extrabold block">{String(data.teamb.name).toLocaleUpperCase()}</span>
                                 <span className="text-base md:text-lg text-gray-500 font-bold block">{data.teamb.scores_full || "Yet to bat"}</span>
@@ -325,7 +335,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                                                 if (!isOut && idx == (Number(data.latest_inning_number) - 1)) {
                                                                     setBettingPlayer(batsman)
                                                                     setBettingNumber(number)
-                                                                    setCurrentPrice(
+                                                                    setCurrentPlayerPrice(
                                                                         basePrice
                                                                         - (Number(batsman.run0) * 0.5)
                                                                         + (Number(batsman.run1) * 0.75)
@@ -532,7 +542,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                                     className="bg-gradient-to-br from-[#19317b]/30 via-[#2c256c]/20 to-[#4b1577]/10 rounded-lg p-4 hover:from-[#19317b]/40 hover:via-[#2c256c]/30 hover:to-[#4b1577]/20 duration-500 cursor-pointer transform transition-all hover:scale-102 "
                                                     onClick={() => {
                                                         setSelectedPlayer(player as any)
-                                                        setIsModalOpen(true)
+                                                        setIsPlayerModalOpen(true)
                                                     }}
                                                 >
                                                     <div className="space-y-1">
@@ -569,7 +579,6 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                     Match Commentary
                                 </CardTitle>
                             </CardHeader>
-                            { }
                             <CardContent>
                                 <div className="space-y-2">
                                     {formatMatchNotes(matchNotesNormalized).map((note, index) => (
@@ -587,7 +596,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                 </Tabs>
 
 
-                {selectedPlayer && isModalOpen && (
+                {selectedPlayer && isPlayerModalOpen && (
                     <div className="fixed inset-0 w-full h-full z-50 flex items-center justify-center bg-black/70 p-4">
                         <div className="w-full max-w-md transform rounded-xl bg-gradient-to-br from-gray-900/80 via-gray-900/90 to-gray-900 p-6 shadow-lg transition-all duration-300">
                             <div className="mb-4 flex items-start justify-between">
@@ -596,7 +605,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                 </h2>
                                 <button
                                     onClick={() => {
-                                        setIsModalOpen(false);
+                                        setIsPlayerModalOpen(false);
                                         setSelectedPlayer(null);
                                     }}
                                     className="text-gray-400 transition-colors hover:text-white cursor-pointer shadow-md"
@@ -656,8 +665,13 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                     <div className="fixed inset-0 z-50 w-full h-full flex items-center justify-center bg-black/70 p-4">
                         <div className="w-full max-w-lg rounded-2xl bg-gradient-to-br from-gray-900/90 via-gray-900/90 to-gray-900 p-8 shadow-2xl transition-all duration-300">
                             {/* === Header === */}
-                            <div className="mb-6 flex items-start justify-between">
-                                <h2 className="text-2xl md:text-3xl flex items-center gap-4 font-extrabold text-white">
+                            <div className="mb-6 flex items-center justify-between">
+                                <img
+                                    src={data.teama.team_id == data.innings[Number(data.latest_inning_number) - 1].batting_team_id ? data.teama.logo_url : data.teamb.logo_url}
+                                    alt={data.teama.team_id == data.innings[Number(data.latest_inning_number) - 1].batting_team_id ? data.teama.name : data.teamb.name}
+                                    className="w-20 h-20 rounded-full shadow-xl"
+                                />
+                                <h2 className="text-4xl flex items-center gap-4 font-extrabold text-white">
                                     {bettingPlayer.name}
                                     <span className="text-sm text-gray-600 capitalize">{bettingPlayer.position}</span>
                                 </h2>
@@ -709,7 +723,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                 </div>
 
                                 <div className="bg-gray-800/40 font-bold rounded-lg p-4">
-                                    <p className="text-2xl font-bold text-white">₹{currentPrice}</p>
+                                    <p className="text-2xl font-bold text-white">₹{currentPlayerPrice}</p>
                                     <p className="text-sm text-gray-400">Price</p>
                                 </div>
                             </div>
@@ -736,9 +750,8 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                 <button
                                     className="flex-1 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-bold py-3 text-lg shadow-md transition cursor-pointer"
                                     onClick={async () => {
-                                        const data = await buyPlayer(bettingPlayer, String(currentPrice), String(quantity), match_id)
+                                        const data = await buyPlayer(bettingPlayer, String(currentPlayerPrice), String(quantity), match_id)
                                         toast(data.message)
-                                        console.log(bettingPlayer)
                                     }}
                                 >
                                     Buy Player
@@ -746,13 +759,171 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                 <button
                                     className="flex-1 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold py-3 text-lg shadow-md transition cursor-pointer"
                                     onClick={async () => {
-                                        const data = await sellPlayer(bettingPlayer, "40", String(quantity), match_id)
+                                        const data = await sellPlayer(bettingPlayer, String(currentPlayerPrice), String(quantity), match_id)
                                         toast(data.message)
                                     }}
                                 >
                                     Sell Player
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {isTeamModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                        <div className="relative bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-8">
+                            <button
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold cursor-pointer"
+                                onClick={() => {
+                                    setIsTeamModalOpen(false);
+                                    setSelectedTeam(null);
+                                    setTeamQuantity(1);
+                                }}
+                                aria-label="Close"
+                            >
+                                ×
+                            </button>
+                            {!data || !data.innings || data.innings.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center text-center text-white py-12">
+                                    <p className="text-2xl font-bold mb-2">No match data available</p>
+                                    <p className="text-gray-400 mb-4">Team statistics are currently unavailable. Please check back later.</p>
+                                    <button
+                                        onClick={() => {
+                                            setIsTeamModalOpen(false);
+                                            setSelectedTeam(null);
+                                            setTeamQuantity(1);
+                                        }}
+                                        className="px-6 py-3 rounded-xl bg-gray-700 hover:bg-gray-600 transition text-white font-bold cursor-pointer"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            ) : (() => {
+                                const teamInnings = data.innings.filter((inn) => inn.batting_team_id === selectedTeam?.team_id);
+                                const otherInnings = data.innings.filter((inn) => inn.batting_team_id !== selectedTeam?.team_id);
+
+                                const latestTeamInning = teamInnings[teamInnings.length - 1];
+                                const latestOtherInning = otherInnings[otherInnings.length - 1];
+
+                                let price = 0;
+                                if (latestTeamInning) {
+                                    if (latestOtherInning && latestOtherInning.scores) {
+                                        const theirRuns = Number(latestOtherInning.equations?.runs || latestOtherInning.scores?.split("/")[0] || 0);
+                                        const ourRuns = Number(latestTeamInning.equations?.runs || latestTeamInning.scores?.split("/")[0] || 0);
+                                        price = theirRuns > 0 ? Math.round((ourRuns / theirRuns) * 100) : ourRuns * 1.5;
+                                    } else {
+                                        price = Number(latestTeamInning.equations?.runs || latestTeamInning.scores?.split("/")[0] || 0) * 1.5;
+                                    }
+                                }
+
+                                if (teamPrice !== price) setTeamPrice(price);
+
+                                if (!latestTeamInning) {
+                                    return (
+                                        <div className="flex flex-col items-center justify-center text-center text-white py-12">
+                                            <p className="text-2xl font-bold mb-2">No team stats yet</p>
+                                            <p className="text-gray-400 mb-4">This team has not played any innings yet.</p>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <>
+                                        <div className="flex items-center justify-around mb-6">
+                                            {/* Left: Logo + Name */}
+                                            <div className="flex flex-col items-center gap-4">
+                                                <span className="text-xl md:text-2xl font-extrabold text-white">
+                                                    {selectedTeam?.name}
+                                                </span>
+                                                <img
+                                                    src={selectedTeam?.logo_url}
+                                                    alt={selectedTeam?.name}
+                                                    className="w-20 h-20 rounded-full shadow-xl"
+                                                />
+                                            </div>
+
+                                            {/* Right: Score Info */}
+                                            <div className="bg-gray-800/40 rounded-lg flex flex-col items-center mt-8">
+                                                {/* <p className="text-2xl font-bold text-white">Score</p> */}
+                                                <p className="text-6xl font-bold text-white">
+                                                    {latestTeamInning?.scores || latestTeamInning?.scores || "-"}
+                                                </p>
+                                            </div>
+                                        </div>                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center mb-6">
+                                            <div className="bg-gray-800/40 rounded-lg p-4">
+                                                <p className="text-2xl font-bold text-white">{latestTeamInning?.equations?.overs || "-"}</p>
+                                                <p className="text-sm font-bold text-gray-400">Overs</p>
+                                            </div>
+                                            <div className="bg-gray-800/40 rounded-lg p-4">
+                                                <p className="text-2xl font-bold text-white">{latestTeamInning?.equations?.wickets || "-"}</p>
+                                                <p className="text-sm font-bold text-gray-400">Wickets</p>
+                                            </div>
+                                            {latestOtherInning && (
+                                                <div className="bg-gray-800/40 rounded-lg p-4 col-span-2 md:col-span-1">
+                                                    <p className="text-2xl font-bold text-white">{latestOtherInning?.scores_full || latestOtherInning?.scores || "-"}</p>
+                                                    <p className="text-sm font-bold text-gray-400">Opponent Score</p>
+                                                </div>
+                                            )}
+                                            <div className="bg-gray-800/40 rounded-lg p-4 col-span-2 md:col-span-1">
+                                                <p className="text-2xl font-bold text-green-400">₹{price}</p>
+                                                <p className="text-sm font-bold text-gray-400">Team Price</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Quantity Selector */}
+                                        <div className="mt-4">
+                                            <label className="block mb-2 text-sm font-bold text-gray-300">Select Quantity</label>
+                                            <div className="flex gap-1.5 flex-wrap">
+                                                {[1, 5, 10, 15, 20, 25, 30, 35].map((qty) => (
+                                                    <button
+                                                        key={qty}
+                                                        onClick={() => setTeamQuantity(qty)}
+                                                        className={`px-[16.7px] py-2 rounded-lg text-white font-bold transition-all cursor-pointer ${teamQuantity === qty
+                                                            ? "bg-green-600 border-green-700"
+                                                            : "bg-gray-800 hover:bg-gray-700"
+                                                            }`}
+                                                    >
+                                                        {qty}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Buy/Sell Buttons */}
+                                        <div className="mt-8 flex flex-col md:flex-row gap-4">
+                                            <button
+                                                className="flex-1 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-bold py-3 text-lg shadow-md transition cursor-pointer"
+                                                onClick={async () => {
+                                                    toast("Feature coming soon...")
+                                                    // if (!selectedTeam) {
+                                                    //     toast("Please select a team to buy.");
+                                                    //     return;
+                                                    // }
+                                                    // const data = await buyTeam(selectedTeam, String(currentTeamPrice), String(quantity), match_id);
+                                                    // toast(data.message);
+                                                }}
+                                            >
+                                                Buy Team
+                                            </button>
+                                            <button
+                                                className="flex-1 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold py-3 text-lg shadow-md transition cursor-pointer"
+                                                onClick={async () => {
+                                                    toast("Feature coming soon...")
+                                                    // if (!selectedTeam) {
+                                                    //     toast("Please select a team to buy.");
+                                                    //     return;
+                                                    // }
+                                                    // const data = await sellTeam(selectedTeam, String(currentTeamPrice), String(quantity), match_id);
+                                                    // toast(data.message);
+                                                }}
+                                            >
+                                                Sell Team
+                                            </button>
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </div>
                     </div>
                 )}

@@ -32,9 +32,12 @@ export default function WithdrawModal() {
     return (
         <div>
             <Button
-                onClick={handleOpen}
+                onClick={() => {
+                    toast("Feature coming soon...")
+                    return
+                    handleOpen
+                }}
                 className="bg-orange-500/50 hover:bg-orange-600 text-white font-semibold px-6 py-2"
-                disabled
             >
                 Withdraw
             </Button>
