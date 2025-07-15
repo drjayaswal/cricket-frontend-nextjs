@@ -76,5 +76,5 @@ export default function BettingPage() {
   //   return <Error message="No match data available" />;
   // }
 
-  return <MatchScorecard matchData={matchData} />;
+  // return <MatchScorecard matchData={matchData} />;
 }
