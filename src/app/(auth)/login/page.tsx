@@ -312,7 +312,7 @@ export default function AuthPage() {
         <div className="text-center mb-8 flex flex-col items-center gap-2 animate-slide-down-lg">
           <Link href={"/"} className="" >
             <Image
-              src={"/logo.png"}
+              src={"/images/logo.png"}
               alt="Logo"
               width={150}
               height={100}
