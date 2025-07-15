@@ -436,7 +436,7 @@ export default function MoneyTransactionsPage() {
                   <div className="text-3xl font-bold text-white">
                     {formatINR(
                       (transactions ?? [])
-                        .filter((transaction) => transaction.type === "Deposit")
+                        .filter((transaction) => transaction.type === "Deposit" && transaction.status === "Completed")
                         .reduce((sum, transaction) => {
                           const amount = Number(
                             (transaction.amount ?? "0").toString().replace(/,/g, "")
