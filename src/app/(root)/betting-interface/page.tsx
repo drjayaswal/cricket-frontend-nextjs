@@ -64,17 +64,17 @@ export default function BettingPage() {
     }
   }, [matchId]);
 
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
-  if (error) {
-    return <Error message={error} />;
-  }
+  // if (error) {
+  //   return <Error message={error} />;
+  // }
 
-  if (!matchData) {
-    return <Error message="No match data available" />;
-  }
+  // if (!matchData) {
+  //   return <Error message="No match data available" />;
+  // }
 
   return <MatchScorecard matchData={matchData} />;
 }

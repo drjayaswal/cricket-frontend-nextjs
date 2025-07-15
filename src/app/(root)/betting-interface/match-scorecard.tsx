@@ -37,15 +37,34 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [bettingPlayer, setBettingPlayer] = useState<BettingPlayer | null>(null)
+    const [bettingNumber, setBettingNumber] = useState(0)
+    const [currentPrice, setCurrentPrice] = useState(0)
     const [isBettingModalOpen, setIsBettingModalOpen] = useState(false)
     const [quantity, setQuantity] = useState(1);
-    const data: CricketMatchData = matchData
-
+    // const data: CricketMatchData = matchData
+    const patchedSample = {
+        ...sample,
+        match_notes: Array.isArray(sample.match_notes)
+            ? (sample.match_notes.flat().join(" | ") || "")
+            : (sample.match_notes ?? ""),
+        match_number: Array.isArray(sample.match_number)
+            ? sample.match_number
+            : (typeof sample.match_number === "string"
+                ? [[sample.match_number]]
+                : [[""]])
+    }
+    const data: CricketMatchData = patchedSample as CricketMatchData
     const match_id = data.match_id
     const currentInnings = data.innings[data.innings.length - 1]
     const battingTeam = currentInnings?.batting_team_id === data.teama.team_id ? data.teama : data.teamb
     const bowlingTeam = currentInnings?.batting_team_id === data.teama.team_id ? data.teamb : data.teama
     const matchNotesNormalized: string[][] = Array.isArray(data.match_notes?.[0]) ? data.match_notes as unknown as string[][] : [[data.match_notes as string]];
+    const basePrice =
+        bettingNumber < 3
+            ? 35
+            : bettingNumber < 6
+                ? 30
+                : 25;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-sky-600 via-transparent to-transparent">
@@ -289,7 +308,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                     {inning.bowlers.length != 0 ?
                                         <CardContent>
                                             <div className="space-y-2">
-                                                {inning.batsmen?.map((batsman) => {
+                                                {inning.batsmen?.map((batsman, number) => {
                                                     const isBatting = batsman.batting === "true";
                                                     const isOut = batsman.how_out !== "Not out";
 
@@ -305,6 +324,16 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                                             onClick={() => {
                                                                 if (!isOut && idx == (Number(data.latest_inning_number) - 1)) {
                                                                     setBettingPlayer(batsman)
+                                                                    setBettingNumber(number)
+                                                                    setCurrentPrice(
+                                                                        basePrice
+                                                                        - (Number(batsman.run0) * 0.5)
+                                                                        + (Number(batsman.run1) * 0.75)
+                                                                        + (Number(batsman.run2) * 1.25)
+                                                                        + (Number(batsman.run3) * 2)
+                                                                        + (Number(batsman.fours) * 3)
+                                                                        + (Number(batsman.sixes) * 4.5)
+                                                                    )
                                                                     setIsBettingModalOpen(true)
                                                                 }
                                                             }}
@@ -675,7 +704,12 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                     <p className="text-sm font-bold text-gray-400">Dot %</p>
                                 </div>
                                 <div className="bg-gray-800/40 font-bold rounded-lg p-4">
-                                    <p className="text-2xl font-bold text-white">₹{30}</p>
+                                    <p className="text-2xl font-bold text-white">₹{basePrice}</p>
+                                    <p className="text-sm text-gray-400">Base Price</p>
+                                </div>
+
+                                <div className="bg-gray-800/40 font-bold rounded-lg p-4">
+                                    <p className="text-2xl font-bold text-white">₹{currentPrice}</p>
                                     <p className="text-sm text-gray-400">Price</p>
                                 </div>
                             </div>
@@ -702,8 +736,9 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                 <button
                                     className="flex-1 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-bold py-3 text-lg shadow-md transition cursor-pointer"
                                     onClick={async () => {
-                                        const data = await buyPlayer(bettingPlayer, "30", String(quantity), match_id)
+                                        const data = await buyPlayer(bettingPlayer, String(currentPrice), String(quantity), match_id)
                                         toast(data.message)
+                                        console.log(bettingPlayer)
                                     }}
                                 >
                                     Buy Player
@@ -711,7 +746,7 @@ export default function MatchScorecard({ matchData }: MatchScorecardProps) {
                                 <button
                                     className="flex-1 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold py-3 text-lg shadow-md transition cursor-pointer"
                                     onClick={async () => {
-                                        const data = await sellPlayer(bettingPlayer, "35", String(quantity), match_id)
+                                        const data = await sellPlayer(bettingPlayer, "40", String(quantity), match_id)
                                         toast(data.message)
                                     }}
                                 >
